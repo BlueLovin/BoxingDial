@@ -9,6 +9,7 @@ function App() {
   const [activeItem, setActiveItem] = useState({
     fight: "",
     content: "",
+    comments: [],
   })
   useEffect(() => {
     refreshPostList();
@@ -17,7 +18,6 @@ function App() {
   const refreshPostList = () => {
     axios
       .get("/api/posts/")
-      // .then((res) => this.setState({ postList: res.data }))
       .then((res) => setpostList(res.data))
       .catch((err) => console.log(err));
   };
@@ -47,7 +47,7 @@ function App() {
   };
 
   const createItem = () => {
-    const item = { fight: "", content: "" };
+    const item = { fight: "", content: "", comments: []};
     setActiveItem(item);
     setModal(!modal);
 

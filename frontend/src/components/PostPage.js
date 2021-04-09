@@ -57,7 +57,10 @@ export default function Comments() {
       .post("/api/comments/", item)
       .then((res) => getComments());
 
-    setActiveItem({})
+    setActiveItem({ // RESET TEXT BOX
+      post: postID,
+      content: "",
+    })
   };
 
   const deleteComment = (comment) => {
@@ -116,15 +119,16 @@ export default function Comments() {
       <div className="h3 text-info">
         comments
         </div>
-      <div className="list-group-item d-flex justify-content-between align-items-center">
-        share your dumbass thoughts
+      <div className="list-group-item text-center align-items-center">
+        <h3>share your dumbass thoughts</h3>
         <FormGroup>
-          <textarea type="text"
+          <Input type="textarea"
             name="content"
             value={activeItem.content} 
             onChange={handleChange}/>
             </FormGroup>
-          <Button onClick={() => submitComment(activeItem)}>post</Button>
+          <Button color="success"
+          onClick={() => submitComment(activeItem)}>post</Button>
       </div>
       </Container>
       <div>

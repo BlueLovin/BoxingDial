@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class SocialmediasiteConfig(AppConfig):
+class socialmediasiteConfig(AppConfig):
     name = 'socialmediasite'
