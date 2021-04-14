@@ -1,14 +1,16 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Modal from "./Modal";
-import Login from "./accounts/Login"
 import Register from "./accounts/Register"
 import ShowUser from "./ShowUser"
 import axios from "axios";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
+import { UserContext } from "../UserContext";
 
 function App() {
   const [postList, setpostList] = useState([]);
   const [modal, setModal] = useState(false);
+  const {user, setUser} = useContext(UserContext);
+
   const [activeItem, setActiveItem] = useState({
     fight: "",
     content: "",
@@ -17,7 +19,21 @@ function App() {
 
   useEffect(() => {
     refreshPostList();
+    fetchUser();
   }, [])
+
+  const fetchUser = () => {
+    var myToken = localStorage.getItem('token');
+    axios.get("api/token-auth/user", {
+        headers: {
+            "Authorization": `Token ${myToken
+                }`
+        }
+    }).then((res) => setUser(res["data"])).catch(function (error) {
+        console.log(error.response.status) // 401
+        console.log(error.response.data.error) //Please Authenticate or whatever returned from server
+    });
+}
 
   const refreshPostList = () => {
     axios
@@ -68,7 +84,7 @@ function App() {
   const renderPosts = () => {
 
     return postList.map((item) => (
-      <div>
+      <>
         <li
           key={item.id}
           className="list-group-item d-flex justify-content-between align-items-center"
@@ -105,7 +121,7 @@ function App() {
           by username123
         </div>
         <hr />
-      </div>
+      </>
     ));
 
 
@@ -113,7 +129,7 @@ function App() {
   return (
     <main className="container">
       <ShowUser />
-
+      {JSON.stringify(user)}
       <div className="row">
         <div className="col-md-6 col-sm-10 mx-auto p-0">
           <div className="card p-3">

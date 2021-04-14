@@ -1,90 +1,74 @@
-import {useEffect, useState} from "react"
+import { useEffect, useContext } from "react"
 import useLocalStorage from "./hooks/useLocalStorage"
 import axios from "axios";
-import { Link } from "react-router-dom/cjs/react-router-dom.min";
-import Logout from "./accounts/Logout";
+import { NavbarBrand } from "reactstrap";
+import { NavLink } from "react-router-dom";
+import { UserContext } from "../UserContext";
 
 
 export default function ShowUser() {
-    const [user, setUser] = useState({});
     const [token, setToken] = useLocalStorage();
-    const [loggedIn, setLoggedIn] = useState();
+    const {user, setUser} = useContext(UserContext);
+
 
 
     useEffect(() => { // update user
         getToken();
-        fetchUser();
-    });
+        renderUsername();
+    }, []);
 
     const getToken = () => {
         setToken(localStorage.getItem('token'));
-        if(token.Length > 1){
-            setLoggedIn(true);
+        if (token.Length > 1) {
+            console.log("weeee boi");
         }
     }
 
-    const Logout = () => {
-        setLoggedIn(false);
+    const Logout = async () => {
+        setUser(null);
 
         getToken();
-    
+
         axios.post("api/token-auth/logout", {}, {
             headers: {
-                "Authorization": `Token ${
-                    token
-                }`
-            }
-        }).then(//redirect
-        )
-        .catch(function (error) {
-            console.log(error.response.status) // 401
-            console.log(error.response.data.error) //Please Authenticate or whatever returned from server
-        });
-    }
-
-
-    const fetchUser = () => {
-            axios.get("api/token-auth/user", {
-                headers: {
-                    "Authorization": `Token ${
-                        token
+                "Authorization": `Token ${token
                     }`
-                }
-            }).then((res) => setUser(res.data)).catch(function (error) {
+            }
+        }).then(
+            window.location.reload()// reload page
+        )
+            .catch(function (error) {
                 console.log(error.response.status) // 401
                 console.log(error.response.data.error) //Please Authenticate or whatever returned from server
             });
-        }
+    }
+
+
     
-        console.log(user);
+
 
     const renderUsername = () => {
 
-        if(user.username){
-            return(
+        if (user) {
+            return (
                 <div>
-                    <h1>
-                        Welcome, {user.username}! <Link onClick={() => Logout()}>Logout</Link>
-                    </h1>
+                    <NavbarBrand>Welcome, {user.username}! </NavbarBrand>
+                    <NavLink onClick={() => Logout()} to="/">Logout</NavLink>
                 </div>
             )
         }
-        else{
-            return(
+        else {
+            return (
                 <div>
-                    <h1>
-                    <Link to='/login'>Login</Link>
-                    </h1>
+                    <NavLink to="/login">Login</NavLink>
                 </div>
             )
         }
     }
 
-    return(
+    return (
         <div className="text-center">
-            <h1>
-                {renderUsername()}
-            </h1>
+            {renderUsername()}
         </div>
     )
 }

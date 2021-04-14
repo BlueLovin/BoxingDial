@@ -1,9 +1,10 @@
-import React, {Component, useEffect, useState} from "react";
-import {Link, Redirect} from 'react-router-dom';
+import React, {useContext, useState} from "react";
+import {Link} from 'react-router-dom';
 import axios from "axios";
 import {
     Button
   } from "reactstrap";
+import { UserContext } from "../../UserContext";
 
 export default function Register() {
     const [activeItem, setActiveItem] = useState({
@@ -11,6 +12,7 @@ export default function Register() {
         email: '',
         password: ''
     });
+    const {setUser} = useContext(UserContext);
 
     const handleChange = (e) => { // this.setState({ [e.target.name]: e.target.value });
         let {name, value} = e.target;
@@ -29,7 +31,10 @@ export default function Register() {
         console.log(activeItem)
         axios // create
         .post("/api/token-auth/register", item)
-        .then((res) => alert(res));
+        .then((res) => {
+            localStorage.setItem('token', res.data.token);
+            setUser(res.data);
+        });
 
         setActiveItem({ // RESET TEXT BOX
             username: '',

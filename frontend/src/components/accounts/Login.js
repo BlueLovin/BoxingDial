@@ -1,22 +1,23 @@
-import React, {useState} from "react";
-import useLocalStorage from "../hooks/useLocalStorage"
-import {Link, Redirect} from 'react-router-dom';
+import React, { useState, useContext } from "react";
+import { Link } from 'react-router-dom';
 import axios from "axios";
 import {
     Button
-  } from "reactstrap";
-  
+} from "reactstrap";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { UserContext } from "../../UserContext";
 
-export default function Register() {
+
+export default function Login() {
     const [activeItem, setActiveItem] = useState({
         username: '',
         password: '',
     });
-    // const [token, setToken] = useLocalStorage("token", "");
-    const [loggedIn, setLoggedIn] = useState(false);
+    const history = useHistory();
+    const { setUser } = useContext(UserContext);
 
     const handleChange = (e) => { // this.setState({ [e.target.name]: e.target.value });
-        let {name, value} = e.target;
+        let { name, value } = e.target;
 
         const item = {
             ...activeItem,
@@ -27,54 +28,58 @@ export default function Register() {
         console.log(activeItem)
     }
 
-    const submitUser = (item) => {
+    const submitUser = async (item) => {
         console.log(activeItem)
         axios // create
-        .post("/api/token-auth/login", item)
-        .then(res => {
-          localStorage.setItem('token', res.data.token);
-        //   axios.get("api/token-auth/user", { headers: {"Authorization" : `Token ${res.data.token}`}}).then((res)=>alert(JSON.stringify(res)));
-        }).catch((res) => alert(res));
+            .post("/api/token-auth/login", item)
+            .then(res => {
+                localStorage.setItem('token', res.data.token);
+                setUser(res.data.user);
+            }).catch((res) => alert(res));
 
         setActiveItem({ // RESET TEXT BOX
             username: '',
             password: '',
         })
+
+        history.push("/");
     };
 
     return (
-        <div className="col-md-6 m-auto">
+        <div className="col-md-6 mx-auto text-center container w-25 d-flex justify-content-center">
             <div className="card card-body mt-5">
-            {loggedIn ? <Redirect to="/"/> : null}
-                <h2 className="text-center">Login</h2>
-                    <div className="form-group">
-                        <label>Username</label>
-                        <input type="text" className="form-control" name="username"
-                            onChange={handleChange}
-                            value={
-                                activeItem.username
-                            }/>
-                    </div>
-                    <div className="form-group">
-                        <label>Password</label>
-                        <input type="password" className="form-control" name="password"
-                            onChange={handleChange}
-                            value={
-                                activeItem.password
-                            }/>
-                    </div>
-                    <div className="form-group">
-                        <Button color="success"
-                            onClick={
-                                () => submitUser(activeItem)
-                        }>
-                            Register
+                <h2 className="font-weight-bold">Login</h2>
+                <div className="form-group text-center">
+                    <br />
+
+                    <input type="text" className="form-control" name="username"
+                        placeholder="Username"
+                        onChange={handleChange}
+                        value={
+                            activeItem.username
+                        } />
+                </div>
+                <div className="form-group text-center">
+                    <input type="password" className="form-control" name="password"
+                        placeholder="Password"
+                        onChange={handleChange}
+                        value={
+                            activeItem.password
+                        } />
+                </div>
+                <div className="form-group text-center">
+                    <Button color="success"
+                        onClick={
+                            () => submitUser(activeItem)
+                        }
+                    >
+                        Login
                         </Button>
-                    </div>
-                    <p>
-                        Don't have an account?
-                        <Link to="/register">Login</Link>
-                    </p>
+                </div>
+                <p>
+                    Don't have an account?
+                        <Link to="/register"> Register</Link>
+                </p>
             </div>
         </div>
     )
