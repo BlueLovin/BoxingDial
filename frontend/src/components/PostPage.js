@@ -41,7 +41,7 @@ export default function Comments() {
   var handleChange = (e) => {
     let { name, value } = e.target;
 
-    const item = {post: postID, [name]: value };
+    const item = { post: postID, [name]: value };
 
     setActiveItem(item);
   };
@@ -71,9 +71,9 @@ export default function Comments() {
 
   const getPost = () => {
     axios
-    .get("/api/posts/" + postID) // get current post
-    .then((res) => setCurrentPost(res.data))// grabs the comments right here
-    .catch((err) => alert(err));
+      .get("/api/posts/" + postID) // get current post
+      .then((res) => setCurrentPost(res.data))// grabs the comments right here
+      .catch((err) => alert(err));
   }
 
   const getComments = () => {
@@ -84,53 +84,63 @@ export default function Comments() {
   };
 
   const renderPost = (post) => {
-    return(
-    <Container>
-      <div className="list-group-item d-flex justify-content-between align-items-center">
-        <p>{post.content}</p> by fuckhead123
-      </div>
-    </Container>
+    return (
+      <Container>
+        <div className="list-group-item">
+          <p className="font-weight-light list-group-item bg-light">{post.content}</p>
+          <p className="text-muted"> by fuckhead123</p>
+        </div>
+      </Container>
     )
   }
 
   const renderComments = () => {
-    return commentList.map((comment) => (
+    return commentList.slice(0).reverse().map((comment) => (
       <Container>
-      <div className="list-group-item d-flex justify-content-between align-items-center">
-        <p>{comment.content}</p>
-        <a>by user123</a>
-        <button
+
+        <div className="list-group-item bg-light">
+          <p>{comment.content}</p>
+          <div className="list-group-item d-flex justify-content-between align-items-center">
+            <Label>by user123</Label>
+            <button
               className="btn btn-danger"
               onClick={() => deleteComment(comment)}
             >
               Delete
           </button>
-      </div>
+          </div>
+        </div>
+        <hr />
       </Container>
+
     ));
   }
 
   return (
     <div>
       {renderPost(currentPost)}
-
-
       <Container>
-      <div className="h3 text-info">
-        comments
+        <div className="h3 text-info font-weight-bold">
+          <br />
+          {commentList.length} comments
         </div>
-      <div className="list-group-item text-center align-items-center">
-        <h3>share your dumbass thoughts</h3>
-        <FormGroup>
-          <Input type="textarea"
-            name="content"
-            value={activeItem.content} 
-            onChange={handleChange}/>
-            </FormGroup>
-          <Button color="success"
-          onClick={() => submitComment(activeItem)}>post</Button>
-      </div>
+        <br />
+        <div className="list-group-item text-center align-items-center p-5">
+          <h4>share your dumbass thoughts</h4>
+
+          <FormGroup>
+            <Input type="textarea"
+              name="content"
+              value={activeItem.content}
+              onChange={handleChange} />
+          </FormGroup>
+
+          <Button color="success" onClick={() => submitComment(activeItem)}>
+            Post
+            </Button>
+        </div>
       </Container>
+      <br />
       <div>
         {renderComments()}
       </div>

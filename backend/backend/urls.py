@@ -11,4 +11,5 @@ router.register(r'comments', views.PostCommentsView, 'postcomment')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('', include('accounts.urls')),
 ]

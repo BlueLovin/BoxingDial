@@ -1,5 +1,8 @@
 import React, { Component, useEffect, useState } from "react";
 import Modal from "./Modal";
+import Login from "./accounts/Login"
+import Register from "./accounts/Register"
+import ShowUser from "./ShowUser"
 import axios from "axios";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
@@ -11,6 +14,7 @@ function App() {
     content: "",
     comments: [],
   })
+
   useEffect(() => {
     refreshPostList();
   }, [])
@@ -47,7 +51,7 @@ function App() {
   };
 
   const createItem = () => {
-    const item = { fight: "", content: "", comments: []};
+    const item = { fight: "", content: "", comments: [] };
     setActiveItem(item);
     setModal(!modal);
 
@@ -75,14 +79,14 @@ function App() {
             {item.fight}
           </span>
           <span>
-              <Link to={"/post/" + item.id}>
-            <button
-              className="btn btn-secondary mr-2"
-              href="/post/"
-            >
-              View
+            <Link to={"/post/" + item.id}>
+              <button
+                className="btn btn-secondary mr-2"
+                href="/post/"
+              >
+                View
           </button>
-          </Link>
+            </Link>
             <button
               className="btn btn-secondary mr-2"
               onClick={() => editItem(item)}
@@ -96,13 +100,11 @@ function App() {
               Delete
           </button>
           </span>
-          <span>
-            fucl yuo
-        </span>
         </li>
         <div className="container flex-d">
           by username123
         </div>
+        <hr />
       </div>
     ));
 
@@ -110,16 +112,17 @@ function App() {
   };
   return (
     <main className="container">
-      <h1 className="text-white text-uppercase text-center my-4">Post app</h1>
+      <ShowUser />
+
       <div className="row">
         <div className="col-md-6 col-sm-10 mx-auto p-0">
           <div className="card p-3">
-            <div className="mb-4">
+            <div className="mb-4 text-center">
               <button
-                className="btn btn-primary"
+                className="btn btn-primary "
                 onClick={createItem}
               >
-                Add task
+                Create Post
                 </button>
             </div>
             <ul className="list-group list-group-flush border-top-0">
@@ -135,6 +138,7 @@ function App() {
           onSave={submitPost}
         />
       ) : null}
+      <Register />
     </main>
   );
 }
