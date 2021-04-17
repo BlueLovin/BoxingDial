@@ -8,9 +8,9 @@ django = "*"
 djangorestframework = "*"
 django-cors-headers = "*"
 djangorestframework-jwt = "*"
-knox = "*"
 cryptography = "*"
 django-rest-knox = "*"
+jinja2 = "*"
 
 [dev-packages]
 

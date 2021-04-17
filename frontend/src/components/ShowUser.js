@@ -19,9 +19,6 @@ export default function ShowUser() {
 
     const getToken = () => {
         setToken(localStorage.getItem('token'));
-        if (token.Length > 1) {
-            console.log("weeee boi");
-        }
     }
 
     const Logout = async () => {
