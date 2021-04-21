@@ -11,6 +11,7 @@ import NavigationBar from "./components/NavBar";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const value = useMemo(()=>({user, setUser}), [user, setUser]);
   return (
     <BrowserRouter>

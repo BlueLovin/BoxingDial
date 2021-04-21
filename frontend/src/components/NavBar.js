@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Navbar, Nav, NavItem, NavLink, NavbarBrand, NavbarToggler, Collapse, UncontrolledDropdown, DropdownMenu, DropdownItem, NavbarText, DropdownToggle } from "reactstrap";
 import ShowUser from "./ShowUser";
 
-
 export default function NavigationBar() {
   const [isOpen, setIsOpen] = useState(false);
 

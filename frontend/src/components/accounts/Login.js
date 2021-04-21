@@ -30,7 +30,7 @@ export default function Login() {
 
     const submitUser = async (item) => {
         console.log(activeItem)
-        axios // create
+        await axios // create
             .post("/api/token-auth/login", item)
             .then(res => {
                 localStorage.setItem('token', res.data.token);

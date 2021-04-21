@@ -19,9 +19,6 @@ export default function ShowUser() {
 
     const getToken = () => {
         setToken(localStorage.getItem('token'));
-        if (token.Length > 1) {
-            console.log("weeee boi");
-        }
     }
 
     const Logout = async () => {
@@ -41,6 +38,7 @@ export default function ShowUser() {
                 console.log(error.response.status) // 401
                 console.log(error.response.data.error) //Please Authenticate or whatever returned from server
             });
+        localStorage.removeItem('token');
     }
 
 

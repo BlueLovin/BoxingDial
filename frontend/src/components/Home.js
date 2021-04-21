@@ -9,30 +9,39 @@ import { UserContext } from "../UserContext";
 function App() {
   const [postList, setpostList] = useState([]);
   const [modal, setModal] = useState(false);
+  const [token, setToken] = useState('');
   const {user, setUser} = useContext(UserContext);
-
+  const {} = useContext(UserContext);
   const [activeItem, setActiveItem] = useState({
     fight: "",
     content: "",
     comments: [],
+    owner: user ? user.id : null,
   })
 
-  useEffect(() => {
+  useEffect(async () => {
+    setToken(localStorage.getItem('token'));
+    await fetchUser();
     refreshPostList();
-    fetchUser();
-  }, [])
+  }, [token])
 
-  const fetchUser = () => {
-    var myToken = localStorage.getItem('token');
-    axios.get("api/token-auth/user", {
-        headers: {
-            "Authorization": `Token ${myToken
-                }`
-        }
-    }).then((res) => setUser(res["data"])).catch(function (error) {
-        console.log(error.response.status) // 401
-        console.log(error.response.data.error) //Please Authenticate or whatever returned from server
-    });
+const fetchUser = async () => {
+    console.log(token);
+    if(token !== ''){  
+      await axios.get("api/token-auth/user", {
+          headers: {
+              "Authorization": `Token ${token}`
+          }
+      }).then((res) => setUser(res.data)).catch(function (error) {
+          console.log(error.response.status) // 401
+          console.log(error.response.data.error) //Please Authenticate or whatever returned from server
+      });
+  }
+}
+
+const options = {
+  'content-type': 'application/json',
+  'Authorization': `Token ${token}`,
 }
 
   const refreshPostList = () => {
@@ -46,17 +55,17 @@ function App() {
     setModal(!modal);
   };
 
-  const submitPost = (item) => {
+  const submitPost = async (item) => {
     toggle();
 
     if (item.id) {
-      axios
+      await axios
         .put(`/api/posts/${item.id}/`, item)
         .then((res) => refreshPostList());
       return;
     }
-    axios
-      .post("/api/posts/", item)
+    await axios
+      .post("/api/posts/", item, {headers: options})
       .then((res) => refreshPostList());
   };
 
@@ -67,7 +76,7 @@ function App() {
   };
 
   const createItem = () => {
-    const item = { fight: "", content: "", comments: [] };
+    const item = { fight: "", content: "", comments: [], owner: user ? user.id : null };
     setActiveItem(item);
     setModal(!modal);
 
@@ -118,7 +127,7 @@ function App() {
           </span>
         </li>
         <div className="container flex-d">
-          by username123
+          by {item.owner ? item.owner : "null"}
         </div>
         <hr />
       </>
@@ -129,7 +138,8 @@ function App() {
   return (
     <main className="container">
       <ShowUser />
-      {JSON.stringify(user)}
+      {JSON.stringify(user)}<br/>
+      {JSON.stringify(token)}
       <div className="row">
         <div className="col-md-6 col-sm-10 mx-auto p-0">
           <div className="card p-3">

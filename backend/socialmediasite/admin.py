@@ -4,7 +4,7 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ('fight', 'content')
 
 class PostCommentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'content', 'post')
+    list_display = ('id', 'content', 'post',)
     search_fields = ('post', 'content') 
 
     def approve_comments(self, request, queryset):

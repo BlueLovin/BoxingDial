@@ -33,7 +33,7 @@ export default function Register() {
         .post("/api/token-auth/register", item)
         .then((res) => {
             localStorage.setItem('token', res.data.token);
-            setUser(res.data);
+            setUser(res.data.user);
         });
 
         setActiveItem({ // RESET TEXT BOX

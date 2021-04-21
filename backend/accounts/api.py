@@ -29,7 +29,7 @@ class LoginAPI(generics.GenericAPIView):
         return Response({
             "user": UserSerializer(user,
              context=self.get_serializer_context()).data,
-             "token": token[1] # must be subscripted
+             "token": token[1] # must be subscripted 
         })
 
 class UserAPI(generics.RetrieveAPIView):
@@ -37,6 +37,5 @@ class UserAPI(generics.RetrieveAPIView):
         permissions.IsAuthenticated,
     ]
     serializer_class = UserSerializer
-
     def get_object(self):
         return self.request.user
