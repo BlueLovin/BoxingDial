@@ -7,9 +7,9 @@ name = "pypi"
 djangorestframework = "==3.11.0"
 django-cors-headers = "==3.2.0"
 djangorestframework-jwt = "*"
-knox = "*"
 cryptography = "*"
 django-rest-knox = "*"
+<<<<<<< HEAD
 appdirs = "==1.4.3"
 asgiref = "==3.2.3"
 attrs = "==19.3.0"
@@ -25,6 +25,9 @@ sqlparse = "==0.3.0"
 toml = "==0.10.0"
 typed-ast = "==1.4.1"
 Django = "==3.0.3"
+=======
+jinja2 = "*"
+>>>>>>> 5aefe9d8511bf9770ba412d388d1380703db7f10
 
 [dev-packages]
 
