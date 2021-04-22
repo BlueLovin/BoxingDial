@@ -14,9 +14,11 @@ export default function Login() {
         password: '',
     });
     const history = useHistory();
-    const {userVal} = useContext(UserContext);
-    const [setUser] = userVal;
-    const handleChange = (e) => { // this.setState({ [e.target.name]: e.target.value });
+    const {userVal, tokenVal} = useContext(UserContext);
+    const [user, setUser] = userVal;
+    const [token, setToken] = tokenVal;
+
+    const handleChange = (e) => { 
         let { name, value } = e.target;
 
         const item = {
@@ -39,6 +41,7 @@ export default function Login() {
             username: '',
             password: '',
         })
+        setToken(localStorage.getItem('token'));
 
         history.push("/");
     };
