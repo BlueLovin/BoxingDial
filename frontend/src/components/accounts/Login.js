@@ -14,8 +14,8 @@ export default function Login() {
         password: '',
     });
     const history = useHistory();
-    const { setUser } = useContext(UserContext);
-
+    const {userVal} = useContext(UserContext);
+    const [setUser] = userVal;
     const handleChange = (e) => { // this.setState({ [e.target.name]: e.target.value });
         let { name, value } = e.target;
 
@@ -25,11 +25,9 @@ export default function Login() {
         };
 
         setActiveItem(item);
-        console.log(activeItem)
     }
 
     const submitUser = async (item) => {
-        console.log(activeItem)
         await axios // create
             .post("/api/token-auth/login", item)
             .then(res => {

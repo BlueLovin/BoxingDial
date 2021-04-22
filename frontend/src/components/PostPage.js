@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { UserContext } from "../UserContext";
 import {
   Button,
   FormGroup,
@@ -21,33 +22,33 @@ export default function Comments() {
     content: "",
   });
 
+  const {tokenVal, userVal} = useContext(UserContext);
+  const [token, setToken] = tokenVal;
+  const [user] = userVal;
   const [activeItem, setActiveItem] = useState({
     post: postID,
     content: "",
   })
 
-  useEffect(() => {
+  useEffect( async () => {
     getComments();
     getPost();
-  }, [])
+  }, [token])
 
   var handleChange = (e) => {
     let { name, value } = e.target;
 
-    const item = { post: postID, [name]: value };
-
+    const item = { post: postID, [name]: value, username: user ? user.username : "null"};
     setActiveItem(item);
   };
 
+const options = {
+  'content-type': 'application/json',
+  'Authorization': `Token ${token}`,
+}
   const submitComment = (item) => {
-    if (item.id) { // edit
-      axios
-        .put(`/api/comments/${item.id}/`, item)
-        .then((res) => getComments());
-      return;
-    }
     axios // create
-      .post("/api/comments/", item)
+      .post("/api/comments/", item, {headers: options})
       .then((res) => getComments());
 
     setActiveItem({ // RESET TEXT BOX
@@ -81,7 +82,7 @@ export default function Comments() {
       <Container>
         <div className="list-group-item">
           <p className="font-weight-light list-group-item bg-light">{post.content}</p>
-          <p className="text-muted"> by fuckhead123</p>
+          <p className="text-muted"> by {post.username}</p>
         </div>
       </Container>
     )
@@ -94,7 +95,7 @@ export default function Comments() {
         <div className="list-group-item bg-light">
           <p>{comment.content}</p>
           <div className="list-group-item d-flex justify-content-between align-items-center">
-            <Label>by user123</Label>
+            <Label>by {comment.username}</Label>
             <button
               className="btn btn-danger"
               onClick={() => deleteComment(comment)}

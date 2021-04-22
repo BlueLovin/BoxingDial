@@ -67,6 +67,8 @@ sdist/
 var/
 wheels/
 pip-wheel-metadata/
+Pipfile
+Pipfile.lock
 share/python-wheels/
 *.egg-info/
 .installed.cfg

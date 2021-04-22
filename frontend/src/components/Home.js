@@ -9,35 +9,22 @@ import { UserContext } from "../UserContext";
 function App() {
   const [postList, setpostList] = useState([]);
   const [modal, setModal] = useState(false);
-  const [token, setToken] = useState('');
-  const {user, setUser} = useContext(UserContext);
-  const {} = useContext(UserContext);
+  const {tokenVal, userVal} = useContext(UserContext);
+  const [user, setUser] = userVal;
+  const [token, setToken] = tokenVal;
   const [activeItem, setActiveItem] = useState({
     fight: "",
     content: "",
     comments: [],
     owner: user ? user.id : null,
+    username: user ? user.username : null,
   })
 
   useEffect(async () => {
-    setToken(localStorage.getItem('token'));
-    await fetchUser();
     refreshPostList();
   }, [token])
 
-const fetchUser = async () => {
-    console.log(token);
-    if(token !== ''){  
-      await axios.get("api/token-auth/user", {
-          headers: {
-              "Authorization": `Token ${token}`
-          }
-      }).then((res) => setUser(res.data)).catch(function (error) {
-          console.log(error.response.status) // 401
-          console.log(error.response.data.error) //Please Authenticate or whatever returned from server
-      });
-  }
-}
+
 
 const options = {
   'content-type': 'application/json',
@@ -76,7 +63,7 @@ const options = {
   };
 
   const createItem = () => {
-    const item = { fight: "", content: "", comments: [], owner: user ? user.id : null };
+    const item = { fight: "", content: "", comments: [], owner: user.id , username: user.username};
     setActiveItem(item);
     setModal(!modal);
 
@@ -127,7 +114,7 @@ const options = {
           </span>
         </li>
         <div className="container flex-d">
-          by {item.owner ? item.owner : "null"}
+          by {item.username ? item.username : "null"}
         </div>
         <hr />
       </>

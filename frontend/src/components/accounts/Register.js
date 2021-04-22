@@ -12,7 +12,8 @@ export default function Register() {
         email: '',
         password: ''
     });
-    const {setUser} = useContext(UserContext);
+    const {userVal} = useContext(UserContext);
+    const [setUser] = userVal;
 
     const handleChange = (e) => { // this.setState({ [e.target.name]: e.target.value });
         let {name, value} = e.target;
@@ -23,12 +24,9 @@ export default function Register() {
         };
 
         setActiveItem(item);
-        console.log(activeItem)
     }
 
     const submitUser = (item) => {
-
-        console.log(activeItem)
         axios // create
         .post("/api/token-auth/register", item)
         .then((res) => {

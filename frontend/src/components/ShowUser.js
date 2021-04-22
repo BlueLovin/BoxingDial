@@ -8,7 +8,9 @@ import { UserContext } from "../UserContext";
 
 export default function ShowUser() {
     const [token, setToken] = useLocalStorage();
-    const {user, setUser} = useContext(UserContext);
+    const {userVal} = useContext(UserContext);
+    const [user, setUser] = userVal; 
+
 
 
 

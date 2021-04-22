@@ -5,6 +5,7 @@ class Post(models.Model):
     fight = models.CharField(max_length=120)
     content = models.TextField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts', null=True)
+    username = models.TextField()
 
     def _str_(self):
         return self.fight
@@ -15,6 +16,7 @@ class PostComment(models.Model):
     content = models.TextField() 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments', null=True)
 
+    username = models.TextField()
 
     def __str__(self):
         return self.content
