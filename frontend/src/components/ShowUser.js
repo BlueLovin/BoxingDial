@@ -17,7 +17,7 @@ export default function ShowUser() {
     useEffect(() => { // update user
         getToken();
         renderUsername();
-    }, []);
+    }, [token]);
 
     const getToken = () => {
         setToken(localStorage.getItem('token'));

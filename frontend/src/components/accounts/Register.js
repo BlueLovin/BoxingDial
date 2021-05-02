@@ -13,7 +13,7 @@ export default function Register() {
         password: ''
     });
     const {userVal} = useContext(UserContext);
-    const [setUser] = userVal;
+    const [user, setUser] = userVal;
 
     const handleChange = (e) => { // this.setState({ [e.target.name]: e.target.value });
         let {name, value} = e.target;
