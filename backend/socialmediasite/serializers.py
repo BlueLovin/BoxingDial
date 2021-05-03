@@ -3,6 +3,12 @@ from .models import Post, PostComment
 from django.contrib.auth.models import User
 
 
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
+
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostComment

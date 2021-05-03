@@ -11,9 +11,6 @@ export default function ShowUser() {
     const {userVal} = useContext(UserContext);
     const [user, setUser] = userVal; 
 
-
-
-
     useEffect(() => { // update user
         getToken();
         renderUsername();

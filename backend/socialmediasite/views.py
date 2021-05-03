@@ -1,11 +1,17 @@
 from rest_framework import viewsets, permissions, generics
 from .models import Post, PostComment
-from .serializers import PostSerialzer, CommentSerializer
+from .serializers import PostSerialzer, CommentSerializer, UserSerializer
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
 
 # Create your views here.
+class UsersView(generics.ListAPIView):
+	serializer_class = UserSerializer
+	queryset = User.objects.all()
+
+	def get_queryset(self):
+		return User.objects.all()
 
 class UserPostListView(generics.ListAPIView):
 	serializer_class = PostSerialzer

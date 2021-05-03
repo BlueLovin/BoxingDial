@@ -4,6 +4,7 @@ import axios from "axios";
 import Home from "./components/Home";
 import Comments from "./components/PostPage"
 import Login from "./components/accounts/Login"
+import UserProfile from "./components/accounts/UserProfile"
 import ShowUser from "./components/ShowUser"
 import { UserContext } from "./UserContext"
 
@@ -22,7 +23,7 @@ function App() {
   const fetchUser = async () => {
     console.log(token);
     if (token !== '' && token) {
-      await axios.get("api/token-auth/user", {
+      await axios.get("/api/token-auth/user", {
         headers: {
           "Authorization": `Token ${token}`
         }
@@ -45,6 +46,10 @@ function App() {
 
           <Route path="/post/:id" exact>
             <Comments />
+          </Route>
+
+          <Route path="/user/:username" exact>
+            <UserProfile/>
           </Route>
 
           <Route path="/register" exact>

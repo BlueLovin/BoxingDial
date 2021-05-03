@@ -22,15 +22,16 @@ export default function Comments() {
     content: "",
   });
 
-  const {tokenVal, userVal} = useContext(UserContext);
+  const { tokenVal, userVal } = useContext(UserContext);
   const [token, setToken] = tokenVal;
   const [user] = userVal;
   const [activeItem, setActiveItem] = useState({
     post: postID,
     content: "",
+    user: user ? user.id : null,
   })
 
-  useEffect( async () => {
+  useEffect(async () => {
     getComments();
     getPost();
   }, [token])
@@ -38,17 +39,17 @@ export default function Comments() {
   var handleChange = (e) => {
     let { name, value } = e.target;
 
-    const item = { post: postID, [name]: value, username: user ? user.username : "null"};
+    const item = { post: postID, [name]: value, username: user ? user.username : "null", user: user ? user.id : null };
     setActiveItem(item);
   };
 
-const options = {
-  'content-type': 'application/json',
-  'Authorization': `Token ${token}`,
-}
+  const options = {
+    'content-type': 'application/json',
+    'Authorization': `Token ${token}`,
+  }
   const submitComment = (item) => {
     axios // create
-      .post("/api/comments/", item, {headers: options})
+      .post("/api/comments/", item, { headers: options })
       .then((res) => getComments());
 
     setActiveItem({ // RESET TEXT BOX
