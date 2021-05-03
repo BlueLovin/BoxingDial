@@ -14,11 +14,11 @@ export default function Login() {
         password: '',
     });
     const history = useHistory();
-    const {userVal, tokenVal} = useContext(UserContext);
+    const { userVal, tokenVal } = useContext(UserContext);
     const [user, setUser] = userVal;
     const [token, setToken] = tokenVal;
 
-    const handleChange = (e) => { 
+    const handleChange = (e) => {
         let { name, value } = e.target;
 
         const item = {
