@@ -13,6 +13,13 @@ class UsersView(generics.ListAPIView):
 	def get_queryset(self):
 		return User.objects.all()
 
+class UserView(generics.ListAPIView):
+	serializer_class = UserSerializer
+	queryset = User.objects.all()
+
+	def get_queryset(self):
+		return User.objects.filter(id=self.kwargs['user'])
+
 class UserPostListView(generics.ListAPIView):
 	serializer_class = PostSerialzer
 	queryset = Post.objects.all()

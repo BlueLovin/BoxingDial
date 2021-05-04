@@ -15,9 +15,9 @@ function App() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
 
-  useEffect(async () => {
+  useEffect(() => {
     setToken(localStorage.getItem('token'));
-    await fetchUser();
+    fetchUser();
   }, [token])
 
   const fetchUser = async () => {
@@ -37,7 +37,9 @@ function App() {
   
   return (
     <BrowserRouter>
-      <UserContext.Provider value={{ userVal: [user, setUser], tokenVal: [token, setToken] }}>
+      <UserContext.Provider 
+      value={{ userVal: [user, setUser],
+       tokenVal: [token, setToken] }}>
         <NavigationBar />
         <Switch>
           <Route path="/" exact>
@@ -48,7 +50,7 @@ function App() {
             <Comments />
           </Route>
 
-          <Route path="/user/:username" exact>
+          <Route path="/user/:userID" exact>
             <UserProfile/>
           </Route>
 

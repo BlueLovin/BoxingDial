@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../UserContext";
 import {
@@ -31,7 +31,7 @@ export default function Comments() {
     user: user ? user.id : null,
   })
 
-  useEffect(async () => {
+  useEffect(() => {
     getComments();
     getPost();
   }, [token])
@@ -83,7 +83,7 @@ export default function Comments() {
       <Container>
         <div className="list-group-item">
           <p className="font-weight-light list-group-item bg-light">{post.content}</p>
-          <p className="text-muted"> by {post.username}</p>
+          <Link to={`/user/${post.owner}`}><p className="text-muted"> by {post.username}</p></Link>
         </div>
       </Container>
     )
@@ -97,12 +97,13 @@ export default function Comments() {
           <p>{comment.content}</p>
           <div className="list-group-item d-flex justify-content-between align-items-center">
             <Label>by {comment.username}</Label>
-            <button
-              className="btn btn-danger"
-              onClick={() => deleteComment(comment)}
-            >
-              Delete
-          </button>
+            {user && user.username === comment.username ? (
+              <React.Fragment>
+                <button className="btn btn-danger" onClick={() => deleteComment(comment)}>
+                  Delete
+								</button>
+              </React.Fragment>
+            ) : null}
           </div>
         </div>
         <hr />
@@ -113,6 +114,7 @@ export default function Comments() {
 
   return (
     <div>
+      <br/>
       {renderPost(currentPost)}
       <Container>
         <div className="h3 text-info font-weight-bold">
