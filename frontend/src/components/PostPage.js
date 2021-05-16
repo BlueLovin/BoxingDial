@@ -28,7 +28,7 @@ export default function Comments() {
   const [activeItem, setActiveItem] = useState({
     post: postID,
     content: "",
-    user: user ? user.id : null,
+    owner: user ? user.id : null,
   })
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function Comments() {
   var handleChange = (e) => {
     let { name, value } = e.target;
 
-    const item = { post: postID, [name]: value, username: user ? user.username : "null", user: user ? user.id : null };
+    const item = { post: postID, [name]: value, username: user ? user.username : "null", owner: user ? user.id : null };
     setActiveItem(item);
   };
 
@@ -97,6 +97,8 @@ export default function Comments() {
           <p>{comment.content}</p>
           <div className="list-group-item d-flex justify-content-between align-items-center">
             <Label>by {comment.username}</Label>
+
+          <Link to={`/user/${comment.owner}`}><p className="text-muted"> by {comment.username}</p></Link>
             {user && user.username === comment.username ? (
               <React.Fragment>
                 <button className="btn btn-danger" onClick={() => deleteComment(comment)}>
