@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, PostComment
+from .models import Post, PostComment, Fight
 from django.contrib.auth.models import User
 
 
@@ -35,3 +35,16 @@ class PostSerialzer(serializers.ModelSerializer):
         for comments in comment_data:
             PostComment.objects.create(Post=post, **comments, owner=owner)
         return post
+class FightSerializer(serializers.ModelSerializer):
+    posts = PostSerialzer(many=True)
+    
+    class Meta:
+        model = Fight
+        fields = ('id', 'title', 'description', 'date', 'image_URL', 'posts')
+
+    def create(self, validated_data):
+        posts_data = validated_data.pop('posts')
+        fight = Fight.objects.create(**validated_data)
+        for posts in posts_data:
+            Post.objects.create(Fight=self.title, **posts)
+        return fight 

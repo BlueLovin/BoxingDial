@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import Post, PostComment
+from .models import Post, PostComment, Fight
 from django.contrib.auth.models import User
 
 class UserAdmin(BaseUserAdmin):
@@ -11,6 +11,9 @@ class UserAdmin(BaseUserAdmin):
 class PostAdmin(admin.ModelAdmin):
     list_display = ('fight', 'content')
 
+class FightAdmin(admin.ModelAdmin):
+    list_display = ('title', 'description')
+    search_fields = ('title', 'description')
 
 class PostCommentAdmin(admin.ModelAdmin):
     list_display = ('id', 'content', 'post')
@@ -22,4 +25,5 @@ class PostCommentAdmin(admin.ModelAdmin):
 admin.site.unregister(User)
 admin.site.register(Post, PostAdmin)
 admin.site.register(User, UserAdmin)
+admin.site.register(Fight, FightAdmin)
 admin.site.register(PostComment, PostCommentAdmin)

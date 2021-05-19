@@ -1,6 +1,6 @@
 from rest_framework import viewsets, permissions, generics
-from .models import Post, PostComment
-from .serializers import PostSerialzer, CommentSerializer, UserSerializer
+from .models import Post, PostComment, Fight
+from .serializers import PostSerialzer, CommentSerializer, UserSerializer, FightSerializer
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
@@ -8,28 +8,24 @@ from django.contrib.auth.models import User
 # Create your views here.
 class UsersView(generics.ListAPIView):
 	serializer_class = UserSerializer
-	queryset = User.objects.all()
 
 	def get_queryset(self):
 		return User.objects.all()
 
 class UserView(generics.ListAPIView):
 	serializer_class = UserSerializer
-	queryset = User.objects.all()
 
 	def get_queryset(self):
 		return User.objects.filter(id=self.kwargs['user'])
 
 class UserPostListView(generics.ListAPIView):
 	serializer_class = PostSerialzer
-	queryset = Post.objects.all()
 
 	def get_queryset(self):
 		return Post.objects.filter(owner=self.kwargs['user'])
 
 class UserCommentListView(generics.ListAPIView):
 	serializer_class = CommentSerializer
-	queryset = PostComment.objects.all()
 
 	def get_queryset(self):
 		return PostComment.objects.filter(owner=self.kwargs['user'])
@@ -49,3 +45,8 @@ class PostView(viewsets.ModelViewSet):
 class PostCommentsView(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     queryset = PostComment.objects.all()
+
+class FightView(viewsets.ModelViewSet):
+    serializer_class = FightSerializer
+    queryset = Fight.objects.all()
+

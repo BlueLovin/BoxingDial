@@ -6,6 +6,7 @@ from socialmediasite import views
 router = routers.DefaultRouter()
 router.register(r'posts', views.PostView, 'post')
 router.register(r'comments', views.PostCommentsView, 'postcomment')
+router.register(r'fights', views.FightView, 'fight')
 
 
 urlpatterns = [

@@ -24,3 +24,10 @@ class PostComment(models.Model):
 
     def __str__(self):
         return self.content
+
+class Fight(models.Model):
+    title = models.TextField()
+    description = models.TextField()
+    image_URL = models.TextField()
+    date = models.TextField()
+    posts = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='posts', blank=True, null=True)
