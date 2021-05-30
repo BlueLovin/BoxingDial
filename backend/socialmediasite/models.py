@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 
 class Post(models.Model):
-    fight = models.CharField(max_length=120)
+    fight = models.ForeignKey('Fight', on_delete=models.CASCADE, related_name='posts')
     content = models.TextField()
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='posts', null=True)
@@ -30,4 +30,7 @@ class Fight(models.Model):
     description = models.TextField()
     image_URL = models.TextField()
     date = models.TextField()
-    posts = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='posts', blank=True, null=True)
+    #posts = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='posts', blank=True, null=True)
+
+    def _str_(self):
+        return self.title

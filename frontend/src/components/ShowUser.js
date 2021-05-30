@@ -2,7 +2,7 @@ import { useEffect, useContext } from "react"
 import useLocalStorage from "./hooks/useLocalStorage"
 import axios from "axios";
 import { NavbarBrand } from "reactstrap";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { UserContext } from "../UserContext";
 
 
@@ -40,16 +40,12 @@ export default function ShowUser() {
         localStorage.removeItem('token');
     }
 
-
-    
-
-
     const renderUsername = () => {
 
         if (user) {
             return (
                 <div>
-                    <NavbarBrand>Welcome, {user.username}! </NavbarBrand>
+                    <NavbarBrand>Welcome, <Link to={"/user/" + user.id}>{user.username}</Link>! </NavbarBrand>
                     <NavLink onClick={() => Logout()} to="/">Logout</NavLink>
                 </div>
             )
