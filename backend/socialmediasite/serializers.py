@@ -26,7 +26,7 @@ class PostSerialzer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('id', 'fight', 'content', 'comments', 'owner', 'username')
-        exclude = ('comments',)
+        
 
     def create(self, validated_data):
         comment_data = validated_data.pop('comments')
