@@ -33,8 +33,9 @@ class UserPostListView(generics.ListAPIView):
 	def get_queryset(self):
 		return Post.objects.filter(owner=self.kwargs['user'])
 
-# all posts /api/posts
-class PostView(viewsets.ModelViewSet):
+# all posts /api/posts 
+# OR single post -- /api/posts/{postID}
+class PostsView(viewsets.ModelViewSet):
     serializer_class = PostSerialzer
 
     def get_queryset(self):
@@ -42,6 +43,7 @@ class PostView(viewsets.ModelViewSet):
         
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
 
 # all comments /api/comments
 class PostCommentsView(viewsets.ModelViewSet):

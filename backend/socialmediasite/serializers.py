@@ -26,6 +26,7 @@ class PostSerialzer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('id', 'fight', 'content', 'comments', 'owner', 'username')
+        exclude = ('comments',)
 
     def create(self, validated_data):
         comment_data = validated_data.pop('comments')
@@ -33,7 +34,7 @@ class PostSerialzer(serializers.ModelSerializer):
         owner = validated_data.pop('owner')
         username = owner.username
         for comments in comment_data:
-            PostComment.objects.create(Post=post, **comments, owner=owner)
+            PostComment.objects.create(Post=post, **comments, owner=owner, username=username)
         return post
 class FightSerializer(serializers.ModelSerializer):
     posts = PostSerialzer(many=True)
