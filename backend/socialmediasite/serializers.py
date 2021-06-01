@@ -3,7 +3,6 @@ from .models import Post, PostComment, Fight
 from django.contrib.auth.models import User
 
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -41,7 +40,7 @@ class FightSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Fight
-        fields = ('id', 'title', 'description', 'date', 'image_URL', 'posts')
+        fields = ('id', 'title', 'description', 'result', 'date', 'image_URL', 'posts')
 
     def create(self, validated_data):
         posts_data = validated_data.pop('posts')

@@ -36,3 +36,8 @@
     transform: rotate(360deg);
   }
 }
+
+.fight-img {
+    width: auto;
+    height: 200px;
+}

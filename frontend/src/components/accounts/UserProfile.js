@@ -8,10 +8,6 @@ export default function UserProfile() {
   const params = useParams();
   const userID = params.userID;
 
-  const { userVal } = useContext(UserContext);
-  const [user] = userVal;
-
-  // const postsEndpoint = 
   const [postsList, setPostsList] = useState({});
   const [profile, setProfile] = useState({});
   const [loading, setLoading] = useState(true);

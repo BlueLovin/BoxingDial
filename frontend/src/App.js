@@ -6,6 +6,7 @@ import Comments from "./components/PostPage"
 import Login from "./components/accounts/Login"
 import UserProfile from "./components/accounts/UserProfile"
 import ShowUser from "./components/ShowUser"
+import FightPage from "./components/fights/FightPage"
 import { UserContext } from "./UserContext"
 
 import Register from "./components/accounts/Register"
@@ -64,6 +65,9 @@ function App() {
 
           <Route path="/user" exact>
             <ShowUser />
+          </Route>
+          <Route path="/fight/:fightID" exact>
+            <FightPage />
           </Route>
         </Switch>
       </UserContext.Provider>
