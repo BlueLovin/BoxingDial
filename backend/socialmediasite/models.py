@@ -2,20 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class Post(models.Model):
-    fight = models.ForeignKey('Fight', on_delete=models.CASCADE, related_name='posts')
-    content = models.TextField()
-    owner = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='posts', null=True)
-    username = models.TextField()
-
-    def _str_(self):
-        return self.fight
 
 
 class PostComment(models.Model):
     post = models.ForeignKey(
-        Post, on_delete=models.CASCADE, related_name='comments')
+        'Post', on_delete=models.CASCADE, related_name='comments')
     content = models.TextField()
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments', null=True)
@@ -34,3 +25,13 @@ class Fight(models.Model):
 
     def _str_(self):
         return self.title
+
+class Post(models.Model):
+    fight = models.ForeignKey(Fight, on_delete=models.CASCADE, related_name='posts')
+    content = models.TextField()
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='posts', null=True)
+    username = models.TextField()
+
+    def _str_(self):
+        return self.fight
