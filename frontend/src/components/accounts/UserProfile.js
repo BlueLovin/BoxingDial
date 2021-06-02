@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import { Link, useParams } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import axios from "axios";
+import { Container } from 'reactstrap';
 
 
 export default function UserProfile() {
@@ -36,13 +37,17 @@ export default function UserProfile() {
   }
 
   const renderPosts = () => {
-    if (!loading) {
-      // console.log("render posts called");
-      return postsList.map((post) => (
-        <Link to={`/post/${post.id}`}>{post.content}</Link>
-      ));
-    }
-  }
+    return postsList.map((post) => (
+      <>
+      <Container>
+        <div className="list-group-item">
+          <p className="font-weight-light list-group-item bg-light">{post.content}</p>
+          <p className="text-muted"> by <Link to={`/user/${post.owner}`}>{post.username}</Link></p>
+        </div>
+      </Container>
+      </>
+    ));
+  };
 
   return (
     <>
@@ -52,7 +57,7 @@ export default function UserProfile() {
             {profile.username}'s Profile
             </h1>
           <br />
-          <h3>Posts</h3>
+          <h3 className="text-center">Posts</h3>
           {renderPosts()}
         </>
       }

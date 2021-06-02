@@ -63,27 +63,27 @@ function App() {
   };
 
   const renderPosts = () => {
-    return postList.map((item) => (
+    return postList.map((post) => (
       <>
-        <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
-          <span fight={item.content}>{item.fight}</span>
+        <li key={post.id} className="list-group-item d-flex justify-content-between align-items-center">
+          <span fight={post.content}>{post.content}</span>
           <span>
-            <Link to={'/post/' + item.id}>
+            <Link to={'/post/' + post.id}>
               <button className="btn btn-secondary mr-2" href="/post/">
                 View
 							</button>
             </Link>
 
-            {user && user.username === item.username ? (
+            {user && user.username === post.username ? (
               <React.Fragment>
-                <button className="btn btn-danger" onClick={() => handleDelete(item)}>
+                <button className="btn btn-danger" onClick={() => handleDelete(post)}>
                   Delete
 								</button>
               </React.Fragment>
             ) : null}
           </span>
         </li>
-        <div className="container flex-d">by {item.username ? item.username : 'null'}</div>
+        <div className="container flex-d">by {post.username ? post.username : 'null'}</div>
         <hr />
       </>
     ));

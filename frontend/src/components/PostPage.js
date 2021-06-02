@@ -83,7 +83,8 @@ export default function Comments() {
       <Container>
         <div className="list-group-item">
           <p className="font-weight-light list-group-item bg-light">{post.content}</p>
-          <Link to={`/user/${post.owner}`}><p className="text-muted"> by {post.username}</p></Link>
+          <p className="text-muted"> by <Link to={`/user/${post.owner}`}>{post.username}</Link></p>
+
         </div>
       </Container>
     )
