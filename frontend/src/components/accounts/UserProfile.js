@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import axios from "axios";
 import { Container } from 'reactstrap';
+import Post from '../posts/Post';
 
 
 export default function UserProfile() {
@@ -39,12 +40,7 @@ export default function UserProfile() {
   const renderPosts = () => {
     return postsList.map((post) => (
       <>
-      <Container>
-        <div className="list-group-item">
-          <p className="font-weight-light list-group-item bg-light">{post.content}</p>
-          <p className="text-muted"> by <Link to={`/user/${post.owner}`}>{post.username}</Link></p>
-        </div>
-      </Container>
+        <Post post={post} />
       </>
     ));
   };

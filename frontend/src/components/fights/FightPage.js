@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link, useParams } from 'react-router-dom/cjs/react-router-dom.min';
 import { UserContext } from '../../UserContext';
 import { Col, Container, Row } from 'reactstrap';
+import Post from '../posts/Post';
 
 
 export default function FightPage() {
@@ -33,12 +34,7 @@ export default function FightPage() {
   const renderPosts = () => {
     return fightData.posts.map((post) => (
       <>
-      <Container>
-        <div className="list-group-item">
-          <p className="font-weight-light list-group-item bg-light">{post.content}</p>
-          <p className="text-muted"> by <Link to={`/user/${post.owner}`}>{post.username}</Link></p>
-        </div>
-      </Container>
+        <Post post={post} />
       </>
     ));
   };
