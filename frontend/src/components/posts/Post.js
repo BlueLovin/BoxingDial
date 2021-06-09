@@ -5,6 +5,7 @@ import { Container } from "reactstrap";
 
 const Post = props => {
     let post = props.post;
+    let commentsButton = props.commentsButton != false ? true : false;
     return (
         <Container>
             <div className="list-group-item">
@@ -12,7 +13,9 @@ const Post = props => {
                 <p className="font-weight-light list-group-item bg-light">{post.content}</p>
                 <div className="d-flex text-center justify-content-between text-muted">
                     <p> on: <Link to={`/fight/${post.fight.id}`}>{post.fight.title}</Link></p>
-                    <p><Link to={`/post/${post.id}`}>view comments</Link></p>
+                    {commentsButton ?
+                        <p><Link to={`/post/${post.id}`}>view comments</Link></p>
+                        : null}
                 </div>
             </div>
         </Container>

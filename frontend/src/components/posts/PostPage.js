@@ -9,6 +9,7 @@ import {
   Label,
   Container
 } from "reactstrap";
+import Post from "./Post";
 
 
 export default function Comments() {
@@ -32,9 +33,8 @@ export default function Comments() {
   })
 
   useEffect(() => {
-    getComments();
     getPost();
-  }, [token])
+  }, []);
 
   var handleChange = (e) => {
     let { name, value } = e.target;
@@ -50,7 +50,7 @@ export default function Comments() {
   const submitComment = (item) => {
     axios // create
       .post("/api/comments/", item, { headers: options })
-      .then((res) => getComments());
+      .then((res) => getPost());
 
     setActiveItem({ // RESET TEXT BOX
       post: postID,
@@ -61,32 +61,26 @@ export default function Comments() {
   const deleteComment = (comment) => {
     axios
       .delete(`/api/comments/${comment.id}/`)
-      .then((res) => getComments());
+      .then((res) => getPost());
   };
 
-  const getPost = () => {
-    axios
+  const getPost = async () => {
+    await axios
       .get("/api/posts/" + postID) // get current post
-      .then((res) => setCurrentPost(res.data))// grabs the comments right here
+      .then((res) => {
+        setCurrentPost(res.data[0])
+        setCommentList(res.data[0].comments)
+      })
       .catch((err) => alert(err));
   }
 
-  const getComments = () => {
-    axios
-      .get("/api/posts/" + postID) // get current post
-      .then((res) => setCommentList(res.data.comments))// grabs the comments right here
-      .catch((err) => alert(err));
-  };
-
   const renderPost = (post) => {
     return (
-      <Container>
-        <div className="list-group-item">
-          <p className="font-weight-light list-group-item bg-light">{post.content}</p>
-          <p className="text-muted"> by <Link to={`/user/${post.owner}`}>{post.username}</Link></p>
-
-        </div>
-      </Container>
+      <>
+        {post.fight ?
+          <Post post={post} commentsButton={false} />
+          : "loading"}
+      </>
     )
   }
 
@@ -97,9 +91,7 @@ export default function Comments() {
         <div className="list-group-item bg-light">
           <p>{comment.content}</p>
           <div className="list-group-item d-flex justify-content-between align-items-center">
-            <Label>by {comment.username}</Label>
-
-          <Link to={`/user/${comment.owner}`}><p className="text-muted"> by {comment.username}</p></Link>
+            <Link to={`/user/${comment.owner}`}><p className="text-muted"> by {comment.username}</p></Link>
             {user && user.username === comment.username ? (
               <React.Fragment>
                 <button className="btn btn-danger" onClick={() => deleteComment(comment)}>
@@ -117,12 +109,14 @@ export default function Comments() {
 
   return (
     <div>
-      <br/>
-      {renderPost(currentPost)}
+      <br />
+      {currentPost ? renderPost(currentPost) : "loading"}
       <Container>
         <div className="h3 text-info font-weight-bold">
           <br />
-          {commentList.length} comments
+          {commentList ?
+            commentList.length + " comments"
+            : "loading"}
         </div>
         <br />
         <div className="list-group-item text-center align-items-center p-5">
@@ -142,9 +136,10 @@ export default function Comments() {
       </Container>
       <br />
       <div>
-        {renderComments()}
+        {commentList ?
+          renderComments()
+          : "loading"}
       </div>
-
     </div>
   );
 

@@ -41,6 +41,13 @@ class PostSerialzer(serializers.ModelSerializer):
             PostComment.objects.create(Post=post, **comments, owner=owner, username=username)
         return post
 
+class SmallPostSerialzer(serializers.ModelSerializer):
+    fight = SmallFightSerializer(many=False)
+
+    class Meta:
+        model = Post
+        fields = ('id', 'fight', 'content', 'owner', 'username')
+        
 class FightSerializer(serializers.ModelSerializer):
     posts = PostSerialzer(many=True)
     
