@@ -17,13 +17,7 @@ function App() {
 
   useEffect(() => {
     setToken(localStorage.getItem('token'));
-    fetchUser();
-  }, [token])
-
-  //following function sends request to API server with token from 
-  //user's browser storage. the server responds with the user associated
-  //with that token or 404s if invalid token
-  const fetchUser = async () => {
+    const fetchUser = async () => {
     console.log(token);
     if (token !== '' && token) {
       await axios.get("/api/token-auth/user", {
@@ -36,7 +30,14 @@ function App() {
           console.log(error.response.data.error)
         });
     }
-  }
+  };
+  fetchUser();
+  }, [token])
+
+  //following function sends request to API server with token from 
+  //user's browser storage. the server responds with the user associated
+  //with that token or 404s if invalid token
+  
 
   return (
     <BrowserRouter>

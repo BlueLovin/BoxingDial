@@ -5,6 +5,7 @@ import { UserContext } from "../../UserContext";
 import Post from "../posts/Post";
 import Fight from "./Fight";
 import Modal from "../posts/PostModal";
+import { Button } from "reactstrap";
 export default function FightPage() {
   const params = useParams();
   const fightID = params.fightID;
@@ -25,6 +26,7 @@ export default function FightPage() {
 
   useEffect(() => {
     fetchFightData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchFightData = async () => {
@@ -82,13 +84,10 @@ export default function FightPage() {
       );
     } else {
       return (
-        <div>
-          <h3 className="text-center">Create a post!</h3>
-          <div className="text-center">
-            <button className="btn btn-primary " onClick={createItem}>
+        <div className="text-center">
+            <Button size="lg" color="primary" onClick={createItem}>
               Create Post
-            </button>
-          </div>
+            </Button>
         </div>
       );
     }
@@ -102,14 +101,14 @@ export default function FightPage() {
       ) : (
         <>
           <div className="container w-75 bg-light bg-gradient">
-            <h1 className="text-center display-4">{fightData.title}</h1>
-            <hr />
             <Fight fightData={fightData} />
             <br />
             {renderCreatePost()}
+            <hr/>
             <h4 className="text-center">Posts</h4>
+            <br/>
             {renderPosts()}
-          </div>{" "}
+          </div>
           {modal ? (
             <Modal
               activeItem={activeItem}

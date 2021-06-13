@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../../UserContext";
@@ -23,10 +23,19 @@ export default function Comments() {
     content: "",
     owner: user ? user.id : null,
   });
-
+  
+  const getPost = useCallback(async () => {
+    await axios
+      .get("/api/posts/" + postID) // get current post
+      .then((res) => {
+        setCurrentPost(res.data[0]);
+        setCommentList(res.data[0].comments);
+      })
+      .catch((err) => alert(err));
+  }, [postID]);
   useEffect(() => {
     getPost();
-  }, []);
+  }, [getPost]);
 
   var handleChange = (e) => {
     let { name, value } = e.target;
@@ -58,16 +67,6 @@ export default function Comments() {
 
   const deleteComment = (comment) => {
     axios.delete(`/api/comments/${comment.id}/`).then((res) => getPost());
-  };
-
-  const getPost = async () => {
-    await axios
-      .get("/api/posts/" + postID) // get current post
-      .then((res) => {
-        setCurrentPost(res.data[0]);
-        setCommentList(res.data[0].comments);
-      })
-      .catch((err) => alert(err));
   };
 
   const renderPost = (post) => {

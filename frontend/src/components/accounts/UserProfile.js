@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Post from "../posts/Post";
@@ -14,6 +14,7 @@ export default function UserProfile() {
   useEffect(() => {
     fetchProfile();
     fetchUserPosts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchUserPosts = async () => {

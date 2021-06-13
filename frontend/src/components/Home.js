@@ -22,8 +22,8 @@ function App() {
 
   useEffect(() => {
     refreshPostList();
-  }, [token, user]);
-
+  }, []);
+  useEffect(() => {}, [user]);
   const options = {
     "content-type": "application/json",
     Authorization: `Token ${token}`,

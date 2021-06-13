@@ -18,7 +18,6 @@ export default class CustomModal extends Component {
     }
 
     const activeItem = { ...this.state.activeItem, [name]: value };
-    console.log(activeItem);
     this.setState({ activeItem });
   };
 
