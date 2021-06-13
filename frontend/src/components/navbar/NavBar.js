@@ -1,5 +1,18 @@
 import { useState } from "react";
-import { Navbar, Nav, NavItem, NavLink, NavbarBrand, NavbarToggler, Collapse, UncontrolledDropdown, DropdownMenu, DropdownItem, NavbarText, DropdownToggle } from "reactstrap";
+import {
+  Navbar,
+  Nav,
+  NavItem,
+  NavLink,
+  NavbarBrand,
+  NavbarToggler,
+  Collapse,
+  UncontrolledDropdown,
+  DropdownMenu,
+  DropdownItem,
+  NavbarText,
+  DropdownToggle,
+} from "reactstrap";
 import ShowUser from "./ShowUser";
 
 export default function NavigationBar() {
@@ -24,22 +37,18 @@ export default function NavigationBar() {
                 Fights
               </DropdownToggle>
               <DropdownMenu right>
-                <DropdownItem>
-                  Popular
-                </DropdownItem>
-                <DropdownItem>
-                  New
-                </DropdownItem>
+                <DropdownItem>Popular</DropdownItem>
+                <DropdownItem>New</DropdownItem>
                 <DropdownItem divider />
-                <DropdownItem>
-                  Reset
-                </DropdownItem>
+                <DropdownItem>Reset</DropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
           </Nav>
-          <NavbarText><ShowUser /></NavbarText>
+          <NavbarText>
+            <ShowUser />
+          </NavbarText>
         </Collapse>
       </Navbar>
     </>
-  )
+  );
 }

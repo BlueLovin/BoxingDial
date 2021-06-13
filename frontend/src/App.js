@@ -5,11 +5,11 @@ import Home from "./components/Home";
 import Comments from "./components/posts/PostPage"
 import Login from "./components/accounts/Login"
 import UserProfile from "./components/accounts/UserProfile"
-import ShowUser from "./components/ShowUser"
+import ShowUser from "./components/navbar/ShowUser"
 import FightPage from "./components/fights/FightPage"
 import { UserContext } from "./UserContext"
 import Register from "./components/accounts/Register"
-import NavigationBar from "./components/NavBar";
+import NavigationBar from "./components/navbar/NavBar";
 
 function App() {
   const [user, setUser] = useState(null);

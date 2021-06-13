@@ -23,7 +23,7 @@ export default function Comments() {
     content: "",
     owner: user ? user.id : null,
   });
-  
+
   const getPost = useCallback(async () => {
     await axios
       .get("/api/posts/" + postID) // get current post

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import Modal from "./posts/PostModal";
 import Register from "./accounts/Register";
-import ShowUser from "./ShowUser";
+import ShowUser from "./navbar/ShowUser";
 import axios from "axios";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
 import { UserContext } from "../UserContext";

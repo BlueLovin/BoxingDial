@@ -2,7 +2,7 @@ import { useEffect, useContext } from "react";
 import axios from "axios";
 import { NavbarBrand } from "reactstrap";
 import { Link, NavLink } from "react-router-dom";
-import { UserContext } from "../UserContext";
+import { UserContext } from "../../UserContext";
 
 export default function ShowUser() {
   const { userVal, tokenVal } = useContext(UserContext);
@@ -10,9 +10,8 @@ export default function ShowUser() {
   const [user, setUser] = userVal;
 
   useEffect(() => {
-    // update user
     renderUsername();
-  // eslint-disable-next-line react-hooks/exhaustive-deps 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getToken = () => {
@@ -21,9 +20,7 @@ export default function ShowUser() {
 
   const Logout = async () => {
     setUser(null);
-
     getToken();
-
     axios
       .post(
         "api/token-auth/logout",
@@ -49,7 +46,7 @@ export default function ShowUser() {
       return (
         <div>
           <NavbarBrand>
-            Welcome, <Link to={"/user/" + user.id}>{user.username}</Link>!{" "}
+            Welcome, <Link to={"/user/" + user.id}>{user.username}</Link>!
           </NavbarBrand>
           <NavLink onClick={() => Logout()} to="/">
             Logout
