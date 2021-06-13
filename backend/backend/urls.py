@@ -7,6 +7,7 @@ router = routers.DefaultRouter()
 router.register(r'posts', views.PostsView, 'post')
 router.register(r'comments', views.PostCommentsView, 'postcomment')
 router.register(r'fights', views.FightView, 'fight')
+router.register(r'post/create', views.CreatePostView, 'createpost')
 
 
 urlpatterns = [
@@ -16,9 +17,6 @@ urlpatterns = [
     path('api/users/<int:user>/', views.UserView.as_view()),
     path('api/users/<int:user>/comments/', views.UserCommentListView.as_view()),
     path('api/users', views.UsersView.as_view()),
-
-
-    # path('api/posts', views.PostsView.as_view()),
     path('api/posts/<int:postID>', views.PostView.as_view()),
     path('', include('accounts.urls')),
 ]

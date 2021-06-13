@@ -1,10 +1,7 @@
-import { useState, useContext, useEffect } from 'react';
-import { Link, useParams } from "react-router-dom";
-import { UserContext } from "../../UserContext";
+import { useState, useContext, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
-import { Container } from 'reactstrap';
-import Post from '../posts/Post';
-
+import Post from "../posts/Post";
 
 export default function UserProfile() {
   const params = useParams();
@@ -21,21 +18,18 @@ export default function UserProfile() {
 
   const fetchUserPosts = async () => {
     setLoading(true);
-    await axios.get(`/api/users/${userID}/posts`)
-      .then((res) => {
-        setPostsList(res.data);
-        setLoading(false);
-        // console.log(res.data);
-      });
+    await axios.get(`/api/users/${userID}/posts`).then((res) => {
+      setPostsList(res.data);
+      setLoading(false);
+    });
   };
 
   const fetchProfile = async () => {
-    await axios.get(`/api/users/${userID}`)
-      .then((res) => {
-        setProfile(res.data[0]);
-        console.log(profile);
-      })
-  }
+    await axios.get(`/api/users/${userID}`).then((res) => {
+      setProfile(res.data[0]);
+      console.log(profile);
+    });
+  };
 
   const renderPosts = () => {
     return postsList.map((post) => (
@@ -47,16 +41,16 @@ export default function UserProfile() {
 
   return (
     <>
-      {loading || !profile ? "loading" :
+      {loading || !profile ? (
+        "loading"
+      ) : (
         <>
-          <h1 className="text-center">
-            {profile.username}'s Profile
-            </h1>
+          <h1 className="text-center">{profile.username}'s Profile</h1>
           <br />
           <h3 className="text-center">Posts</h3>
           {renderPosts()}
         </>
-      }
+      )}
     </>
   );
 }

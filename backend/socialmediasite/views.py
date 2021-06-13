@@ -1,6 +1,6 @@
 from rest_framework import viewsets, permissions, generics
 from .models import Post, PostComment, Fight
-from .serializers import PostSerialzer, CommentSerializer, UserSerializer, FightSerializer, SmallPostSerialzer
+from .serializers import CreatePostSerializer, PostSerialzer, CommentSerializer, UserSerializer, FightSerializer, SmallPostSerialzer
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
@@ -40,9 +40,15 @@ class PostsView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Post.objects.all()
+
+class CreatePostView(viewsets.ModelViewSet):
+    serializer_class = CreatePostSerializer
+
+    def get_queryset(self):
+        return Post.objects.all()
         
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        serializer.save()
 
 # single post - /api/post/{postID}
 class PostView(generics.ListAPIView):

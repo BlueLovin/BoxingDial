@@ -31,12 +31,19 @@ class PostSerialzer(serializers.ModelSerializer):
         model = Post
         fields = ('id', 'fight', 'content', 'comments', 'owner', 'username')
         
+class CreatePostSerializer(serializers.ModelSerializer):
+    comments = CommentSerializer(many=True)
+
+    class Meta:
+        model = Post
+        fields = ('id', 'fight', 'content', 'comments', 'owner', 'username')
+        
 
     def create(self, validated_data):
         comment_data = validated_data.pop('comments')
         post = Post.objects.create(**validated_data)
         owner = validated_data.pop('owner')
-        username = owner.username
+        username = validated_data.pop('username')
         for comments in comment_data:
             PostComment.objects.create(Post=post, **comments, owner=owner, username=username)
         return post
@@ -49,7 +56,7 @@ class SmallPostSerialzer(serializers.ModelSerializer):
         fields = ('id', 'fight', 'content', 'owner', 'username')
         
 class FightSerializer(serializers.ModelSerializer):
-    posts = PostSerialzer(many=True)
+    posts = SmallPostSerialzer(many=True)
     
     class Meta:
         model = Fight

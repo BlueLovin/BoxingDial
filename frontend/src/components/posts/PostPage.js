@@ -2,18 +2,10 @@ import React, { useEffect, useState, useContext } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../../UserContext";
-import {
-  Button,
-  FormGroup,
-  Input,
-  Label,
-  Container
-} from "reactstrap";
+import { Button, FormGroup, Input, Container } from "reactstrap";
 import Post from "./Post";
 
-
 export default function Comments() {
-
   const params = useParams();
   const postID = params.id;
 
@@ -24,13 +16,13 @@ export default function Comments() {
   });
 
   const { tokenVal, userVal } = useContext(UserContext);
-  const [token, setToken] = tokenVal;
+  const [token] = tokenVal;
   const [user] = userVal;
   const [activeItem, setActiveItem] = useState({
     post: postID,
     content: "",
     owner: user ? user.id : null,
-  })
+  });
 
   useEffect(() => {
     getPost();
@@ -39,73 +31,81 @@ export default function Comments() {
   var handleChange = (e) => {
     let { name, value } = e.target;
 
-    const item = { post: postID, [name]: value, username: user ? user.username : "null", owner: user ? user.id : null };
+    const item = {
+      post: postID,
+      [name]: value,
+      username: user ? user.username : "null",
+      owner: user ? user.id : null,
+    };
     setActiveItem(item);
   };
 
   const options = {
-    'content-type': 'application/json',
-    'Authorization': `Token ${token}`,
-  }
+    "content-type": "application/json",
+    Authorization: `Token ${token}`,
+  };
   const submitComment = (item) => {
     axios // create
       .post("/api/comments/", item, { headers: options })
       .then((res) => getPost());
 
-    setActiveItem({ // RESET TEXT BOX
+    setActiveItem({
+      // RESET TEXT BOX
       post: postID,
       content: "",
-    })
+    });
   };
 
   const deleteComment = (comment) => {
-    axios
-      .delete(`/api/comments/${comment.id}/`)
-      .then((res) => getPost());
+    axios.delete(`/api/comments/${comment.id}/`).then((res) => getPost());
   };
 
   const getPost = async () => {
     await axios
       .get("/api/posts/" + postID) // get current post
       .then((res) => {
-        setCurrentPost(res.data[0])
-        setCommentList(res.data[0].comments)
+        setCurrentPost(res.data[0]);
+        setCommentList(res.data[0].comments);
       })
       .catch((err) => alert(err));
-  }
+  };
 
   const renderPost = (post) => {
     return (
       <>
-        {post.fight ?
-          <Post post={post} commentsButton={false} />
-          : "loading"}
+        {post.fight ? <Post post={post} commentsButton={false} /> : "loading"}
       </>
-    )
-  }
+    );
+  };
 
   const renderComments = () => {
-    return commentList.slice(0).reverse().map((comment) => (
-      <Container>
-
-        <div className="list-group-item bg-light">
-          <p>{comment.content}</p>
-          <div className="list-group-item d-flex justify-content-between align-items-center">
-            <Link to={`/user/${comment.owner}`}><p className="text-muted"> by {comment.username}</p></Link>
-            {user && user.username === comment.username ? (
-              <React.Fragment>
-                <button className="btn btn-danger" onClick={() => deleteComment(comment)}>
-                  Delete
-								</button>
-              </React.Fragment>
-            ) : null}
+    return commentList
+      .slice(0)
+      .reverse()
+      .map((comment) => (
+        <Container>
+          <div className="list-group-item bg-light">
+            <p>{comment.content}</p>
+            <div className="list-group-item d-flex justify-content-between align-items-center">
+              <Link to={`/user/${comment.owner}`}>
+                <p className="text-muted"> by {comment.username}</p>
+              </Link>
+              {user && user.username === comment.username ? (
+                <React.Fragment>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => deleteComment(comment)}
+                  >
+                    Delete
+                  </button>
+                </React.Fragment>
+              ) : null}
+            </div>
           </div>
-        </div>
-        <hr />
-      </Container>
-
-    ));
-  }
+          <hr />
+        </Container>
+      ));
+  };
 
   return (
     <div>
@@ -114,33 +114,28 @@ export default function Comments() {
       <Container>
         <div className="h3 text-info font-weight-bold">
           <br />
-          {commentList ?
-            commentList.length + " comments"
-            : "loading"}
+          {commentList ? commentList.length + " comments" : "loading"}
         </div>
         <br />
         <div className="list-group-item text-center align-items-center p-5">
           <h4>share your dumbass thoughts</h4>
 
           <FormGroup>
-            <Input type="textarea"
+            <Input
+              type="textarea"
               name="content"
               value={activeItem.content}
-              onChange={handleChange} />
+              onChange={handleChange}
+            />
           </FormGroup>
 
           <Button color="success" onClick={() => submitComment(activeItem)}>
             Post
-            </Button>
+          </Button>
         </div>
       </Container>
       <br />
-      <div>
-        {commentList ?
-          renderComments()
-          : "loading"}
-      </div>
+      <div>{commentList ? renderComments() : "loading"}</div>
     </div>
   );
-
 }

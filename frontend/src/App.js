@@ -8,7 +8,6 @@ import UserProfile from "./components/accounts/UserProfile"
 import ShowUser from "./components/ShowUser"
 import FightPage from "./components/fights/FightPage"
 import { UserContext } from "./UserContext"
-
 import Register from "./components/accounts/Register"
 import NavigationBar from "./components/NavBar";
 
@@ -21,6 +20,9 @@ function App() {
     fetchUser();
   }, [token])
 
+  //following function sends request to API server with token from 
+  //user's browser storage. the server responds with the user associated
+  //with that token or 404s if invalid token
   const fetchUser = async () => {
     console.log(token);
     if (token !== '' && token) {
@@ -29,19 +31,23 @@ function App() {
           "Authorization": `Token ${token}`
         }
       }).then((res) => setUser(res.data))
-      .catch(function (error) {
-        console.log(error.response.status)
-        console.log(error.response.data.error) 
-      });
+        .catch(function (error) {
+          console.log(error.response.status)
+          console.log(error.response.data.error)
+        });
     }
   }
-  
+
   return (
     <BrowserRouter>
-      <UserContext.Provider 
-      value={{ userVal: [user, setUser],
-       tokenVal: [token, setToken] }}>
+      <UserContext.Provider
+        value={{
+          userVal: [user, setUser],
+          tokenVal: [token, setToken]
+        }}>
+          
         <NavigationBar />
+
         <Switch>
           <Route path="/" exact>
             <Home />
@@ -52,7 +58,7 @@ function App() {
           </Route>
 
           <Route path="/user/:userID" exact>
-            <UserProfile/>
+            <UserProfile />
           </Route>
 
           <Route path="/register" exact>
@@ -66,6 +72,7 @@ function App() {
           <Route path="/user" exact>
             <ShowUser />
           </Route>
+
           <Route path="/fight/:fightID" exact>
             <FightPage />
           </Route>

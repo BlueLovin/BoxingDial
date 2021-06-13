@@ -38,6 +38,14 @@
 }
 
 .fight-img {
-    width: auto;
-    height: 200px; 
+  width: auto;
+  height: 200px;
+}
+
+textarea {
+  border-style: none;
+  border-color: Transparent;
+  overflow: auto;
+  outline: none;
+  resize: none;
 }
