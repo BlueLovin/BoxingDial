@@ -19,6 +19,7 @@ gunicorn==20.0.4
 hvac==0.10.9
 idna==2.10
 Jinja2==2.11.3
+knox==0.1.11
 loguru==0.5.3
 MarkupSafe==1.1.1
 pathspec==0.8.0

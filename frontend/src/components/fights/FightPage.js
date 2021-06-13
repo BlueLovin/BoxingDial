@@ -77,7 +77,7 @@ export default function FightPage() {
     if (!user) {
       return (
         <div>
-          <h1>Log in to make a post</h1>
+          <h3 className="text-center">Log in to make a post</h3>
         </div>
       );
     } else {
