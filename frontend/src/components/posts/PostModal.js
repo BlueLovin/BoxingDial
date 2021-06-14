@@ -25,17 +25,18 @@ export default class CustomModal extends Component {
     const { toggle, onSave } = this.props;
 
     return (
-      <Modal isOpen={true} toggle={toggle}>
+      <Modal isOpen={true} toggle={toggle} >
         <ModalHeader toggle={toggle}>Create Post</ModalHeader>
         <TextareaAutosize
           id="content"
-          className="m-2 bg-light rounded"
+          className="m-3 bg-light rounded p-2"
           name="content"
           maxLength={500}
           minRows={3}
           value={this.state.activeItem.content}
           onChange={this.handleChange}
           placeholder="Share your unbiased thoughts"
+          autoFocus
         />
         <ModalBody>
           <Button color="primary" onClick={() => onSave(this.state.activeItem)}>

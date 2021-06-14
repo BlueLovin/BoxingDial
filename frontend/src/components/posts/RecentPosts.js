@@ -30,7 +30,7 @@ export default function RecentPosts() {
   };
   return (
     <>
-      <Container>
+      <Container className="recentContainer">
         <div className="card p-3">
           <h4 className="text-center">Recent Posts</h4>
           {renderPosts()}

@@ -46,6 +46,11 @@
   display: inline-block;
 }
 
+.recentContainer{
+  /* min-width: 500px;
+  max-width: auto; */
+}
+
 .fight-img {
   height: auto;
   min-inline-size: 200px;
@@ -54,7 +59,9 @@
   display: inline-block;
 }
 
+
 textarea {
+  padding: 1%;
   border-style: none;
   border-color: Transparent;
   overflow: auto;

@@ -1,4 +1,4 @@
-import { useEffect, useContext } from "react";
+import { useContext } from "react";
 import axios from "axios";
 import { NavbarBrand } from "reactstrap";
 import { Link, NavLink } from "react-router-dom";
@@ -6,21 +6,11 @@ import { UserContext } from "../../UserContext";
 
 export default function ShowUser() {
   const { userVal, tokenVal } = useContext(UserContext);
-  const [token, setToken] = tokenVal;
+  const [token] = tokenVal;
   const [user, setUser] = userVal;
-
-  useEffect(() => {
-    renderUsername();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const getToken = () => {
-    setToken(localStorage.getItem("token"));
-  };
 
   const Logout = async () => {
     setUser(null);
-    getToken();
     axios
       .post(
         "api/token-auth/logout",

@@ -30,7 +30,7 @@ export default function Register() {
     axios // create
       .post("/api/token-auth/register", item)
       .then((res) => {
-        localStorage.setItem('token', res.data.token);
+        localStorage.setItem("token", res.data.token);
         setUser(res.data.user);
       });
 

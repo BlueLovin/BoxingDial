@@ -22,7 +22,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class SmallFightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Fight
-        fields = ('id', 'title', 'description', 'result', 'date')
+        fields = ('id', 'title', 'description', 'result', 'date', 'image_URL')
 class PostSerialzer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True)
     fight = SmallFightSerializer(many=False)

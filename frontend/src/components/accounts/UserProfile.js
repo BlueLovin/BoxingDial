@@ -12,25 +12,22 @@ export default function UserProfile() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchUserPosts = async () => {
+      setLoading(true);
+      await axios.get(`/api/users/${userID}/posts`).then((res) => {
+        setPostsList(res.data);
+        setLoading(false);
+      });
+    };
+
+    const fetchProfile = async () => {
+      await axios.get(`/api/users/${userID}`).then((res) => {
+        setProfile(res.data[0]);
+      });
+    };
     fetchProfile();
     fetchUserPosts();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchUserPosts = async () => {
-    setLoading(true);
-    await axios.get(`/api/users/${userID}/posts`).then((res) => {
-      setPostsList(res.data);
-      setLoading(false);
-    });
-  };
-
-  const fetchProfile = async () => {
-    await axios.get(`/api/users/${userID}`).then((res) => {
-      setProfile(res.data[0]);
-      console.log(profile);
-    });
-  };
+  }, [userID]);
 
   const renderPosts = () => {
     return postsList.map((post) => (

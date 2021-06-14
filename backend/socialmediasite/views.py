@@ -1,6 +1,6 @@
 from rest_framework import viewsets, permissions, generics
 from .models import Post, PostComment, Fight
-from .serializers import CreatePostSerializer, PostSerialzer, CommentSerializer, UserSerializer, FightSerializer, SmallPostSerialzer
+from .serializers import CreatePostSerializer, PostSerialzer, CommentSerializer, SmallFightSerializer, UserSerializer, FightSerializer, SmallPostSerialzer
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
@@ -67,3 +67,7 @@ class FightView(viewsets.ModelViewSet):
     serializer_class = FightSerializer
     queryset = Fight.objects.all()
 
+
+class SmallFightView(generics.ListAPIView):
+    serializer_class = SmallFightSerializer
+    queryset = Fight.objects.all()
