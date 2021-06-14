@@ -15,7 +15,6 @@ const Post = (props) => {
         </p>
         <div className="d-flex text-center justify-content-between text-muted">
           <p>
-            {" "}
             on: <Link to={`/fight/${post.fight.id}`}>{post.fight.title}</Link>
           </p>
           {commentsButton ? (

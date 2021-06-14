@@ -36,10 +36,22 @@
     transform: rotate(360deg);
   }
 }
+.container{
+  margin: 0 auto;
+}
+
+.small-fight-img {
+  height: 150px;
+  width: auto;
+  display: inline-block;
+}
 
 .fight-img {
-  width: auto;
-  height: 200px;
+  height: auto;
+  min-inline-size: 200px;
+  max-inline-size: 300px;
+  width: 100%;
+  display: inline-block;
 }
 
 textarea {

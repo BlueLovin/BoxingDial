@@ -1,14 +1,16 @@
 import { Row, Col } from "reactstrap";
-
-const Fight = (props) => {
+import { Link } from "react-router-dom";
+const SmallFight = (props) => {
   let fightData = props.fightData;
   return (
     <>
+    <Link to={`/fight/${fightData.id}`}>
       <h1 className="text-center display-6">{fightData.title}</h1>
+    </Link>
       <hr />
       <Row>
         <Col className="text-center">
-          <img alt="fight" src={fightData.image_URL} className="fight-img " />
+          <img alt="fight" src={fightData.image_URL} className="small-fight-img " />
         </Col>
         <hr />
         <Col>
@@ -24,4 +26,4 @@ const Fight = (props) => {
   );
 };
 
-export default Fight;
+export default SmallFight;
