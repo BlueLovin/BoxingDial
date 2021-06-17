@@ -57,6 +57,12 @@ class PostView(generics.ListAPIView):
 	def get_queryset(self):
 		return Post.objects.filter(id=self.kwargs['postID']).annotate(comment_count=Count('comments'))
 
+class PopularPostsView(generics.ListAPIView):
+	serializer_class = PostSerialzer
+
+	def get_queryset(self):
+		return Post.objects.annotate(comment_count=Count('comments')).order_by('-comment_count')
+
 # all comments /api/comments
 class PostCommentsView(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
