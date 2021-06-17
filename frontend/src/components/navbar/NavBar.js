@@ -14,7 +14,6 @@ import {
   DropdownToggle,
 } from "reactstrap";
 import ShowUser from "./ShowUser";
-import { Link } from "react-router-dom";
 
 export default function NavigationBar() {
   const [isOpen, setIsOpen] = useState(false);
