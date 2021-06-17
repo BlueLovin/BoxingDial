@@ -77,6 +77,36 @@ export default function Comments() {
     );
   };
 
+  const renderCommentInput = () => {
+    if (user) {
+      return (
+        <div className="list-group-item text-center align-items-center p-5">
+          <h4>share your dumbass thoughts</h4>
+
+          <FormGroup>
+            <Input
+              type="textarea"
+              name="content"
+              value={activeItem.content}
+              onChange={handleChange}
+            />
+          </FormGroup>
+
+          <Button color="success" onClick={() => submitComment(activeItem)}>
+            Post
+          </Button>
+        </div>
+      );
+    }
+    else {
+      return (
+        <div className="list-group-item text-center align-items-center p-5">
+          <h4>Please login to post a comment</h4>
+        </div>
+      );
+    }
+  }
+
   const renderComments = () => {
     return commentList
       .slice(0)
@@ -116,22 +146,7 @@ export default function Comments() {
           {commentList ? commentList.length + " comments" : "loading"}
         </div>
         <br />
-        <div className="list-group-item text-center align-items-center p-5">
-          <h4>share your dumbass thoughts</h4>
-
-          <FormGroup>
-            <Input
-              type="textarea"
-              name="content"
-              value={activeItem.content}
-              onChange={handleChange}
-            />
-          </FormGroup>
-
-          <Button color="success" onClick={() => submitComment(activeItem)}>
-            Post
-          </Button>
-        </div>
+        {renderCommentInput()}
       </Container>
       <br />
       <div>{commentList ? renderComments() : "loading"}</div>
