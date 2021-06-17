@@ -3,7 +3,7 @@ from .models import Post, PostComment, Fight
 from .serializers import CreatePostSerializer, PostSerialzer, CommentSerializer, SmallFightSerializer, UserSerializer, FightSerializer, SmallPostSerialzer
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-
+from django.db.models import Count
 
 # all users - /api/users
 class UsersView(generics.ListAPIView):
@@ -55,7 +55,7 @@ class PostView(generics.ListAPIView):
 	serializer_class = PostSerialzer
 
 	def get_queryset(self):
-		return Post.objects.filter(id=self.kwargs['postID'])
+		return Post.objects.filter(id=self.kwargs['postID']).annotate(comment_count=Count('comments'))
 
 # all comments /api/comments
 class PostCommentsView(viewsets.ModelViewSet):

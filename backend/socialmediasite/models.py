@@ -5,6 +5,7 @@ class PostComment(models.Model):
     post = models.ForeignKey(
         'Post', on_delete=models.CASCADE, related_name='comments')
     content = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments', null=True)
 

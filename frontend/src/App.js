@@ -10,6 +10,7 @@ import FightPage from "./components/fights/FightPage";
 import { UserContext } from "./UserContext";
 import Register from "./components/accounts/Register";
 import NavigationBar from "./components/navbar/NavBar";
+import { NotFound } from "./NotFound404";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -78,6 +79,9 @@ function App() {
           <Route path="/fight/:fightID" exact>
             <FightPage />
           </Route>
+
+          <Route component={NotFound} />
+          
         </Switch>
       </UserContext.Provider>
     </BrowserRouter>
