@@ -4,19 +4,16 @@ from django.contrib.auth.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    posts_count = serializers.IntegerField()
     class Meta:
         model = User
-        fields = ['id', 'username']
+        fields = ['id', 'username', 'posts_count']
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostComment
         fields = ('id', 'post', 'content', 'owner', 'username')
     def create(self, validated_data):
-        # content = validated_data.pop('content')
-        # fight = validated_data.pop('fight')
-        # owner = validated_data.pop('owner')
-        # username = owner.username
         post = PostComment.objects.create(**validated_data)
         return post
 class SmallFightSerializer(serializers.ModelSerializer):
@@ -58,10 +55,10 @@ class SmallPostSerialzer(serializers.ModelSerializer):
         
 class FightSerializer(serializers.ModelSerializer):
     posts = SmallPostSerialzer(many=True)
-    
+    posts_count = serializers.IntegerField()
     class Meta:
         model = Fight
-        fields = ('id', 'title', 'description', 'result', 'date', 'image_URL', 'posts')
+        fields = ('id', 'title', 'description', 'result', 'date', 'image_URL','posts_count', 'posts')
 
     def create(self, validated_data):
         posts_data = validated_data.pop('posts')

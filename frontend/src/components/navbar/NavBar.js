@@ -14,6 +14,7 @@ import {
   DropdownToggle,
 } from "reactstrap";
 import ShowUser from "./ShowUser";
+import { Link } from "react-router-dom";
 
 export default function NavigationBar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,17 +31,17 @@ export default function NavigationBar() {
               <NavLink href="/">Home</NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href="">Popular Posts</NavLink>
+              <NavLink href="/posts/popular">Popular Posts</NavLink>
             </NavItem>
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>
                 Fights
               </DropdownToggle>
               <DropdownMenu right>
-                <DropdownItem>Popular</DropdownItem>
-                <DropdownItem>New</DropdownItem>
+                <DropdownItem href="/fights/popular">Popular</DropdownItem>
+                <DropdownItem href="/fights/recent">Recently Added</DropdownItem>
                 <DropdownItem divider />
-                <DropdownItem>Reset</DropdownItem>
+                <DropdownItem>Request a fight</DropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
           </Nav>

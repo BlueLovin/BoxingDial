@@ -3,10 +3,13 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import axios from "axios";
 import Home from "./components/HomePage";
 import Comments from "./components/posts/PostPage";
+import PopularPosts from "./components/posts/PopularPosts";
 import Login from "./components/accounts/Login";
 import UserProfile from "./components/accounts/UserProfile";
 import ShowUser from "./components/navbar/ShowUser";
 import FightPage from "./components/fights/FightPage";
+import PopularFights from "./components/fights/PopularFights";
+import RecentFights from "./components/fights/RecentFights";
 import { UserContext } from "./UserContext";
 import Register from "./components/accounts/Register";
 import NavigationBar from "./components/navbar/NavBar";
@@ -60,6 +63,10 @@ function App() {
             <Comments />
           </Route>
 
+          <Route path="/posts/popular" exact>
+            <PopularPosts />
+          </Route>
+
           <Route path="/user/:userID" exact>
             <UserProfile />
           </Route>
@@ -79,9 +86,14 @@ function App() {
           <Route path="/fight/:fightID" exact>
             <FightPage />
           </Route>
-
-          <Route component={NotFound} />
           
+          <Route path="/fights/popular" exact>
+            <PopularFights />
+          </Route>
+          <Route path="/fights/recent" exact>
+            <RecentFights />
+          </Route>
+          <Route component={NotFound} />
         </Switch>
       </UserContext.Provider>
     </BrowserRouter>

@@ -10,14 +10,14 @@ class UsersView(generics.ListAPIView):
 	serializer_class = UserSerializer
 
 	def get_queryset(self):
-		return User.objects.all()
+		return User.objects.all().annotate(posts_count=Count('posts'))
 
 # single user - /api/users/{userID}
 class UserView(generics.ListAPIView):
 	serializer_class = UserSerializer
 
 	def get_queryset(self):
-		return User.objects.filter(id=self.kwargs['user'])
+		return User.objects.filter(id=self.kwargs['user']).annotate(posts_count=Count('posts'))
 
 # user's comments - /api/users/{userID}/comments
 class UserCommentListView(generics.ListAPIView):
@@ -73,6 +73,9 @@ class FightView(viewsets.ModelViewSet):
     serializer_class = FightSerializer
     queryset = Fight.objects.all()
 
+class PopularFightsView(generics.ListAPIView):
+    serializer_class = FightSerializer
+    queryset = Fight.objects.all().annotate(posts_count=Count('posts')).order_by('-posts_count')
 
 class SmallFightView(generics.ListAPIView):
     serializer_class = SmallFightSerializer

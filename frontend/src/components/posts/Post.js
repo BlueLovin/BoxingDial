@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 import { Container } from "reactstrap";
 
 const Post = (props) => {
-  let post = props.post;
+  //yes the following line is terrible. it checks if the argument was passed in or not. what the fuck
+  //it works tho...
   let commentsButton = props.commentsButton !== false ? true : false;
+  let post = props.post;
   return (
     <Container>
       <div className="list-group-item">
@@ -19,7 +21,7 @@ const Post = (props) => {
           </p>
           {commentsButton ? (
             <p>
-              <Link to={`/post/${post.id}`}>view comments</Link>
+              <Link to={`/post/${post.id}`}>comments</Link>
             </p>
           ) : null}
         </div>

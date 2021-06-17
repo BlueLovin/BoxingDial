@@ -18,6 +18,7 @@ urlpatterns = [
     path('api/users/<int:user>/comments/', views.UserCommentListView.as_view()),
     path('api/users', views.UsersView.as_view()),
     path('api/fights/small', views.SmallFightView.as_view()),
+    path('api/fights/popular', views.PopularFightsView.as_view()),
     path('api/posts/<int:postID>', views.PostView.as_view()),
     path('api/posts/popular', views.PopularPostsView.as_view()),
 
