@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import axios from "axios";
-import Home from "./components/Home";
-import Comments from "./components/posts/PostPage"
-import Login from "./components/accounts/Login"
-import UserProfile from "./components/accounts/UserProfile"
-import ShowUser from "./components/navbar/ShowUser"
-import FightPage from "./components/fights/FightPage"
-import { UserContext } from "./UserContext"
-import Register from "./components/accounts/Register"
+import Home from "./components/HomePage";
+import Comments from "./components/posts/PostPage";
+import Login from "./components/accounts/Login";
+import UserProfile from "./components/accounts/UserProfile";
+import ShowUser from "./components/navbar/ShowUser";
+import FightPage from "./components/fights/FightPage";
+import { UserContext } from "./UserContext";
+import Register from "./components/accounts/Register";
 import NavigationBar from "./components/navbar/NavBar";
 
 function App() {
@@ -16,37 +16,38 @@ function App() {
   const [token, setToken] = useState(null);
 
   useEffect(() => {
-    setToken(localStorage.getItem('token'));
-    const fetchUser = async () => {
-    console.log(token);
-    if (token !== '' && token) {
-      await axios.get("/api/token-auth/user", {
-        headers: {
-          "Authorization": `Token ${token}`
-        }
-      }).then((res) => setUser(res.data))
-        .catch(function (error) {
-          console.log(error.response.status)
-          console.log(error.response.data.error)
-        });
-    }
-  };
-  fetchUser();
-  }, [token])
+    setToken(localStorage.getItem("token"));
 
-  //following function sends request to API server with token from 
-  //user's browser storage. the server responds with the user associated
-  //with that token or 404s if invalid token
-  
+    //following function sends request to API server with token from
+    //user's browser storage. the server responds with the user associated
+    //with that token or 404s if invalid token
+    const fetchUser = async () => {
+      console.log(token);
+      if (token !== "" && token) {
+        await axios
+          .get("/api/token-auth/user", {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          })
+          .then((res) => setUser(res.data))
+          .catch(function (error) {
+            console.log(error.response.status);
+            console.log(error.response.data.error);
+          });
+      }
+    };
+    fetchUser();
+  }, [token]);
 
   return (
     <BrowserRouter>
       <UserContext.Provider
         value={{
           userVal: [user, setUser],
-          tokenVal: [token, setToken]
-        }}>
-          
+          tokenVal: [token, setToken],
+        }}
+      >
         <NavigationBar />
 
         <Switch>
