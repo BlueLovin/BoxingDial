@@ -12,19 +12,18 @@ const Post = (props) => {
         <p>
           <Link to={`/user/${post.owner}`}>{post.username}</Link>
         </p>
-        <p className="font-weight-light list-group-item bg-light">
+        <p className="font-weight-light list-group-item bg-light p-2 m-1">
           {post.content}
         </p>
-        <div className="d-flex text-center justify-content-between text-muted">
-          <p>
-            on: <Link to={`/fight/${post.fight.id}`}>{post.fight.title}</Link>
+        
+        {commentsButton ? (
+          <p className="text-right m-1">
+            <Link to={`/post/${post.id}`}>comments</Link>
           </p>
-          {commentsButton ? (
-            <p>
-              <Link to={`/post/${post.id}`}>comments</Link>
-            </p>
-          ) : null}
-        </div>
+        ) : null}
+        <p className="text-center p-1 m-1">
+          on: <Link to={`/fight/${post.fight.id}`}>{post.fight.title}</Link>
+        </p>
       </div>
     </Container>
   );

@@ -5,7 +5,7 @@ const SmallFight = (props) => {
   return (
     <>
     <Link to={`/fight/${fightData.id}`}>
-      <h1 className="text-center display-6">{fightData.title}</h1>
+      <h4 className="text-center">{fightData.title}</h4>
     </Link>
       <hr />
       <Row>

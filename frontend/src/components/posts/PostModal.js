@@ -38,7 +38,7 @@ export default class CustomModal extends Component {
           placeholder="Share your unbiased thoughts"
           autoFocus
         />
-        <ModalBody>
+        <ModalBody className="text-right p-3">
           <Button color="primary" onClick={() => onSave(this.state.activeItem)}>
             Post
           </Button>

@@ -26,7 +26,7 @@ export default function FightPage() {
 
   useEffect(() => {
     fetchFightData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchFightData = async () => {
@@ -85,9 +85,9 @@ export default function FightPage() {
     } else {
       return (
         <div className="text-center">
-            <Button size="lg" color="primary" onClick={createItem}>
-              Create Post
-            </Button>
+          <Button size="lg" color="primary" onClick={createItem}>
+            Create Post
+          </Button>
         </div>
       );
     }
@@ -104,9 +104,9 @@ export default function FightPage() {
             <Fight fightData={fightData} />
             <br />
             {renderCreatePost()}
-            <hr/>
-            <h4 className="text-center">Posts</h4>
-            <br/>
+            <hr />
+            <h4 className="text-center">{fightData.posts_count} Posts</h4>
+            <br />
             {renderPosts()}
           </div>
           {modal ? (

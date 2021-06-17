@@ -71,7 +71,7 @@ class PostCommentsView(viewsets.ModelViewSet):
 # all fights /api/fights
 class FightView(viewsets.ModelViewSet):
     serializer_class = FightSerializer
-    queryset = Fight.objects.all()
+    queryset = Fight.objects.all().annotate(posts_count=Count('posts'))
 
 class PopularFightsView(generics.ListAPIView):
     serializer_class = FightSerializer
