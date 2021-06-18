@@ -12,10 +12,10 @@ const Post = (props) => {
         <p>
           <Link to={`/user/${post.owner}`}>{post.username}</Link>
         </p>
-        <p className="font-weight-light list-group-item bg-light p-2 m-1">
+        <p className="font-weight-light list-group-item bg-light p-2 m-1 post-content">
           {post.content}
         </p>
-        
+
         {commentsButton ? (
           <p className="text-right m-1">
             <Link to={`/post/${post.id}`}>comments</Link>

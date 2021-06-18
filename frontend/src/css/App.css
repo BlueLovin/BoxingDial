@@ -58,6 +58,9 @@
   width: 100%;
   display: inline-block;
 }
+.post-content{
+  white-space: pre-line;
+}
 
 
 textarea {
