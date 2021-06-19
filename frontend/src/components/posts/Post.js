@@ -12,7 +12,7 @@ const Post = (props) => {
         <p>
           <Link to={`/user/${post.owner}`}>{post.username}</Link>
         </p>
-        <p className="font-weight-light list-group-item bg-light p-2 m-1 preserve-white-space">
+        <p className="font-weight-light list-group-item bg-light p-2 m-1 preserve-line-breaks">
           {post.content}
         </p>
 
