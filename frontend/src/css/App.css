@@ -58,7 +58,7 @@
   width: 100%;
   display: inline-block;
 }
-.post-content{
+.preserve-line-breaks{
   white-space: pre-line;
 }
 
