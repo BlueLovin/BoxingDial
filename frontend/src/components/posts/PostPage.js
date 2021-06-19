@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { UserContext } from '../../UserContext';
 import { Button, FormGroup, Input, Container } from 'reactstrap';
@@ -66,7 +66,6 @@ export default function Comments() {
 		});
 	};
 
-
 	const renderPost = (post) => {
 		return <>{post.fight ? <Post post={post} commentsButton={false} /> : 'loading'}</>;
 	};
@@ -109,7 +108,7 @@ export default function Comments() {
 			<Container>
 				<div className="h3 text-info font-weight-bold">
 					<br />
-					{commentList ? commentList.length + ' comments' : 'loading'}
+					{currentPost.comment_count ? currentPost.comment_count + ' comments' : 'loading'}
 				</div>
 				<br />
 				{renderCommentInput()}

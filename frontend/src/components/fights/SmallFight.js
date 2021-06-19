@@ -1,9 +1,16 @@
 import { Row, Col } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import ShowMoreText from 'react-show-more-text';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
-const SmallFight = (props) => {
+function SmallFight(props) {
 	let fightData = props.fightData;
+	const history = useHistory();
+
+	const goToFight = () => {
+		history.push(`/fight/${fightData.id}`);
+	};
+
 	return (
 		<>
 			<Link to={`/fight/${fightData.id}`}>
@@ -24,13 +31,13 @@ const SmallFight = (props) => {
 				</Col>
 			</Row>
 			<Row className="p-3 preserve-line-breaks">
-				<ShowMoreText>
+				<ShowMoreText onClick={goToFight}>
 					<p>{fightData.description}</p>
 				</ShowMoreText>
 				<br />
 			</Row>
 		</>
 	);
-};
+}
 
 export default SmallFight;

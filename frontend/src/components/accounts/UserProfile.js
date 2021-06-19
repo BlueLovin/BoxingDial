@@ -15,19 +15,16 @@ export default function UserProfile() {
 	const [profile, setProfile] = useState({});
 	const [loading, setLoading] = useState(true);
 	const [activeTab, setActiveTab] = useState('1');
-  const { userVal } = useContext(UserContext);
-  const [user] = userVal;
+	const { userVal } = useContext(UserContext);
+	const [user] = userVal;
 
-	const toggle = (tab) => {
-		if (activeTab !== tab) setActiveTab(tab);
-	};
 	useEffect(() => {
 		const fetchUserPosts = async () => {
 			setLoading(true);
 			await axios.get(`/api/users/${userID}/posts`).then((res) => {
 				setPostsList(res.data);
 			});
-      await axios.get(`/api/users/${userID}/comments`).then((res) => {
+			await axios.get(`/api/users/${userID}/comments`).then((res) => {
 				setCommentsList(res.data);
 				setLoading(false);
 			});
@@ -51,11 +48,11 @@ export default function UserProfile() {
 		));
 	};
 
-  const renderUserComments = () => {
+	const renderUserComments = () => {
 		return commentsList.map((comment) => (
 			<>
 				<br />
-				<Comment comment={comment} user={user} />
+				<Comment comment={comment} user={user} contextButton={true}/>
 			</>
 		));
 	};
@@ -71,12 +68,18 @@ export default function UserProfile() {
 					<div className="">
 						<Nav tabs className="justify-content-center">
 							<NavItem>
-								<NavLink className={activeTab == '1' ? 'active' : ''} onClick={() => setActiveTab('1')}>
+								<NavLink
+									className={activeTab === '1' ? 'active' : ''}
+									onClick={() => setActiveTab('1')}
+								>
 									Posts
 								</NavLink>
 							</NavItem>
 							<NavItem>
-								<NavLink className={activeTab == '2' ? 'active' : ''} onClick={() => setActiveTab('2')}>
+								<NavLink
+									className={activeTab === '2' ? 'active' : ''}
+									onClick={() => setActiveTab('2')}
+								>
 									Comments and Replies
 								</NavLink>
 							</NavItem>
