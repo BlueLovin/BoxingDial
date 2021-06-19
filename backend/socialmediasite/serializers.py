@@ -20,6 +20,10 @@ class SmallFightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Fight
         fields = ('id', 'title', 'description', 'result', 'date', 'image_URL')
+class TinyFightSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Fight
+        fields = ('id', 'title', 'result', 'date', 'image_URL')
 class PostSerialzer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True)
     fight = SmallFightSerializer(many=False)
@@ -47,7 +51,7 @@ class CreatePostSerializer(serializers.ModelSerializer):
         return post
 
 class SmallPostSerialzer(serializers.ModelSerializer):
-    fight = SmallFightSerializer(many=False)
+    fight = TinyFightSerializer(many=False)
 
     class Meta:
         model = Post
