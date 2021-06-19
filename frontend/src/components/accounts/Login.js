@@ -46,12 +46,11 @@ export default function Login() {
   };
 
   return (
-    <div className="col-md-6 mx-auto text-center container w-25 d-flex justify-content-center">
+    <div className="mx-auto text-center container login-container">
       <div className="card card-body mt-5">
         <h2 className="font-weight-bold">Login</h2>
         <div className="form-group text-center">
           <br />
-
           <input
             type="text"
             className="form-control"

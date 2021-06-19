@@ -71,3 +71,10 @@ textarea {
   outline: none;
   resize: none;
 }
+
+.login-container {
+  max-width: 500px;
+}
+.register-container {
+  max-width: 500px;
+}

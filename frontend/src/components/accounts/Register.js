@@ -43,7 +43,7 @@ export default function Register() {
 
 
   return (
-    <div className="col-md-6 m-auto">
+    <div className="container login-container">
       <div className="card card-body mt-5">
         <h2 className="text-center">Register</h2>
         <div className="form-group">
