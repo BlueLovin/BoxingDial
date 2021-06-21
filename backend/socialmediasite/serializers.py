@@ -52,10 +52,10 @@ class CreatePostSerializer(serializers.ModelSerializer):
 
 class SmallPostSerialzer(serializers.ModelSerializer):
     fight = TinyFightSerializer(many=False)
-
+    comment_count = serializers.IntegerField()
     class Meta:
         model = Post
-        fields = ('id', 'fight', 'content', 'owner', 'username')
+        fields = ('id', 'fight', 'content', 'comment_count', 'owner', 'username')
         
 class FightSerializer(serializers.ModelSerializer):
     posts = SmallPostSerialzer(many=True)

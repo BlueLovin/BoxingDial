@@ -23,8 +23,7 @@ urlpatterns = [
     url(r'api/fights/(?P<pk>[0-9]+)/$', views.FightView.as_view()),
     path('api/fights/small', views.SmallFightView.as_view()),
     path('api/fights/popular', views.PopularFightsView.as_view()),
-
-    path('api/posts/<int:postID>', views.PostView.as_view()),
+    
     path('api/posts/popular', views.PopularPostsView.as_view()),
 
     path('', include('accounts.urls')),

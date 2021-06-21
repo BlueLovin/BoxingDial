@@ -1,120 +1,138 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import { UserContext } from '../../UserContext';
-import { Button, FormGroup, Input, Container } from 'reactstrap';
-import Post from './Post';
-import Comment from '../comments/Comment';
+import React, { useEffect, useState, useContext, useCallback } from "react";
+import { useHistory, useParams, Link } from "react-router-dom";
+import axios from "axios";
+import { UserContext } from "../../UserContext";
+import { Button, FormGroup, Input, Container } from "reactstrap";
+import Post from "./Post";
+import Comment from "../comments/Comment";
 
 export default function Comments() {
-	const params = useParams();
-	const postID = params.id;
+  const params = useParams();
+  const postID = params.id;
 
-	const [commentList, setCommentList] = useState([]);
+  const [commentList, setCommentList] = useState([]);
 
-	const [currentPost, setCurrentPost] = useState({
-		content: '',
-	});
+  const [currentPost, setCurrentPost] = useState({
+    content: "",
+  });
 
-	const { tokenVal, userVal } = useContext(UserContext);
-	const [token] = tokenVal;
-	const [user] = userVal;
-	const [activeItem, setActiveItem] = useState({
-		post: postID,
-		content: '',
-		owner: user ? user.id : null,
-	});
+  const { tokenVal, userVal } = useContext(UserContext);
+  const [token] = tokenVal;
+  const [user] = userVal;
+  const [activeItem, setActiveItem] = useState({
+    post: postID,
+    content: "",
+    owner: user ? user.id : null,
+  });
+  const history = useHistory();
 
-	const getPost = useCallback(async () => {
-		await axios
-			.get('/api/posts/' + postID) // get current post
-			.then((res) => {
-				setCurrentPost(res.data[0]);
-				setCommentList(res.data[0].comments);
-			})
-			.catch((err) => alert(err));
-	}, [postID]);
-	useEffect(() => {
-		getPost();
-	}, [getPost]);
+  const getPost = useCallback(async () => {
+    await axios
+      .get("/api/posts/" + postID) // get current post
+      .then((res) => {
+        setCurrentPost(res.data);
+        setCommentList(res.data.comments);
+      })
+      .catch((err) => history.push('/404'));
+  }, [postID, history]);
 
-	var handleChange = (e) => {
-		let { name, value } = e.target;
+  useEffect(() => {
+    getPost();
+  }, [getPost]);
 
-		const item = {
-			post: postID,
-			[name]: value,
-			username: user ? user.username : 'null',
-			owner: user ? user.id : null,
-		};
-		setActiveItem(item);
-	};
+  var handleChange = (e) => {
+    let { name, value } = e.target;
 
-	const options = {
-		'content-type': 'application/json',
-		Authorization: `Token ${token}`,
-	};
-	const submitComment = (item) => {
-		axios // create
-			.post('/api/comments/', item, { headers: options })
-			.then((res) => getPost());
+    const item = {
+      post: postID,
+      [name]: value,
+      username: user ? user.username : "null",
+      owner: user ? user.id : null,
+    };
+    setActiveItem(item);
+  };
 
-		setActiveItem({
-			// RESET TEXT BOX
-			post: postID,
-			content: '',
-		});
-	};
+  const options = {
+    "content-type": "application/json",
+    Authorization: `Token ${token}`,
+  };
+  const submitComment = (item) => {
+    axios // create
+      .post("/api/comments/", item, { headers: options })
+      .then((res) => getPost());
 
-	const renderPost = (post) => {
-		return <>{post.fight ? <Post post={post} commentsButton={false} /> : 'loading'}</>;
-	};
+    setActiveItem({
+      // RESET TEXT BOX
+      post: postID,
+      content: "",
+    });
+  };
 
-	const renderCommentInput = () => {
-		if (user) {
-			return (
-				<div className="list-group-item text-center align-items-center p-5">
-					<h4>share your dumbass thoughts</h4>
+  const renderPost = (post) => {
+    return (
+      <>
+        {post.content ? <Post post={post} commentsButton={false} /> : "loading"}
+      </>
+    );
+  };
 
-					<FormGroup>
-						<Input type="textarea" name="content" value={activeItem.content} onChange={handleChange} />
-					</FormGroup>
+  const renderCommentInput = () => {
+    if (user) {
+      return (
+        <div className="list-group-item text-center align-items-center p-5">
+          <h4>share your dumbass thoughts</h4>
 
-					<Button color="success" onClick={() => submitComment(activeItem)}>
-						Post
-					</Button>
-				</div>
-			);
-		} else {
-			return (
-				<div className="list-group-item text-center align-items-center p-5">
-					<h4>Please login to post a comment</h4>
-				</div>
-			);
-		}
-	};
+          <FormGroup>
+            <Input
+              type="textarea"
+              name="content"
+              value={activeItem.content}
+              onChange={handleChange}
+            />
+          </FormGroup>
 
-	const renderComments = () => {
-		return commentList
-			.slice(0)
-			.reverse()
-			.map((comment) => <Comment comment={comment} user={user} />);
-	};
+          <Button color="success" onClick={() => submitComment(activeItem)}>
+            Post
+          </Button>
+        </div>
+      );
+    } else {
+      return (
+        <div className="list-group-item text-center align-items-center p-5">
+          <h4>Please <Link to={`/login/`}>login</Link> to post a comment</h4>
+        </div>
+      );
+    }
+  };
 
-	return (
-		<div>
-			<br />
-			{currentPost ? renderPost(currentPost) : 'loading'}
-			<Container>
-				<div className="h3 text-info font-weight-bold">
-					<br />
-					{currentPost.comment_count ? currentPost.comment_count + ' comments' : 'loading'}
-				</div>
-				<br />
-				{renderCommentInput()}
-			</Container>
-			<br />
-			<div>{commentList ? renderComments() : 'loading'}</div>
-		</div>
-	);
+  const renderComments = () => {
+    return commentList
+      .slice(0)
+      .reverse()
+      .map((comment) => <Comment comment={comment} user={user} />);
+  };
+
+  return (
+    <div>
+      <br />
+      {currentPost ? (
+        <>
+          {renderPost(currentPost)}
+          <Container>
+            <div className="h3 text-info font-weight-bold">
+              <br />
+              {currentPost.comment_count !== null
+                ? currentPost.comment_count + " comments"
+                : "loading"}
+            </div>
+            <br />
+            {renderCommentInput()}
+          </Container>
+          <br />
+          <div>{commentList ? renderComments() : null}</div>
+        </>
+      ) : 
+        "loading"}
+    </div>
+  );
 }
