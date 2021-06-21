@@ -1,6 +1,6 @@
 from rest_framework import viewsets, permissions, generics
 from .models import Post, PostComment, Fight
-from .serializers import CreatePostSerializer, PostSerializer, CommentSerializer, SmallFightSerializer, UserSerializer, FightSerializer, SmallPostSerialzer
+from .serializers import CreatePostSerializer, PostSerializer, CommentSerializer, SmallFightSerializer, UserSerializer, FightSerializer, SmallPostSerializer
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.db.models import Count, Prefetch
@@ -36,7 +36,7 @@ class UserCommentListView(generics.ListAPIView):
 
 
 class UserPostListView(generics.ListAPIView):
-    serializer_class = SmallPostSerialzer
+    serializer_class = SmallPostSerializer
 
     def get_queryset(self):
         return Post.objects.filter(owner=self.kwargs['user']).annotate(comment_count=Count('comments')).order_by('-id')
@@ -46,7 +46,7 @@ class UserPostListView(generics.ListAPIView):
 
 
 class PostsView(generics.ListAPIView):
-    serializer_class = SmallPostSerialzer
+    serializer_class = SmallPostSerializer
 
     def get_queryset(self):
         return Post.objects.all().annotate(comment_count=Count('comments'))
@@ -72,7 +72,7 @@ class PostView(generics.RetrieveAPIView):
 
 
 class PopularPostsView(generics.ListAPIView):
-    serializer_class = SmallPostSerialzer
+    serializer_class = SmallPostSerializer
 
     def get_queryset(self):
         return Post.objects.annotate(comment_count=Count('comments')).order_by('-comment_count')[:5]
@@ -98,7 +98,8 @@ class FightView(generics.RetrieveAPIView):
 
 class FightsView(generics.ListAPIView):
     serializer_class = FightSerializer
-    query = Fight.objects.all().annotate(
+    query = Fight.objects.all().prefetch_related(
+            Prefetch('posts', Post.objects.annotate(comment_count=Count('comments')))).annotate(
         posts_count=Count('posts')).order_by('-id')
     queryset = query[:5]  # five most recent fights
 

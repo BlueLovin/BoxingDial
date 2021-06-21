@@ -16,14 +16,17 @@ class CommentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         comment = PostComment.objects.create(**validated_data)
         return comment
+
 class SmallFightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Fight
         fields = ('id', 'title', 'description', 'result', 'date', 'image_URL')
+
 class TinyFightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Fight
         fields = ('id', 'title', 'result', 'date', 'image_URL')
+
 class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True)
     fight = SmallFightSerializer(many=False)
@@ -50,7 +53,7 @@ class CreatePostSerializer(serializers.ModelSerializer):
             PostComment.objects.create(Post=post, **comments, owner=owner, username=username)
         return post
 
-class SmallPostSerialzer(serializers.ModelSerializer):
+class SmallPostSerializer(serializers.ModelSerializer):
     fight = TinyFightSerializer(many=False)
     comment_count = serializers.IntegerField()
     class Meta:
@@ -58,7 +61,7 @@ class SmallPostSerialzer(serializers.ModelSerializer):
         fields = ('id', 'fight', 'content', 'comment_count', 'owner', 'username')
         
 class FightSerializer(serializers.ModelSerializer):
-    posts = PostSerializer(many=True)
+    posts = SmallPostSerializer(many=True)
     posts_count = serializers.IntegerField()
     class Meta:
         model = Fight
