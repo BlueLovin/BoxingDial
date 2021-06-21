@@ -3,11 +3,13 @@ import axios from "axios";
 import { NavbarBrand } from "reactstrap";
 import { Link, NavLink } from "react-router-dom";
 import { UserContext } from "../../UserContext";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function ShowUser() {
   const { userVal, tokenVal } = useContext(UserContext);
   const [token] = tokenVal;
   const [user, setUser] = userVal;
+  const history = useHistory();
 
   const Logout = async () => {
     setUser(null);
@@ -22,7 +24,7 @@ export default function ShowUser() {
         }
       )
       .then(
-        window.location.reload() // reload page
+        history.push("/") // reload page
       )
       .catch(function (error) {
         console.log(error.response.status); // 401

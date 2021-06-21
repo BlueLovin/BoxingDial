@@ -129,7 +129,7 @@ export default function Comments() {
             {renderCommentInput()}
           </Container>
           <br />
-          <div>{commentList ? renderComments() : null}</div>
+          <div>{commentList != null ? renderComments() : null}</div>
         </>
       ) : 
         "loading"}

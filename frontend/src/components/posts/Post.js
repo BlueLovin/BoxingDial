@@ -20,7 +20,7 @@ const Post = (props) => {
 				<div className="text-right m-1">
 					{commentsButton ? (
 						<p>
-							<Link to={`/post/${post.id}`}>comments</Link>
+							<Link to={`/post/${post.id}`}>{post.comment_count} comments</Link>
 						</p>
 					) : null}
 					<span>

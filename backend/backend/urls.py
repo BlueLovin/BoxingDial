@@ -5,7 +5,7 @@ from rest_framework import routers
 from socialmediasite import views
 
 router = routers.DefaultRouter()
-router.register(r'posts', views.PostsView, 'post')
+# router.register(r'posts', views.PostsView, 'post')
 router.register(r'comments', views.PostCommentsView, 'postcomment')
 router.register(r'post/create', views.CreatePostView, 'createpost')
 
@@ -23,7 +23,10 @@ urlpatterns = [
     url(r'api/fights/(?P<pk>[0-9]+)/$', views.FightView.as_view()),
     path('api/fights/small', views.SmallFightView.as_view()),
     path('api/fights/popular', views.PopularFightsView.as_view()),
+
     
+    path('api/posts/', views.PostsView.as_view()),
+    url(r'api/posts/(?P<pk>[0-9]+)/$', views.PostView.as_view()),
     path('api/posts/popular', views.PopularPostsView.as_view()),
 
     path('', include('accounts.urls')),

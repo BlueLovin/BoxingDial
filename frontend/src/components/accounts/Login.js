@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Button } from "reactstrap";
@@ -10,10 +10,17 @@ export default function Login() {
     username: "",
     password: "",
   });
+  const [error, setError] = useState(false);
   const history = useHistory();
   const { userVal, tokenVal } = useContext(UserContext);
-  const [, setUser] = userVal;
+  const [user, setUser] = userVal;
   const [, setToken] = tokenVal;
+
+  useEffect(() => {
+    if (user) {
+      history.goBack();
+    }
+  }, [history, user]);
 
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -32,8 +39,13 @@ export default function Login() {
       .then((res) => {
         localStorage.setItem("token", res.data.token);
         setUser(res.data.user);
+
+        if (error) {
+          setError(false);
+        }
+        history.goBack();
       })
-      .catch((res) => alert(res));
+      .catch((res) => setError(true));
 
     setActiveItem({
       // RESET TEXT BOX
@@ -41,8 +53,6 @@ export default function Login() {
       password: "",
     });
     setToken(localStorage.getItem("token"));
-
-    history.push("/");
   };
 
   return (
@@ -53,22 +63,30 @@ export default function Login() {
           <br />
           <input
             type="text"
-            className="form-control"
+            className={error ? "form-control border-danger" : "form-control"}
             name="username"
             placeholder="Username"
             onChange={handleChange}
+            onFocus={() => setError(false)}
             value={activeItem.username}
           />
         </div>
         <div className="form-group text-center">
           <input
             type="password"
-            className="form-control"
+            className={error ? "form-control border-danger" : "form-control"}
             name="password"
             placeholder="Password"
             onChange={handleChange}
+            onFocus={() => setError(false)}
             value={activeItem.password}
           />
+          {error ? (
+            <>
+              <br />
+              <h6 className="text-danger">Invalid username or password</h6>
+            </>
+          ) : null}
         </div>
         <div className="form-group text-center">
           <Button color="success" onClick={() => submitUser(activeItem)}>
