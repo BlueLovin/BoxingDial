@@ -33,7 +33,7 @@ export default function Comments() {
         setCurrentPost(res.data);
         setCommentList(res.data.comments);
       })
-      .catch((err) => history.push('/404'));
+      .catch((err) => history.push("/404"));
   }, [postID, history]);
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export default function Comments() {
     if (user) {
       return (
         <div className="list-group-item text-center align-items-center p-5">
-          <h4>share your dumbass thoughts</h4>
+          <h4>share your thoughts</h4>
 
           <FormGroup>
             <Input
@@ -99,7 +99,9 @@ export default function Comments() {
     } else {
       return (
         <div className="list-group-item text-center align-items-center p-5">
-          <h4>Please <Link to={`/login/`}>login</Link> to post a comment</h4>
+          <h4>
+            Please <Link to={`/login/`}>login</Link> to post a comment
+          </h4>
         </div>
       );
     }
@@ -131,8 +133,9 @@ export default function Comments() {
           <br />
           <div>{commentList != null ? renderComments() : null}</div>
         </>
-      ) : 
-        "loading"}
+      ) : (
+        "loading"
+      )}
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Container } from 'reactstrap';
 
 const Post = (props) => {
-	//yes the following line is terrible. it checks if the argument was passed in or not. what the fuck
+	//yes the following line is terrible. it checks if the argument was passed in or not. what the f@ck
 	//it works tho...
 	let commentsButton = props.commentsButton !== false ? true : false;
 	let post = props.post;

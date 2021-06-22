@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom/cjs/react-router-dom.min";
+import { useParams, Link } from "react-router-dom/cjs/react-router-dom.min";
 import { UserContext } from "../../UserContext";
 import Post from "../posts/Post";
 import Fight from "./Fight";
@@ -79,7 +79,7 @@ export default function FightPage() {
     if (!user) {
       return (
         <div>
-          <h3 className="text-center">Log in to make a post</h3>
+          <h3 className="text-center"><Link to={'/login/'}>Login</Link> to make a post</h3>
         </div>
       );
     } else {

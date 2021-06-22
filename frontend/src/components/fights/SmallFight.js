@@ -30,7 +30,7 @@ function SmallFight(props) {
 					</p>
 				</Col>
 			</Row>
-			<Row className="p-3 preserve-line-breaks">
+			<Row className="p-3 preserve-line-breaks m-2">
 				<ShowMoreText onClick={goToFight}>
 					<p>{fightData.description}</p>
 				</ShowMoreText>

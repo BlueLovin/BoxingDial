@@ -80,10 +80,8 @@ export default function Register() {
     if (error && errorMessages) {
       return errorMessages.map((error) => (
         <>
-          <>
-            <br />
-            <h6 className="text-danger">{error}</h6>
-          </>
+          <br />
+          <h6 className="text-danger">{error}</h6>
         </>
       ));
     }
