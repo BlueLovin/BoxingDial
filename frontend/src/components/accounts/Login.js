@@ -43,6 +43,7 @@ export default function Login() {
         if (error) {
           setError(false);
         }
+        setToken(localStorage.getItem("token"));
         history.goBack();
       })
       .catch((res) => setError(true));
@@ -52,7 +53,6 @@ export default function Login() {
       username: "",
       password: "",
     });
-    setToken(localStorage.getItem("token"));
   };
 
   return (

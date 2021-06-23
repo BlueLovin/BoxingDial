@@ -86,13 +86,15 @@ function App() {
           <Route path="/fight/:fightID" exact>
             <FightPage />
           </Route>
-          
+
           <Route path="/fights/popular" exact>
             <PopularFights />
           </Route>
+
           <Route path="/fights/recent" exact>
             <RecentFights />
           </Route>
+
           <Route component={NotFound} />
         </Switch>
       </UserContext.Provider>
