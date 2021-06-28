@@ -6,10 +6,15 @@ import { Container } from "reactstrap";
 const Comment = (props) => {
   const comment = props.comment;
   const user = props.user;
-  let contextButton = props.contextButton !== true ? false : true; // what the f#ck? this means default false. unless stated otherwise
+  const { contextButton = false } = props;
+  const { updateStateFunction = null } = props;
 
   const deleteComment = (comment) => {
-    axios.delete(`/api/comments/${comment.id}/`);
+    axios.delete(`/api/comments/${comment.id}/`).then(() => {
+      if (updateStateFunction) {
+        updateStateFunction();
+      }
+    });
   };
 
   return (

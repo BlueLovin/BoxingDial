@@ -59,7 +59,7 @@ export default function Comments() {
   const submitComment = (item) => {
     axios // create
       .post("/api/comments/", item, { headers: options })
-      .then((res) => getPost());
+      .then(() => getPost());
 
     setActiveItem({
       // RESET TEXT BOX
@@ -111,7 +111,9 @@ export default function Comments() {
     return commentList
       .slice(0)
       .reverse()
-      .map((comment) => <Comment comment={comment} user={user} />);
+      .map((comment) => (
+        <Comment comment={comment} user={user} updateStateFunction={getPost} />
+      ));
   };
 
   return (

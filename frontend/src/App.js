@@ -34,11 +34,8 @@ function App() {
               Authorization: `Token ${token}`,
             },
           })
-          .then((res) => setUser(res.data))
-          .catch(function (error) {
-            console.log(error.response.status);
-            console.log(error.response.data.error);
-          });
+          .then((res) => setUser(res.data))//success = set user with response
+          .catch((error) => setUser(null));//failure = set user to null
       }
     };
     fetchUser();
