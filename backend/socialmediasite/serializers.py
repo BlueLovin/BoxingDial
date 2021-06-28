@@ -2,7 +2,6 @@ from rest_framework import serializers
 from .models import Post, PostComment, Fight
 from django.contrib.auth.models import User
 
-
 class UserSerializer(serializers.ModelSerializer):
     posts_count = serializers.IntegerField()
     class Meta:

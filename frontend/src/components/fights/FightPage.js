@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom/cjs/react-router-dom.min";
 import { UserContext } from "../../UserContext";
@@ -24,12 +24,7 @@ export default function FightPage() {
     username: null,
   });
 
-  useEffect(() => {
-    fetchFightData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchFightData = async () => {
+  const fetchFightData = useCallback(async () => {
     setLoading(true);
     let data = {};
     //fetch fight data
@@ -39,7 +34,12 @@ export default function FightPage() {
     console.log(data);
     setFightData(data); // set local fight object
     setLoading(false);
-  };
+  }, [fightID]);
+
+  useEffect(() => {
+    fetchFightData();
+  }, [fetchFightData]);
+
   const options = {
     "content-type": "application/json",
     Authorization: `Token ${token}`,
@@ -50,7 +50,7 @@ export default function FightPage() {
       .reverse()
       .map((post) => (
         <>
-          <Post post={post} /> <br />
+          <Post post={post} updateStateFunction={fetchFightData}/> <br />
         </>
       ));
   };
@@ -79,7 +79,9 @@ export default function FightPage() {
     if (!user) {
       return (
         <div>
-          <h3 className="text-center"><Link to={'/login/'}>Login</Link> to make a post</h3>
+          <h3 className="text-center">
+            <Link to={"/login/"}>Login</Link> to make a post
+          </h3>
         </div>
       );
     } else {

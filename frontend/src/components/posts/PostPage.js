@@ -71,7 +71,7 @@ export default function Comments() {
   const renderPost = (post) => {
     return (
       <>
-        {post.content ? <Post post={post} commentsButton={false} /> : "loading"}
+        {post.content ? <Post post={post} commentsButton={false} user={user} token={token}/> : "loading"}
       </>
     );
   };
@@ -112,7 +112,7 @@ export default function Comments() {
       .slice(0)
       .reverse()
       .map((comment) => (
-        <Comment comment={comment} user={user} updateStateFunction={getPost} />
+        <Comment comment={comment} user={user} token={token} updateStateFunction={getPost} />
       ));
   };
 

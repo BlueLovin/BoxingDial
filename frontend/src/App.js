@@ -21,7 +21,7 @@ function App() {
 
   useEffect(() => {
     setToken(localStorage.getItem("token"));
-
+    
     //following function sends request to API server with token from
     //user's browser storage. the server responds with the user associated
     //with that token or 404s if invalid token
@@ -35,7 +35,7 @@ function App() {
             },
           })
           .then((res) => setUser(res.data))//success = set user with response
-          .catch((error) => setUser(null));//failure = set user to null
+          .catch(() => setUser(null));//failure = set user to null
       }
     };
     fetchUser();

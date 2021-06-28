@@ -2,10 +2,10 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
+from django.views.decorators.csrf import csrf_exempt
 from socialmediasite import views
 
 router = routers.DefaultRouter()
-# router.register(r'posts', views.PostsView, 'post')
 router.register(r'comments', views.PostCommentsView, 'postcomment')
 router.register(r'post/create', views.CreatePostView, 'createpost')
 
