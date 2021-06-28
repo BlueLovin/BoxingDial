@@ -3,7 +3,7 @@ from rest_framework import viewsets, permissions, generics, status
 from .models import Post, PostComment, Fight
 from .serializers import CreatePostSerializer, PostSerializer, CommentSerializer, SmallFightSerializer, UserSerializer, FightSerializer, SmallPostSerializer
 from django.shortcuts import get_object_or_404
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsAdminUserOrReadOnly, IsOwnerOrReadOnly
 from django.contrib.auth.models import User
 from django.db.models import Count, Prefetch
 
