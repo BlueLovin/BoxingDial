@@ -31,7 +31,6 @@ export default function FightPage() {
     await axios.get(`/api/fights/${fightID}/`).then((res) => {
       data = res.data;
     });
-    console.log(data);
     setFightData(data); // set local fight object
     setLoading(false);
   }, [fightID]);
@@ -45,14 +44,11 @@ export default function FightPage() {
     Authorization: `Token ${token}`,
   };
   const renderPosts = () => {
-    return fightData.posts
-      .slice(0)
-      .reverse()
-      .map((post) => (
-        <>
-          <Post post={post} updateStateFunction={fetchFightData}/> <br />
-        </>
-      ));
+    return fightData.posts.map((post, i) => (
+      <>
+        <Post post={post} updateStateFunction={fetchFightData} /> <br />
+      </>
+    ));
   };
   const toggle = () => {
     setModal(!modal);

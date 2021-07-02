@@ -11,10 +11,11 @@ export default function Register() {
     email: "",
     password: "",
   });
-  const { userVal } = useContext(UserContext);
+  const { userVal, tokenVal } = useContext(UserContext);
   const [error, setError] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
   const [, setUser] = userVal;
+  const [, setToken] = tokenVal;
   const history = useHistory();
 
   const handleChange = (e) => {
@@ -34,6 +35,8 @@ export default function Register() {
       .post("/api/token-auth/register", item)
       .then((res) => {
         setError(false);
+        setToken(res.data.token);
+        localStorage.removeItem("token");
         localStorage.setItem("token", res.data.token);
         setUser(res.data.user);
         history.goBack();

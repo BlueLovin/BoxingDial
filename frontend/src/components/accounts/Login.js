@@ -14,13 +14,30 @@ export default function Login() {
   const history = useHistory();
   const { userVal, tokenVal } = useContext(UserContext);
   const [user, setUser] = userVal;
-  const [, setToken] = tokenVal;
+  const [token, setToken] = tokenVal;
 
   useEffect(() => {
     if (user) {
       history.goBack();
     }
   }, [history, user]);
+
+  const fetchUser = async () => {
+    // fetch user and set user state
+    await axios
+      .get("/api/token-auth/user", {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      })
+      .then((res) => setUser(res.data)) //success = set user with response
+      .catch(() => setUser(null)); //failure = set user to null
+    };
+
+  // useEffect(()=>{
+    
+  //   fetchUser();
+  // }, [token, setUser])
 
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -34,17 +51,18 @@ export default function Login() {
   };
 
   const submitUser = async (item) => {
-    await axios // create
+    // create user object
+    await axios
       .post("/api/token-auth/login", item)
       .then((res) => {
+        setToken(res.data.token);
+        localStorage.removeItem("token");
         localStorage.setItem("token", res.data.token);
-        setUser(res.data.user);
-
         if (error) {
           setError(false);
         }
-        setToken(localStorage.getItem("token"));
         history.goBack();
+        fetchUser();
       })
       .catch((res) => setError(true));
 
