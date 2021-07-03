@@ -52,6 +52,7 @@ export default function FightPage() {
   };
   const toggle = () => {
     setModal(!modal);
+      
   };
   const submitPost = async (item) => {
     toggle();
@@ -70,6 +71,7 @@ export default function FightPage() {
     };
     setActiveItem(item);
     setModal(!modal);
+    // textarea.current.focus();
   };
   const renderCreatePost = () => {
     if (!user) {
@@ -112,6 +114,7 @@ export default function FightPage() {
               activeItem={activeItem}
               toggle={toggle}
               onSave={submitPost}
+              autoFocus={false}
             />
           ) : null}
         </>

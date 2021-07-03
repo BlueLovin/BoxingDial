@@ -3,7 +3,7 @@ import { Button, Modal, ModalHeader, ModalBody } from "reactstrap";
 import TextareaAutosize from "react-textarea-autosize";
 
 export default function PostModal(props) {
-  const { toggle, onSave } = props;
+  let { toggle, onSave } = props;
   const [activeItem, setActiveItem] = useState(props.activeItem);
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -13,9 +13,10 @@ export default function PostModal(props) {
   };
 
   return (
-    <Modal isOpen={true} toggle={toggle}>
+    <Modal isOpen={true} toggle={toggle} autoFocus={false}>
       <ModalHeader toggle={toggle}>Create Post</ModalHeader>
       <TextareaAutosize
+        autoFocus={true}
         id="content"
         className="m-3 bg-light rounded p-2"
         name="content"
@@ -24,7 +25,6 @@ export default function PostModal(props) {
         value={activeItem.content}
         onChange={handleChange}
         placeholder="Share your unbiased thoughts"
-        autoFocus
       />
       <ModalBody className="text-right p-3">
         <Button color="primary" onClick={() => onSave(activeItem)}>
