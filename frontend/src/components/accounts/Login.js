@@ -86,6 +86,8 @@ export default function Login() {
             placeholder="Username"
             onChange={handleChange}
             onFocus={() => setError(false)}
+            autoFocus={true}
+            autoComplete="off"
             value={activeItem.username}
           />
         </div>

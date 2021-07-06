@@ -54,10 +54,12 @@ export default function Comments() {
 
   const submitComment = (item) => {
     axios // create
-      .post("/api/comments/", item, { headers: {
-        "content-type": "application/json",
-        Authorization: `Token ${token}`,
-      } })
+      .post("/api/comments/", item, {
+        headers: {
+          "content-type": "application/json",
+          Authorization: `Token ${token}`,
+        },
+      })
       .then(() => getPost());
 
     setActiveItem({

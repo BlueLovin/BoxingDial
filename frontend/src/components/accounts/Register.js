@@ -103,6 +103,8 @@ export default function Register() {
             name="username"
             onChange={handleChange}
             value={activeItem.username}
+            autoFocus={true}
+            autoComplete="off"
             required
           />
         </div>

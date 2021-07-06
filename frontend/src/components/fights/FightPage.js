@@ -44,15 +44,17 @@ export default function FightPage() {
     Authorization: `Token ${token}`,
   };
   const renderPosts = () => {
-    return fightData.posts.map((post, i) => (
-      <>
-        <Post post={post} updateStateFunction={fetchFightData} /> <br />
-      </>
-    ));
+    return fightData.posts
+      .slice(0)
+      .reverse()
+      .map((post) => (
+        <>
+          <Post post={post} updateStateFunction={fetchFightData} /> <br />
+        </>
+      ));
   };
   const toggle = () => {
     setModal(!modal);
-      
   };
   const submitPost = async (item) => {
     toggle();
