@@ -33,7 +33,7 @@ const Post = (props) => {
     <Container>
       <div className="list-group-item p-3">
         <span>
-          <Link to={`/user/${post.owner}`}>{post.username}</Link>
+          <Link to={`/user/${post.username}`}>{post.username}</Link>
         </span>
         <br />
         <br />

@@ -29,7 +29,7 @@ const Comment = (props) => {
         <div className="list-group-item p-auto  m-auto d-flex justify-content-between align-items-center ">
           <div>
             <span className="text-muted">by </span>
-            <Link to={`/user/${comment.owner}`}>{comment.username}</Link>
+            <Link to={`/user/${comment.username}`}>{comment.username}</Link>
           </div>
           {contextButton ? (
             <Link to={`/post/${comment.post}`}>

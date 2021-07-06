@@ -14,26 +14,26 @@ class UsersView(generics.ListAPIView):
     def get_queryset(self):
         return User.objects.all().annotate(posts_count=Count('posts'))
 
-# single user - /api/users/{userID}
+# single user - /api/users/{username}
 class UserView(generics.ListAPIView):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        return User.objects.filter(id=self.kwargs['user']).annotate(posts_count=Count('posts'))
+        return User.objects.filter(username=self.kwargs['user']).annotate(posts_count=Count('posts'))
 
-# user's comments - /api/users/{userID}/comments
+# user's comments - /api/users/{username}/comments
 class UserCommentListView(generics.ListAPIView):
     serializer_class = CommentSerializer
 
     def get_queryset(self):
-        return PostComment.objects.filter(owner=self.kwargs['user']).order_by('-id')
+        return PostComment.objects.filter(username=self.kwargs['user']).order_by('-id')
 
-# user's posts - /api/users/{userID}/posts
+# user's posts - /api/users/{username}/posts
 class UserPostListView(generics.ListAPIView):
     serializer_class = SmallPostSerializer
 
     def get_queryset(self):
-        return Post.objects.filter(owner=self.kwargs['user']).annotate(comment_count=Count('comments')).order_by('-id')
+        return Post.objects.filter(username=self.kwargs['user']).annotate(comment_count=Count('comments')).order_by('-id')
 
 # all posts /api/posts
 class PostsView(generics.ListAPIView):

@@ -8,7 +8,7 @@ import { UserContext } from "../../UserContext";
 
 export default function UserProfile() {
   const params = useParams();
-  const userID = params.userID;
+  const username = params.username;
 
   const [postsList, setPostsList] = useState({});
   const [commentsList, setCommentsList] = useState({});
@@ -20,24 +20,24 @@ export default function UserProfile() {
 
   const fetchUserPosts = useCallback(async () => {
     setLoading(true);
-      await axios.get(`/api/users/${userID}/posts`).then((res) => {
+      await axios.get(`/api/users/${username}/posts`).then((res) => {
         setPostsList(res.data);
       });
-      await axios.get(`/api/users/${userID}/comments`).then((res) => {
+      await axios.get(`/api/users/${username}/comments`).then((res) => {
         setCommentsList(res.data);
         setLoading(false);
       });
-  }, [userID]);
+  }, [username]);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      await axios.get(`/api/users/${userID}`).then((res) => {
+      await axios.get(`/api/users/${username}`).then((res) => {
         setProfile(res.data[0]);
       });
     };
     fetchProfile();
     fetchUserPosts();
-  }, [userID, fetchUserPosts]);
+  }, [username, fetchUserPosts]);
 
   const renderUserPosts = () => {
     return postsList.map((post) => (

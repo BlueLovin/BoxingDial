@@ -63,7 +63,7 @@ function App() {
             <PopularPosts />
           </Route>
 
-          <Route path="/user/:userID" exact>
+          <Route path="/user/:username" exact>
             <UserProfile />
           </Route>
 
