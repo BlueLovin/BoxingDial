@@ -38,7 +38,7 @@ export default function ShowUser() {
       return (
         <div>
           <NavbarBrand>
-            Welcome, <Link to={"/user/" + user.username}>{user.username}</Link>!
+            Welcome, <a href={"/user/" + user.username}>{user.username}</a>!
           </NavbarBrand>
           <NavLink onClick={() => Logout()} to="/">
             Logout

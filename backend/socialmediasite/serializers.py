@@ -6,7 +6,7 @@ class UserSerializer(serializers.ModelSerializer):
     posts_count = serializers.IntegerField()
     class Meta:
         model = User
-        fields = ['id', 'username', 'posts_count']
+        fields = ['id', 'username', 'posts_count',]
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:

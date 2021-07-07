@@ -18,6 +18,8 @@ urlpatterns = [
     path('api/users/<str:user>/', views.UserView.as_view()),
     path('api/users/<str:user>/comments/', views.UserCommentListView.as_view()),
     path('api/users', views.UsersView.as_view()),
+    path('api/users/<str:user>/following/', views.UserFollowingView.as_view()),
+    path('api/users/<str:user>/followers/', views.UserFollowersView.as_view()),
 
     path('api/fights/', views.FightsView.as_view()),
     url(r'api/fights/(?P<pk>[0-9]+)/$', views.FightView.as_view()),

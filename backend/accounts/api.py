@@ -65,7 +65,6 @@ class AddFollowerView(generics.GenericAPIView):
             "follow_object": 
             UserFollowingSerializer(new_follower, 
             context=self.get_serializer_context()).data,
-
         })
         
 class DeleteFollowerView(generics.GenericAPIView):
@@ -73,7 +72,7 @@ class DeleteFollowerView(generics.GenericAPIView):
     def post(self, request, format=None):
         user = self.request.user
         unfollow = User.objects.get(id=self.request.data.get('unfollow'))
-        new_follower = UserFollowing.objects.get(user_id=user,
+        UserFollowing.objects.get(user_id=user,
             following_user_id=unfollow).delete()
         # return Response("unfollowed successfully")
         return Response({
