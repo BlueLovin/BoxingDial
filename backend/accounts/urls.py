@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .api import RegisterAPI, LoginAPI, UserAPI
+from .api import RegisterAPI, LoginAPI, UserAPI, AddFollowerView, DeleteFollowerView
 from knox import views as knox_views
 from rest_framework.authtoken import views
 
@@ -9,4 +9,7 @@ urlpatterns = [
     path('api/token-auth/user', UserAPI.as_view()),
     path('api/token-auth/login', LoginAPI.as_view()),
     path('api/token-auth/logout', knox_views.LogoutView.as_view(), name="knox_logout"),
+    path('api/user/follow', AddFollowerView.as_view(), name="follow"),
+    path('api/user/unfollow', DeleteFollowerView.as_view(), name="follow"),
+
 ]

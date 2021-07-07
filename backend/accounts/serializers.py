@@ -1,13 +1,34 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from .models import UserFollowing
+from socialmediasite.serializers import PostSerializer
 from django.contrib.auth import authenticate
 
 #User Serializer
 
-class UserSerializer(serializers.ModelSerializer):
+class SmallUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email')
+        fields = ('id', 'username')
+
+class UserFollowingSerializer(serializers.ModelSerializer):
+    following_user_id = SmallUserSerializer()
+    class Meta:
+        model = UserFollowing
+        fields = ("following_user_id", "followed_on")
+class FollowersSerializer(serializers.ModelSerializer):
+    user_id = SmallUserSerializer()
+    class Meta:
+        model = UserFollowing
+        fields = ("user_id", "followed_on")
+
+class UserSerializer(serializers.ModelSerializer):
+    following = UserFollowingSerializer(many=True)
+    followers = FollowersSerializer(many=True)
+    class Meta:
+        unique_together = ['followers, following']
+        model = User
+        fields = ('id', 'username', 'followers', "following")
 
 #Register Serializer
 class RegisterSerializer(serializers.ModelSerializer):
