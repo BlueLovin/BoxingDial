@@ -34,7 +34,10 @@ function App() {
             },
           })
           .then((res) => setUser(res.data)) //success = set user with response
-          .catch(() => setUser(null)); //failure = set user to null
+          .catch(() => {
+            localStorage.removeItem("token");
+            setUser(null);
+          }); //failure = set user to null
       }
     };
     fetchUser();

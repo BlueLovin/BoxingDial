@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import axios from "axios";
 import { NavbarBrand } from "reactstrap";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 

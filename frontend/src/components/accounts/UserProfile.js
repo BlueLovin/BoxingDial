@@ -32,30 +32,39 @@ export default function UserProfile() {
       setCommentsList(res.data);
       setLoading(false);
     });
-    
   }, [username]);
 
   useEffect(() => {
     const fetchProfile = async () => {
       let this_token = localStorage.getItem("token");
-      let CONFIG = {}
-      if (this_token) {
+      let CONFIG = {};
+      if (this_token !== null) {
         CONFIG = {
           headers: {
-            "Authorization": `Token ${this_token}`
-          }
+            Authorization: `Token ${this_token}`,
+          },
         };
       }
-      await axios.get(`/api/users/${username}`, CONFIG).then((res) => {
-        setProfile(res.data);
-        setFollowing(res.data.following)
-      });
-await axios.get(`/api/users/${username}/following`)
-      .then((res) => {
+      //fetch profile with token
+      //if token fails, fetch without token 
+      await axios
+        .get(`/api/users/${username}`, CONFIG)
+        .then((res) => {
+          setProfile(res.data);
+          setFollowing(res.data.following);
+        })
+        .catch(async () => {
+          await axios.get(`/api/users/${username}`).then((res) => {
+            setProfile(res.data);
+            setFollowing(res.data.following);
+          });
+        });
+      // set profile followers list
+      await axios.get(`/api/users/${username}/following`).then((res) => {
         setFollowingList(res.data);
       });
-    await axios.get(`/api/users/${username}/followers`)
-      .then((res) => {
+      // set profile following list
+      await axios.get(`/api/users/${username}/followers`).then((res) => {
         setFollowersList(res.data);
       });
     };
@@ -63,32 +72,31 @@ await axios.get(`/api/users/${username}/following`)
     fetchProfile();
   }, [fetchUserPosts, username, followButtonPressed]);
 
-  useEffect(() => { }, []);
-
-
   const follow = async () => {
     let config = {
       headers: {
-        "Authorization": `Token ${token}`
-      }
+        Authorization: `Token ${token}`,
+      },
     };
     let data = {
-      "follow": profile.id
+      follow: profile.id,
     };
-    await axios.post(`/api/user/follow`, data, config)
+    await axios
+      .post(`/api/user/follow`, data, config)
       .then(() => setFollowing(true));
   };
 
   const unfollow = async () => {
     let config = {
       headers: {
-        "Authorization": `Token ${token}`
-      }
+        Authorization: `Token ${token}`,
+      },
     };
     let data = {
-      "unfollow": profile.id
+      unfollow: profile.id,
     };
-    await axios.post(`/api/user/unfollow`, data, config)
+    await axios
+      .post(`/api/user/unfollow`, data, config)
       .then(() => setFollowing(false));
   };
   const renderProfilePosts = () => {
@@ -137,21 +145,26 @@ await axios.get(`/api/users/${username}/following`)
         return (
           <>
             <Button
-              onClick={async () => { await follow(); setFollowButtonPressed(!followButtonPressed)}}
+              onClick={async () => {
+                await follow();
+                setFollowButtonPressed(!followButtonPressed);
+              }}
             >
               Follow
-        </Button>
+            </Button>
           </>
         );
-      }
-      else if (following != null) {
+      } else if (following != null) {
         return (
           <>
             <Button
-              onClick={async () => { await unfollow(); setFollowButtonPressed(!followButtonPressed)}}
+              onClick={async () => {
+                await unfollow();
+                setFollowButtonPressed(!followButtonPressed);
+              }}
             >
               Unfollow
-        </Button>
+            </Button>
           </>
         );
       }
