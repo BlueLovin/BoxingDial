@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { Redirect, useHistory, useParams } from "react-router-dom";
 import axios from "axios";
 import Post from "../posts/Post";
 import { Nav, NavItem, TabContent, TabPane, NavLink, Button } from "reactstrap";
@@ -22,6 +22,7 @@ export default function UserProfile() {
   const { userVal, tokenVal } = useContext(UserContext);
   const [user] = userVal;
   const [token] = tokenVal;
+  const history = useHistory();
 
   const fetchUserPosts = useCallback(async () => {
     setLoading(true);
@@ -36,7 +37,7 @@ export default function UserProfile() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      let this_token = localStorage.getItem("token");
+      let this_token = localStorage.token;
       let CONFIG = {};
       if (this_token !== null) {
         CONFIG = {
@@ -48,7 +49,7 @@ export default function UserProfile() {
       //fetch profile with token
       //if token fails, fetch without token 
       await axios
-        .get(`/api/users/${username}`, CONFIG)
+        .get(`/api/users/${username}/`, CONFIG)
         .then((res) => {
           setProfile(res.data);
           setFollowing(res.data.following);
@@ -58,6 +59,9 @@ export default function UserProfile() {
             setProfile(res.data);
             setFollowing(res.data.following);
           });
+        })
+        .catch(() => {
+          window.location = '/404/'; //404 if user doesnt exist
         });
       // set profile followers list
       await axios.get(`/api/users/${username}/following`).then((res) => {
