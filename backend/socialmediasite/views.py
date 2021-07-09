@@ -38,6 +38,7 @@ class UserView(generics.GenericAPIView):
         try:
             following = this_user.followers.filter(
                 user_id=request.user).exists()
+
             follows_you = request.user.followers.filter(
                 user_id=this_user).exists()
             return Response({
@@ -47,7 +48,7 @@ class UserView(generics.GenericAPIView):
                 "following": following,
                 "follows_you": follows_you,
             })
-        except:
+        except Exception:
             return Response(UserSerializer(this_user).data)
 
 

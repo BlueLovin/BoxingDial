@@ -47,7 +47,7 @@ export default function UserProfile() {
         };
       }
       //fetch profile with token
-      //if token fails, fetch without token 
+      //if token fails, fetch without token
       await axios
         .get(`/api/users/${username}/`, CONFIG)
         .then((res) => {
@@ -61,7 +61,7 @@ export default function UserProfile() {
           });
         })
         .catch(() => {
-          window.location = '/404/'; //404 if user doesnt exist
+          window.location = "/404/"; //404 if user doesnt exist
         });
       // set profile followers list
       await axios.get(`/api/users/${username}/following`).then((res) => {
@@ -86,7 +86,7 @@ export default function UserProfile() {
       follow: profile.id,
     };
     await axios
-      .post(`/api/user/follow`, data, config)
+      .post(`/api/users/follow`, data, config)
       .then(() => setFollowing(true));
   };
 
@@ -100,7 +100,7 @@ export default function UserProfile() {
       unfollow: profile.id,
     };
     await axios
-      .post(`/api/user/unfollow`, data, config)
+      .post(`/api/users/unfollow`, data, config)
       .then(() => setFollowing(false));
   };
   const renderProfilePosts = () => {

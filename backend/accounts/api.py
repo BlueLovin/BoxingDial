@@ -1,3 +1,6 @@
+from django.db.models.aggregates import Count
+from django.db.models.query import Prefetch, QuerySet
+from django.http.response import HttpResponse, JsonResponse
 from rest_framework import generics, permissions, viewsets
 from rest_framework.response import Response
 from knox.models import AuthToken
@@ -5,8 +8,11 @@ from django.db import models
 import json
 # from django.contrib.auth import User
 from django.contrib.auth.models import User
+
+from socialmediasite.serializers import PostSerializer, SmallPostSerializer
 from .models import UserFollowing
-from .serializers import UserSerializer, UserFollowingSerializer,RegisterSerializer, LoginSerializer
+from socialmediasite.models import Post
+from .serializers import FollowersSerializer, UserSerializer, UserFollowingSerializer,RegisterSerializer, LoginSerializer
 
 
 class RegisterAPI(generics.GenericAPIView):
@@ -74,10 +80,34 @@ class DeleteFollowerView(generics.GenericAPIView):
         unfollow = User.objects.get(id=self.request.data.get('unfollow'))
         UserFollowing.objects.get(user_id=user,
             following_user_id=unfollow).delete()
-        # return Response("unfollowed successfully")
         return Response({
             "user": 
             UserSerializer(user, 
             context=self.get_serializer_context()).data,
 
         })
+
+class UserFeedView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, format=None):
+        follower_user_ids = UserFollowing.objects.filter(user_id=request.user).values_list('following_user_id_id', flat=True)\
+                                          .distinct()
+
+
+
+        posts = Post.objects.filter(owner__in=follower_user_ids).annotate(
+            comment_count=Count('comments'))
+        # return Response({
+        #     "following": 
+        #     follower_user_ids,
+        # })
+        return Response({
+        "following": 
+        SmallPostSerializer(posts, many=True).data,
+        })
+        # return JsonResponse({"following ids": list(posts)})
+        # HttpResponse(json.simplejson.dumps(posts), mimetype="application/json")
+
+class UserFollowingView(generics.ListAPIView):
+    queryset = UserFollowing.objects.prefetch_related(Prefetch('following_user_id')).all()
+    serializer_class = UserFollowingSerializer
