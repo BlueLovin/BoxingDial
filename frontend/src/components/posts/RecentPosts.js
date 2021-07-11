@@ -18,8 +18,6 @@ export default function RecentPosts() {
   };
   const renderPosts = () => {
     return postList
-      .slice(0)
-      .reverse()
       .slice(0, 3)
       .map((post) => (
         <>

@@ -114,8 +114,6 @@ export default function Comments() {
 
   const renderComments = () => {
     return commentList
-      .slice(0)
-      .reverse()
       .map((comment) => (
         <Comment
           comment={comment}

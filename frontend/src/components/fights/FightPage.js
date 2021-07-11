@@ -45,8 +45,6 @@ export default function FightPage() {
   };
   const renderPosts = () => {
     return fightData.posts
-      .slice(0)
-      .reverse()
       .map((post) => (
         <>
           <Post post={post} updateStateFunction={fetchFightData} /> <br />

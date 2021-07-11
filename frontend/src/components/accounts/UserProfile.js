@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, useCallback } from "react";
-import { Redirect, useHistory, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import Post from "../posts/Post";
 import { Nav, NavItem, TabContent, TabPane, NavLink, Button } from "reactstrap";
@@ -22,7 +22,6 @@ export default function UserProfile() {
   const { userVal, tokenVal } = useContext(UserContext);
   const [user] = userVal;
   const [token] = tokenVal;
-  const history = useHistory();
 
   const fetchUserPosts = useCallback(async () => {
     setLoading(true);

@@ -106,9 +106,10 @@ class CreatePostView(viewsets.ModelViewSet):
 class PostView(generics.RetrieveDestroyAPIView):
     permission_classes = [IsOwnerOrReadOnly]
     serializer_class = PostSerializer
-
+    #get current post, and order the comments by their ID descending. or recent, in other words
     def get_queryset(self):
-        return Post.objects.filter(id=self.kwargs['pk']).annotate(
+        return Post.objects.filter(id=self.kwargs['pk']).prefetch_related(
+            Prefetch('comments', queryset=PostComment.objects.order_by('-id'))).annotate(
             comment_count=Count('comments'))
 
 
@@ -136,7 +137,7 @@ class FightView(generics.RetrieveAPIView):
         return Fight.objects.filter(id=self.kwargs['pk']).prefetch_related(
             Prefetch('posts',
                      Post.objects.annotate(
-                         comment_count=Count('comments')))).annotate(
+                         comment_count=Count('comments')).order_by('-id'))).annotate(
                              posts_count=Count('posts'))
 
 
@@ -164,4 +165,4 @@ class PopularFightsView(generics.ListAPIView):
 # all fights without posts field
 class SmallFightView(generics.ListAPIView):
     serializer_class = SmallFightSerializer
-    queryset = Fight.objects.all()
+    queryset = Fight.objects.all().order_by("-id")
