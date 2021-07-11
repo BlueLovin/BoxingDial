@@ -97,10 +97,9 @@ class UserFeedView(generics.GenericAPIView):
 
         posts = Post.objects.filter(owner__in=follower_user_ids).annotate(
             comment_count=Count('comments')).order_by('-id')
-        return Response({
-        "following": 
+        return Response(
         SmallPostSerializer(posts, many=True).data,
-        })
+        )
 
 class UserFollowingView(generics.ListAPIView):
     queryset = UserFollowing.objects.prefetch_related(Prefetch('following_user_id')).all()

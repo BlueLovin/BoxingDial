@@ -18,7 +18,7 @@ export default function UserFeed(){
     if(token){
       console.log("token is " + token)
     await axios.get('/api/feed', config)
-      .then((res) => setPostList(res.data.following))
+      .then((res) => setPostList(res.data))
     }
   };
 
