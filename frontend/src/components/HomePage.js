@@ -3,6 +3,7 @@ import RecentPosts from "./posts/RecentPosts";
 import RecentFights from "./fights/RecentFights";
 import { UserContext } from "../UserContext";
 import { Row, Col } from "reactstrap";
+import UserFeed from "./feed/UserFeed";
 
 function App() {
   const { userVal } = useContext(UserContext);
@@ -13,7 +14,7 @@ function App() {
   return (
     <main className="container">
       <br />
-      <Row>
+      {/* <Row>
         <Col>
           <RecentFights />
         </Col>
@@ -21,7 +22,8 @@ function App() {
         <Col>
           <RecentPosts />
         </Col>
-      </Row>
+      </Row> */}
+      <UserFeed/>
     </main>
   );
 }
