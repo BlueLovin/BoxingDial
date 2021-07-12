@@ -24,11 +24,11 @@ export default function ShowUser() {
         }
       )
       .then(
-        history.push("/") // reload page
+        history.push("/") // go to home page
       )
       .catch(function (error) {
         console.log(error.response.status); // 401
-        console.log(error.response.data.error); //Please Authenticate or whatever returned from server
+        console.log(error.response.data.error);
       });
     localStorage.removeItem("token");
   };
