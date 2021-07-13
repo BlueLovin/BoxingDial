@@ -2,7 +2,6 @@ import { UserContext } from "../../UserContext";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import Post from "../posts/Post";
-import RecentFights from "../fights/RecentFights";
 import { Card, Container } from "reactstrap";
 
 export default function UserFeed() {
@@ -31,7 +30,7 @@ export default function UserFeed() {
 
   const renderPosts = () => {
     console.log("post list = " + postList);
-    if (user && user.following.length == 0) {
+    if (user && user.following.length === 0) {
       //link here to see all the users of the site?
       return (
         <p className="text-center">

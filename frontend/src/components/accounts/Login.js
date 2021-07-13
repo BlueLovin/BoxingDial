@@ -13,8 +13,8 @@ export default function Login() {
   const [error, setError] = useState(false);
   const history = useHistory();
   const { userVal, tokenVal } = useContext(UserContext);
-  const [user, setUser] = userVal;
-  const [token, setToken] = tokenVal;
+  const [user] = userVal;
+  const [, setToken] = tokenVal;
 
   useEffect(() => {
     if (user) {
