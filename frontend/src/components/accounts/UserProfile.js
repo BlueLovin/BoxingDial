@@ -103,40 +103,40 @@ export default function UserProfile() {
       .then(() => setFollowing(false));
   };
   const renderProfilePosts = () => {
-    return postsList.map((post) => (
-      <>
+    return postsList.map((post, i) => (
+      <div key={i}>
         <br />
         <Post post={post} user={user} updateStateFunction={fetchUserPosts} />
-      </>
+      </div>
     ));
   };
 
   const renderProfileComments = () => {
-    return commentsList.map((comment) => (
-      <>
+    return commentsList.map((comment, i) => (
+      <div key={i}>
         <br />
         <Comment comment={comment} user={user} contextButton={true} />
-      </>
+      </div>
     ));
   };
   const renderProfileFollowers = () => {
     if (profileFollowersList !== null) {
-      return profileFollowersList.map((follower) => (
-        <>
+      return profileFollowersList.map((follower, i) => (
+        <div key={i}>
           <br />
           <p>{follower.user_id.username}</p>
-        </>
+        </div>
       ));
     }
     return "loading...";
   };
   const renderProfileFollowing = () => {
     if (profileFollowingList) {
-      return profileFollowingList.map((following_user) => (
-        <>
+      return profileFollowingList.map((following_user, i) => (
+        <div key={i}>
           <br />
           <p>{following_user.following_user_id.username}</p>
-        </>
+        </div>
       ));
     }
     return "loading...";

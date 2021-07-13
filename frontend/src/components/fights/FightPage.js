@@ -45,10 +45,10 @@ export default function FightPage() {
   };
   const renderPosts = () => {
     return fightData.posts
-      .map((post) => (
-        <>
-          <Post post={post} updateStateFunction={fetchFightData} /> <br />
-        </>
+      .map((post, i) => (
+        <div key={i}>
+          <Post post={post}  updateStateFunction={fetchFightData} /> <br />
+        </div>
       ));
   };
   const toggle = () => {

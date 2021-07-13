@@ -19,11 +19,11 @@ export default function PopularPosts() {
   const renderPosts = () => {
     return postList
       .slice(0, 5)
-      .map((post) => (
-        <>
+      .map((post, i) => (
+        <div key={i}>
           <Post post={post} />
           <hr />
-        </>
+        </div>
       ));
   };
   return (

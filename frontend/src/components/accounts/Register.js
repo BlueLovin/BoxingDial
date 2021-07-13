@@ -19,7 +19,6 @@ export default function Register() {
   const history = useHistory();
 
   const handleChange = (e) => {
-    // this.setState({ [e.target.name]: e.target.value });
     let { name, value } = e.target;
 
     const item = {
@@ -81,11 +80,11 @@ export default function Register() {
 
   const renderErrors = () => {
     if (error && errorMessages) {
-      return errorMessages.map((error) => (
-        <>
+      return errorMessages.map((_error, i) => (
+        <div key={i}>
           <br />
-          <h6 className="text-danger">{error}</h6>
-        </>
+          <h6 className="text-danger">{_error}</h6>
+        </div>
       ));
     }
     return null;

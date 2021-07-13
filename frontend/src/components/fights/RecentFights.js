@@ -19,8 +19,8 @@ export default function RecentFights() {
   const renderFights = () => {
     return fightList
       .slice(0, 3)
-      .map((fightData) => (
-        <div className="border rounded p-3">
+      .map((fightData, i) => (
+        <div className="border rounded p-3" key={i}>
           <SmallFight fightData={fightData} />
         </div>
       ));

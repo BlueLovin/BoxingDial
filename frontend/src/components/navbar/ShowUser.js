@@ -7,7 +7,7 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function ShowUser() {
   const { userVal, tokenVal } = useContext(UserContext);
-  const [token] = tokenVal;
+  const [token, setToken] = tokenVal;
   const [user, setUser] = userVal;
   const history = useHistory();
 
@@ -23,8 +23,12 @@ export default function ShowUser() {
           },
         }
       )
-      .then(
-        history.push("/") // go to home page
+      .then(() => {
+        localStorage.removeItem("token");
+        setToken(undefined);
+        history.push("/"); // go to home page
+        window.location.reload();
+      }
       )
       .catch(function (error) {
         console.log(error.response.status); // 401

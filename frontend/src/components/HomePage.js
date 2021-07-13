@@ -6,27 +6,39 @@ import { Row, Col } from 'reactstrap';
 import UserFeed from './feed/UserFeed';
 
 function App() {
-	const { userVal } = useContext(UserContext);
+	const { userVal, loggedInVal } = useContext(UserContext);
 	const [user] = userVal;
+	const [loggedIn] = loggedInVal;
 
-	useEffect(() => {}, [user]);
+	const renderHome = () => {
+		if(loggedIn !== null && user){
+			if(loggedIn){
+				return <UserFeed />;
+			}
+		}
+    if(loggedIn === false){
+      return (
+        <Row>
+          <Col>
+            <RecentFights />
+          </Col>
+          <hr />
+          <Col>
+            <RecentPosts />
+          </Col>
+        </Row>
+      );
+    }
+    else{
+      return <p>loading...</p>
+    }
+	}
 
 	return (
 		<main className="container">
 			<br />
-			{user ? (
-				<UserFeed />
-			) : (
-				<Row>
-					<Col>
-						<RecentFights />
-					</Col>
-					<hr />
-					<Col>
-						<RecentPosts />
-					</Col>
-				</Row>
-			)}
+      <h4>Home</h4>
+			{renderHome()}
 		</main>
 	);
 }

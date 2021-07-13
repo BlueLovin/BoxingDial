@@ -16,31 +16,49 @@ import NavigationBar from "./components/navbar/NavBar";
 import { NotFound } from "./NotFound404";
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(); // set to undefined initially
+  const [token, setToken] = useState();
+  const [loggedIn, setLoggedIn] = useState(null);
 
   useEffect(() => {
-    setToken(localStorage.getItem("token"));
+    const getToken = async () => {
+      let tokenValue = localStorage.getItem("token");
+      console.log("token vallluueeeee = " + tokenValue);
+      setToken(tokenValue);
+    };
+    getToken();
+  }, []);
 
-    //following function sends request to API server with token from
-    //user's browser storage. the server responds with the user associated
-    //with that token or 404s if invalid token
-    const fetchUser = async () => {
-      if (token !== "" && token) {
+  useEffect(()=>{
+    const setLoggedInUser = async () => {
+      console.log("token valll = " + token);
+      if (token) {
         await axios
           .get("/api/token-auth/user", {
             headers: {
               Authorization: `Token ${token}`,
             },
           })
-          .then((res) => setUser(res.data)) //success = set user with response
+          .then((res) => {
+            setUser(res.data);
+            setLoggedIn(true);
+          }) //success = set user
           .catch(() => {
             localStorage.removeItem("token");
+            setToken(undefined);
             setUser(null);
+            setLoggedIn(false);
           }); //failure = set user to null
+      } else {
+        console.log("fuckkk = " + token);
+        setUser(null);
+        setLoggedIn(false);
       }
-    };
-    fetchUser();
+    }
+    
+    if(token !== undefined){
+      setLoggedInUser();
+    }
   }, [token]);
 
   return (
@@ -49,6 +67,7 @@ function App() {
         value={{
           userVal: [user, setUser],
           tokenVal: [token, setToken],
+          loggedInVal: [loggedIn, setLoggedIn],
         }}
       >
         <NavigationBar />

@@ -114,12 +114,13 @@ export default function Comments() {
 
   const renderComments = () => {
     return commentList
-      .map((comment) => (
+      .map((comment, i) => (
         <Comment
           comment={comment}
           user={user}
           token={token}
           updateStateFunction={getPost}
+          key={i}
         />
       ));
   };

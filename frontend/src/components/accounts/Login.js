@@ -22,23 +22,6 @@ export default function Login() {
     }
   }, [history, user]);
 
-  const fetchUser = async () => {
-    // fetch user and set user state
-    await axios
-      .get("/api/token-auth/user", {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      })
-      .then((res) => setUser(res.data)) //success = set user with response
-      .catch(() => setUser(null)); //failure = set user to null
-    };
-
-  // useEffect(()=>{
-    
-  //   fetchUser();
-  // }, [token, setUser])
-
   const handleChange = (e) => {
     let { name, value } = e.target;
 
@@ -62,7 +45,9 @@ export default function Login() {
           setError(false);
         }
         history.goBack();
-        fetchUser();
+        window.location.reload();
+        //fetchUser();
+
       })
       .catch((res) => setError(true));
 
