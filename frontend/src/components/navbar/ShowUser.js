@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import axios from "axios";
-import { NavbarBrand } from "reactstrap";
 import { NavLink } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
@@ -28,8 +27,7 @@ export default function ShowUser() {
         setToken(undefined);
         history.push("/"); // go to home page
         window.location.reload();
-      }
-      )
+      })
       .catch(function (error) {
         console.log(error.response.status); // 401
         console.log(error.response.data.error);
@@ -40,14 +38,15 @@ export default function ShowUser() {
   const renderUsername = () => {
     if (user) {
       return (
-        <div>
-          <NavbarBrand>
+        <>
+          <span>
             Welcome, <a href={"/user/" + user.username}>{user.username}</a>!
-          </NavbarBrand>
-          <NavLink onClick={() => Logout()} to="/">
-            Logout
-          </NavLink>
-        </div>
+             <b>&nbsp;</b> {/*empty space lol */}
+            <NavLink onClick={() => Logout()} to="/">
+              Logout
+            </NavLink>
+            </span>
+        </>
       );
     } else {
       return (

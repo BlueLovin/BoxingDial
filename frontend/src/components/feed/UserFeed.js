@@ -29,12 +29,11 @@ export default function UserFeed() {
   }, []);
 
   const renderPosts = () => {
-    console.log("post list = " + postList);
     if (user && user.following.length === 0) {
       //link here to see all the users of the site?
       return (
-        <p className="text-center">
-          Follow somebody to get their posts here on your feed.
+        <p className="text-center p-3 m-3">
+          Welcome to your feed! Follow somebody to see their posts here.
         </p>
       );
     }
@@ -52,7 +51,6 @@ export default function UserFeed() {
     <>
       <Container>
         <Card className="p-3 m-3">
-          <h3 className="text-center">User Feed</h3>
           <div>{postList ? renderPosts() : "loading"}</div>
         </Card>
       </Container>
