@@ -51,7 +51,7 @@ export default function ShowUser() {
     } else {
       return (
         <div>
-          <NavLink to="/login/">Login</NavLink>
+          <a href="/login/">Login</a>
         </div>
       );
     }

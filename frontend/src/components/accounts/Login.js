@@ -44,9 +44,6 @@ export default function Login() {
         if (error) {
           setError(false);
         }
-        history.goBack();
-        window.location.reload();
-        //fetchUser();
 
       })
       .catch((res) => setError(true));
