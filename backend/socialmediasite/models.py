@@ -30,6 +30,7 @@ class Post(models.Model):
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='posts', null=True)
     username = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.content

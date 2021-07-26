@@ -28,9 +28,9 @@ export default function ShowUser() {
         history.push("/"); // go to home page
         window.location.reload();
       })
-      .catch(function (error) {
-        console.log(error.response.status); // 401
-        console.log(error.response.data.error);
+      .catch((err) => {
+        console.log(err.response.status); // 401
+        console.log(err.response.data.error);
       });
     localStorage.removeItem("token");
   };
@@ -38,15 +38,13 @@ export default function ShowUser() {
   const renderUsername = () => {
     if (user) {
       return (
-        <>
-          <span>
-            Welcome, <a href={"/user/" + user.username}>{user.username}</a>!
-             <b>&nbsp;</b> {/*empty space lol */}
-            <NavLink onClick={() => Logout()} to="/">
-              Logout
-            </NavLink>
-            </span>
-        </>
+        <span>
+          Welcome, <a href={"/user/" + user.username}>{user.username}</a>!
+          <b>&nbsp;</b> {/*empty space lol */}
+          <NavLink onClick={() => Logout()} to="/">
+            Logout
+          </NavLink>
+        </span>
       );
     } else {
       return (

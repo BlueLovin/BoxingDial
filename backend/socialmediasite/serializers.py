@@ -7,6 +7,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'posts_count']
+        
+class TinyPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ('id', 'content', 'date', 'owner', 'username')
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,6 +20,11 @@ class CommentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         comment = PostComment.objects.create(**validated_data)
         return comment
+    
+class FeedCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostComment
+        fields = ('id', 'post', 'date', 'content', 'owner', 'username')
 
 class SmallFightSerializer(serializers.ModelSerializer):
     class Meta:
@@ -33,16 +43,15 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('id', 'fight', 'comment_count', 'content', 'comments', 'owner', 'username')
+        fields = ('id', 'date', 'fight', 'comment_count', 'content', 'comments', 'owner', 'username')
         
 class CreatePostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True)
 
     class Meta:
         model = Post
-        fields = ('id', 'fight', 'content', 'comments', 'owner', 'username')
+        fields = ('id', 'date', 'fight', 'content', 'comments', 'owner', 'username')
         
-
     def create(self, validated_data):
         comment_data = validated_data.pop('comments')
         post = Post.objects.create(**validated_data)
@@ -57,8 +66,8 @@ class SmallPostSerializer(serializers.ModelSerializer):
     comment_count = serializers.IntegerField()
     class Meta:
         model = Post
-        fields = ('id', 'fight', 'content', 'comment_count', 'owner', 'username')
-        
+        fields = ('id', 'date', 'fight', 'content', 'comment_count', 'owner', 'username')
+                
 class FightSerializer(serializers.ModelSerializer):
     posts = SmallPostSerializer(many=True)
     posts_count = serializers.IntegerField()
