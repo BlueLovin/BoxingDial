@@ -91,21 +91,23 @@ class UserFeedByRecentView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, format=None):
-        #get following user IDs
+        # get following user IDs
         follower_user_ids = UserFollowing.objects.filter(user_id=request.user).values_list(
             'following_user_id_id', flat=True)\
             .distinct()
 
         posts = Post.objects.filter(owner__in=follower_user_ids).annotate(
             comment_count=Count('comments')).order_by('-id')
-        comments = PostComment.objects.filter(owner__in=follower_user_ids).order_by('-id')
-                
-        #combine post list and comment list
-        combined = list(chain(SmallPostSerializer(posts, many=True).data, FeedCommentSerializer(comments, many=True).data))
-        
-        #sort combined list
-        newlist = sorted(combined, key=lambda k: k['date'], reverse=True) 
-                
+        comments = PostComment.objects.filter(
+            owner__in=follower_user_ids).order_by('-id')
+
+        # combine post list and comment list
+        combined = list(chain(SmallPostSerializer(
+            posts, many=True).data, FeedCommentSerializer(comments, many=True).data))
+
+        # sort combined list
+        newlist = sorted(combined, key=lambda k: k['date'], reverse=True)
+
         return Response(newlist)
 
 

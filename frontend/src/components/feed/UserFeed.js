@@ -19,11 +19,10 @@ export default function UserFeed() {
         },
       };
       if (token) {
-        await axios
-          .get("/api/feed/recent", config)
-          .then((res) => {
-            setFeed(res.data);
-          })
+        await axios.get("/api/feed/recent", config)
+        .then((res) => {
+          setFeed(res.data);
+        });
       }
     };
     fetchPostsAndComments();
@@ -43,18 +42,16 @@ export default function UserFeed() {
 
     if (feed) {
       console.log(feed);
+      // the following ternary is to determine if the current item
+      // is a post or a comment, and
       return feed.map((item, i) => (
         <div key={i}>
-          {item.fight ?
-              <>
-                <Post post={item} />
-                <br />
-              </>
-            :
-            //comment
+          {item.fight ? (
+            <Post post={item} />
+          ) : (
             <Comment comment={item} user={user} contextButton={true} />
-          }
-          
+          )}
+          <br />
         </div>
       ));
     }
