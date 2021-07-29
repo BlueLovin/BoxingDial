@@ -26,10 +26,10 @@ const Comment = (props) => {
   return (
     <Container>
       <h5>
-        <Link to={`/user/${comment.username}`}>{comment.username + " "}</Link>
-        posted on
+        <Link to={`/user/${comment.username}`}>{comment.username}</Link>
+        {" posted on "}
         <Link to={`/post/${comment.post.id}`}>
-          {" " + comment.post.truncated_content}
+          {comment.post.truncated_content}
         </Link>
       </h5>
       <div className="list-group-item bg-light justify-content-center">
