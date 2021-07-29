@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { Container } from "reactstrap";
 
 const Comment = (props) => {
-  const { contextButton = false } = props;
   const { updateStateFunction = null } = props;
   const comment = props.comment;
   const user = props.user;
@@ -29,7 +28,7 @@ const Comment = (props) => {
       <h5>
         <Link to={`/user/${comment.username}`}>{comment.username + " "}</Link>
         posted on
-        <Link to={`/post/${comment.post}`}>
+        <Link to={`/post/${comment.post.id}`}>
           {" " + comment.post.truncated_content}
         </Link>
       </h5>
