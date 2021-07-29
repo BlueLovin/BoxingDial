@@ -20,11 +20,6 @@ class CommentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         comment = PostComment.objects.create(**validated_data)
         return comment
-    
-class FeedCommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PostComment
-        fields = ('id', 'post', 'date', 'content', 'owner', 'username')
 
 class SmallFightSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,7 +30,18 @@ class TinyFightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Fight
         fields = ('id', 'title', 'result', 'date', 'image_URL')
-
+        
+class MicroPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ('id', 'truncated_content')
+        
+class FeedCommentSerializer(serializers.ModelSerializer):
+    post = MicroPostSerializer(many=False)
+    class Meta:
+        model = PostComment
+        fields = ('id', 'post', 'date', 'content', 'owner', 'username')
+        
 class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True)
     fight = SmallFightSerializer(many=False)

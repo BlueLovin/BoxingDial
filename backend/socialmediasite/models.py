@@ -35,6 +35,10 @@ class Post(models.Model):
         User, on_delete=models.CASCADE, related_name='posts', null=True)
     username = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
+    
+    @property
+    def truncated_content(self):
+        return self.content[:25] + "..."
 
     def __str__(self):
         return self.content

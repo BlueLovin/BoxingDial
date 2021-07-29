@@ -2,7 +2,7 @@ import { UserContext } from "../../UserContext";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import Post from "../posts/Post";
-import Comment from "../comments/Comment";
+import FeedComment from "../comments/FeedComment";
 import { Card, Container } from "reactstrap";
 
 export default function UserFeed() {
@@ -49,7 +49,7 @@ export default function UserFeed() {
           {item.fight ? (
             <Post post={item} />
           ) : (
-            <Comment comment={item} user={user} contextButton={true} />
+            <FeedComment comment={item} user={user} contextButton={true} />
           )}
           <br />
         </div>
