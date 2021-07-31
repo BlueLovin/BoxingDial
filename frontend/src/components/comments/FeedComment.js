@@ -25,13 +25,15 @@ const Comment = (props) => {
 
   return (
     <Container>
-      <h5>
+      <p>
         <Link to={`/user/${comment.username}`}>{comment.username}</Link>
         {" posted on "}
         <Link to={`/post/${comment.post.id}`}>
           {comment.post.truncated_content}
         </Link>
-      </h5>
+        {" by "}
+        <Link to={`/user/${comment.post.username}`}>{comment.post.username}</Link>
+      </p>
       <div className="list-group-item bg-light justify-content-center">
         <p>{comment.content}</p>
         <div className="list-group-item p-auto  m-auto d-flex justify-content-between align-items-center ">
@@ -51,7 +53,6 @@ const Comment = (props) => {
           ) : null}
         </div>
       </div>
-      <hr />
     </Container>
   );
 };

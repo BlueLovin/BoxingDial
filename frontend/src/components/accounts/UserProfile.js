@@ -181,9 +181,12 @@ export default function UserProfile() {
         "loading"
       ) : (
         <>
-          <h1 className="text-center">{username}'s Profile</h1>
+          <h1 className="text-center">
+            {`${username}'s Profile `}
+            {renderFollowButton()}
+          </h1>
           <br />
-          {renderFollowButton()}
+
           <br />
           <div className="">
             <Nav tabs className="justify-content-center">

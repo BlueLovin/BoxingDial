@@ -38,7 +38,10 @@ class Post(models.Model):
     
     @property
     def truncated_content(self):
-        return self.content[:25] + "..."
+        if(len(self.content) > 25):
+            return self.content[:25] + "..."
+            
+        return self.content
 
     def __str__(self):
         return self.content

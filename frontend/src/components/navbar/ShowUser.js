@@ -39,8 +39,8 @@ export default function ShowUser() {
     if (user) {
       return (
         <span>
-          Welcome, <a href={"/user/" + user.username}>{user.username}</a>!
-          <b>&nbsp;</b> {/*empty space lol */}
+          Welcome, <a href={"/user/" + user.username}>{user.username}</a>
+          {"! "}
           <NavLink onClick={() => Logout()} to="/">
             Logout
           </NavLink>

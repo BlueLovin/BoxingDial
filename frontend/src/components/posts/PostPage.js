@@ -135,7 +135,7 @@ export default function Comments() {
             <div className="h3 text-info font-weight-bold">
               <br />
               {currentPost.comment_count !== null
-                ? currentPost.comment_count + " comments"
+                ? `${currentPost.comment_count} comments`
                 : "loading"}
             </div>
             <br />

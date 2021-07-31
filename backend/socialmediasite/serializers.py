@@ -34,7 +34,7 @@ class TinyFightSerializer(serializers.ModelSerializer):
 class MicroPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ('id', 'truncated_content')
+        fields = ('id', 'username', 'truncated_content')
         
 class FeedCommentSerializer(serializers.ModelSerializer):
     post = MicroPostSerializer(many=False)

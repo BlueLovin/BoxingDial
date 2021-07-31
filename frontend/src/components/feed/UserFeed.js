@@ -51,7 +51,7 @@ export default function UserFeed() {
           ) : (
             <FeedComment comment={item} user={user} contextButton={true} />
           )}
-          <br />
+          <hr/>
         </div>
       ));
     }
