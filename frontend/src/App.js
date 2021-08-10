@@ -23,7 +23,6 @@ function App() {
   useEffect(() => {
     const getToken = async () => {
       let tokenValue = localStorage.getItem("token");
-      console.log("token vallluueeeee = " + tokenValue);
       setToken(tokenValue);
     };
     getToken();
@@ -31,7 +30,6 @@ function App() {
 
   useEffect(()=>{
     const setLoggedInUser = async () => {
-      console.log("token valll = " + token);
       if (token) {
         await axios
           .get("/api/token-auth/user", {
@@ -50,7 +48,6 @@ function App() {
             setLoggedIn(false);
           }); //failure = set user to null
       } else {
-        console.log("fuckkk = " + token);
         setUser(null);
         setLoggedIn(false);
       }

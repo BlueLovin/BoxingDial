@@ -28,12 +28,12 @@ export default function Comments() {
 
   const getPost = useCallback(async () => {
     await axios
-      .get("/api/posts/" + postID) // get current post
+      .get(`/api/posts/${postID}`) // get current post
       .then((res) => {
         setCurrentPost(res.data);
         setCommentList(res.data.comments);
       })
-      .catch((err) => history.push("/404"));
+      .catch(() => history.push("/404"));
   }, [postID, history]);
 
   useEffect(() => {

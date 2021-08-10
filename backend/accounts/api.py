@@ -102,9 +102,18 @@ class UserFeedByRecentView(generics.GenericAPIView):
         comments = PostComment.objects.filter(
             owner__in=follower_user_ids).order_by('-id')
 
+        # get posts and comments from logged in user
+        user_posts = Post.objects.filter(owner__in=[request.user]).annotate(
+            comment_count=Count('comments')).order_by('-id')
+        user_comments = PostComment.objects.filter(
+            owner__in=[request.user]).order_by('-id')
+
         # combine post list and comment list
         combined = list(chain(SmallPostSerializer(
-            posts, many=True).data, FeedCommentSerializer(comments, many=True).data))
+            posts, many=True).data, SmallPostSerializer(
+            user_posts, many=True).data,
+            FeedCommentSerializer(comments, many=True).data,
+            FeedCommentSerializer(user_comments, many=True).data))
 
         # sort combined list by date
         newlist = sorted(combined, key=lambda k: k['date'], reverse=True)

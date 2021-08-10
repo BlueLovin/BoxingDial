@@ -29,7 +29,7 @@ class Fight(models.Model):
 
 class Post(models.Model):
     fight = models.ForeignKey(
-        Fight, on_delete=models.CASCADE, related_name='posts', blank=True, default='')
+        Fight, on_delete=models.CASCADE, related_name='posts', null=True)
     content = models.TextField()
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='posts', null=True)

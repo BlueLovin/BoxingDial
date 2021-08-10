@@ -3,12 +3,16 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import Post from "../posts/Post";
 import FeedComment from "../comments/FeedComment";
-import { Card, Container } from "reactstrap";
+import Modal from "../posts/PostModal";
+import { Button, Card, Container } from "reactstrap";
 
 export default function UserFeed() {
   const [feed, setFeed] = useState(null);
   const { userVal } = useContext(UserContext);
+  const [modal, setModal] = useState(false);
+  const [headers, setHeaders] = useState({});
   const [user] = userVal;
+  const [activeItem, setActiveItem] = useState({});
 
   useEffect(() => {
     const fetchPostsAndComments = async () => {
@@ -18,6 +22,7 @@ export default function UserFeed() {
           Authorization: `Token ${token}`,
         },
       };
+      setHeaders(config);
       if (token) {
         await axios.get("/api/feed/recent", config)
         .then((res) => {
@@ -27,6 +32,38 @@ export default function UserFeed() {
     };
     fetchPostsAndComments();
   }, []);
+
+  const toggleModal = () => {
+    setModal(!modal);
+  };
+  const submitPost = async (item) => {
+    toggleModal();
+
+    await axios
+      .post("/api/post/create/", item, { headers: headers })
+      //.then(() => fetchFightData());
+  };
+  const createItem = () => {
+    const item = {
+      fight: null,
+      content: "",
+      comments: [],
+      owner: user.id,
+      username: user.username,
+    };
+    setActiveItem(item);
+    toggleModal();
+  };
+
+  const renderCreatePost = () => {
+    return (
+      <div className="text-center">
+        <Button size="lg" color="primary" onClick={createItem}>
+          Create Post
+        </Button>
+      </div>
+    );
+  };
 
   const renderPosts = () => {
     //logged in, not following anybody feed
@@ -42,11 +79,13 @@ export default function UserFeed() {
 
     if (feed) {
       console.log(feed);
-      // the following ternary is to determine if the current item
-      // is a post or a comment, and
+      // the following ternary is 
+      // to determine if the current item
+      // is a post or a comment.
       return feed.map((item, i) => (
         <div key={i}>
-          {item.fight ? (
+          {/* if the item contains a "comment_count" field, it is a post */}
+          {item.comment_count != null ? (
             <Post post={item} />
           ) : (
             <FeedComment comment={item} user={user} contextButton={true} />
@@ -59,11 +98,22 @@ export default function UserFeed() {
 
   return (
     <>
+    
       <Container>
+      {renderCreatePost()}
         <Card className="p-3 m-3">
           <div>{feed ? renderPosts() : "loading"}</div>
         </Card>
       </Container>
+
+      {modal ? (
+            <Modal
+              activeItem={activeItem}
+              toggle={toggleModal}
+              onSave={submitPost}
+              autoFocus={false}
+            />
+          ) : null}
     </>
   );
 }

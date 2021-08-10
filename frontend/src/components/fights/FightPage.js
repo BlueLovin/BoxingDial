@@ -59,7 +59,7 @@ export default function FightPage() {
 
     await axios
       .post("/api/post/create/", item, { headers: options })
-      .then((res) => fetchFightData());
+      .then(() => fetchFightData());
   };
   const createItem = () => {
     const item = {
@@ -71,7 +71,6 @@ export default function FightPage() {
     };
     setActiveItem(item);
     setModal(!modal);
-    // textarea.current.focus();
   };
   const renderCreatePost = () => {
     if (!user) {
