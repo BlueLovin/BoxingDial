@@ -29,18 +29,18 @@ class Fight(models.Model):
 
 class Post(models.Model):
     fight = models.ForeignKey(
-        Fight, on_delete=models.CASCADE, related_name='posts')
+        Fight, on_delete=models.CASCADE, related_name='posts', blank=True, default='')
     content = models.TextField()
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='posts', null=True)
     username = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
-    
+
     @property
     def truncated_content(self):
         if(len(self.content) > 25):
             return self.content[:25] + "..."
-            
+
         return self.content
 
     def __str__(self):
