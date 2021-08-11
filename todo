@@ -1,6 +1,6 @@
 [] add explore page
 [] like button on posts/comments
-[] fight optional on posts
+[x] fight optional on posts
 [] add bio/picture and other info to user profiles
 [] rate limiting
 [] fix register page
