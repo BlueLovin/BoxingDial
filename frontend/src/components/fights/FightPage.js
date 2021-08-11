@@ -6,6 +6,7 @@ import Post from "../posts/Post";
 import Fight from "./Fight";
 import Modal from "../posts/PostModal";
 import { Button } from "reactstrap";
+
 export default function FightPage() {
   const params = useParams();
   const fightID = params.fightID;
@@ -44,12 +45,11 @@ export default function FightPage() {
     Authorization: `Token ${token}`,
   };
   const renderPosts = () => {
-    return fightData.posts
-      .map((post, i) => (
-        <div key={i}>
-          <Post post={post}  updateStateFunction={fetchFightData} /> <br />
-        </div>
-      ));
+    return fightData.posts.map((post, i) => (
+      <div key={i}>
+        <Post post={post} updateStateFunction={fetchFightData} /> <br />
+      </div>
+    ));
   };
   const toggle = () => {
     setModal(!modal);

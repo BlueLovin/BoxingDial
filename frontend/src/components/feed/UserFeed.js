@@ -14,22 +14,22 @@ export default function UserFeed() {
   const [user] = userVal;
   const [activeItem, setActiveItem] = useState({});
 
-  useEffect(() => {
-    const fetchPostsAndComments = async () => {
-      let token = localStorage.getItem("token");
-      let config = {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      };
-      setHeaders(config);
-      if (token) {
-        await axios.get("/api/feed/recent", config)
-        .then((res) => {
-          setFeed(res.data);
-        });
-      }
+  const fetchPostsAndComments = async () => {
+    let token = localStorage.getItem("token");
+    let config = {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
     };
+    setHeaders(config);
+    if (token) {
+      await axios.get("/api/feed/recent", config).then((res) => {
+        setFeed(res.data);
+      });
+    }
+  };
+
+  useEffect(() => {
     fetchPostsAndComments();
   }, []);
 
@@ -37,11 +37,13 @@ export default function UserFeed() {
     setModal(!modal);
   };
   const submitPost = async (item) => {
-    toggleModal();
-
     await axios
       .post("/api/post/create/", item, { headers: headers })
-      //.then(() => fetchFightData());
+      .then(() => {
+        toggleModal();
+        fetchPostsAndComments();
+      })
+      .catch(() => alert("Error creating your post. Please try again."));
   };
   const createItem = () => {
     const item = {
@@ -79,18 +81,18 @@ export default function UserFeed() {
 
     if (feed) {
       console.log(feed);
-      // the following ternary is 
+      // the following ternary is
       // to determine if the current item
       // is a post or a comment.
       return feed.map((item, i) => (
         <div key={i}>
           {/* if the item contains a "comment_count" field, it is a post */}
           {item.comment_count != null ? (
-            <Post post={item} />
+            <Post post={item} updateStateFunction={fetchPostsAndComments} />
           ) : (
             <FeedComment comment={item} user={user} contextButton={true} />
           )}
-          <hr/>
+          <hr />
         </div>
       ));
     }
@@ -98,22 +100,21 @@ export default function UserFeed() {
 
   return (
     <>
-    
       <Container>
-      {renderCreatePost()}
+        {renderCreatePost()}
         <Card className="p-3 m-3">
           <div>{feed ? renderPosts() : "loading"}</div>
         </Card>
       </Container>
 
       {modal ? (
-            <Modal
-              activeItem={activeItem}
-              toggle={toggleModal}
-              onSave={submitPost}
-              autoFocus={false}
-            />
-          ) : null}
+        <Modal
+          activeItem={activeItem}
+          toggle={toggleModal}
+          onSave={submitPost}
+          autoFocus={false}
+        />
+      ) : null}
     </>
   );
 }

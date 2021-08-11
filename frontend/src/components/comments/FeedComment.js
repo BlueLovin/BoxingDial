@@ -1,27 +1,9 @@
-import axios from "axios";
 import React from "react";
 import { Link } from "react-router-dom";
 import { Container } from "reactstrap";
 
 const Comment = (props) => {
-  const { updateStateFunction = null } = props;
   const comment = props.comment;
-  const user = props.user;
-  const token = props.token;
-
-  const deleteComment = (comment) => {
-    axios
-      .delete(`/api/comments/${comment.id}/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      })
-      .then(() => {
-        if (updateStateFunction) {
-          updateStateFunction();
-        }
-      });
-  };
 
   return (
     <Container>

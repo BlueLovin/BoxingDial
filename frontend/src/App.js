@@ -28,7 +28,7 @@ function App() {
     getToken();
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     const setLoggedInUser = async () => {
       if (token) {
         await axios
@@ -51,9 +51,9 @@ function App() {
         setUser(null);
         setLoggedIn(false);
       }
-    }
-    
-    if(token !== undefined){
+    };
+
+    if (token !== undefined) {
       setLoggedInUser();
     }
   }, [token]);

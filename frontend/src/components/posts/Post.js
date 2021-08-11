@@ -20,12 +20,17 @@ const Post = (props) => {
         },
       })
       .then(() => {
-        if (updateStateFunction) {
+        if (updateStateFunction != null) {
           updateStateFunction();
         } else {
           history.goBack();
         }
       });
+  };
+
+  const formatDateTime = (date) => {
+    const dateTime = new Date(date);
+    return dateTime.toLocaleString();
   };
 
   return (
@@ -39,7 +44,7 @@ const Post = (props) => {
         <span className="font-weight-light list-group-item bg-light p-2 m-1 preserve-line-breaks">
           {post.content}
         </span>
-        <div className="text-right m-1">{post.date}</div>
+        <div className="text-right m-1">{formatDateTime(post.date)}</div>
 
         <div className="text-right m-1">
           {/* if the component was called with a comments button */}
