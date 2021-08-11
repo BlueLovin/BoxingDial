@@ -33,6 +33,11 @@ export default function Login() {
     setActiveItem(item);
   };
 
+  const onClickFunction = (e) => {
+    e.preventDefault(); // PREVENT REFRESH
+    submitUser(activeItem);
+  };
+
   const submitUser = async (item) => {
     // create user object
     await axios
@@ -44,7 +49,6 @@ export default function Login() {
         if (error) {
           setError(false);
         }
-
       })
       .catch((res) => setError(true));
 
@@ -59,42 +63,44 @@ export default function Login() {
     <div className="mx-auto text-center container login-container">
       <div className="card card-body mt-5">
         <h2 className="font-weight-bold">Login</h2>
-        <div className="form-group text-center">
-          <br />
-          <input
-            type="text"
-            className={error ? "form-control border-danger" : "form-control"}
-            name="username"
-            placeholder="Username"
-            onChange={handleChange}
-            onFocus={() => setError(false)}
-            autoFocus={true}
-            autoComplete="off"
-            value={activeItem.username}
-          />
-        </div>
-        <div className="form-group text-center">
-          <input
-            type="password"
-            className={error ? "form-control border-danger" : "form-control"}
-            name="password"
-            placeholder="Password"
-            onChange={handleChange}
-            onFocus={() => setError(false)}
-            value={activeItem.password}
-          />
-          {error ? (
-            <>
-              <br />
-              <h6 className="text-danger">Invalid username or password</h6>
-            </>
-          ) : null}
-        </div>
-        <div className="form-group text-center">
-          <Button color="success" onClick={() => submitUser(activeItem)}>
-            Login
-          </Button>
-        </div>
+        <form onSubmit={onClickFunction}>
+          <div className="form-group text-center">
+            <br />
+            <input
+              type="text"
+              className={error ? "form-control border-danger" : "form-control"}
+              name="username"
+              placeholder="Username"
+              onChange={handleChange}
+              onFocus={() => setError(false)}
+              autoFocus={true}
+              autoComplete="off"
+              value={activeItem.username}
+            />
+          </div>
+          <div className="form-group text-center">
+            <input
+              type="password"
+              className={error ? "form-control border-danger" : "form-control"}
+              name="password"
+              placeholder="Password"
+              onChange={handleChange}
+              onFocus={() => setError(false)}
+              value={activeItem.password}
+            />
+            {error ? (
+              <>
+                <br />
+                <h6 className="text-danger">Invalid username or password</h6>
+              </>
+            ) : null}
+          </div>
+          <div className="form-group text-center">
+            <Button color="success" type="submit">
+              Login
+            </Button>
+          </div>
+        </form>
         <p>
           Don't have an account?
           <Link to="/register"> Register</Link>
