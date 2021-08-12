@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import UserFollowing
-from socialmediasite.serializers import PostSerializer
 from django.contrib.auth import authenticate
 
 #User Serializer

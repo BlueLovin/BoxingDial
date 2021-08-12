@@ -2,7 +2,6 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from django.views.decorators.csrf import csrf_exempt
 from socialmediasite import views
 
 router = routers.DefaultRouter()

@@ -10,23 +10,25 @@ const Comment = (props) => {
   const user = props.user;
   const token = props.token;
 
-  const deleteComment = (comment) => {
-    axios.delete(`/api/comments/${comment.id}/`, {
-      headers: {
-        Authorization: `Token ${token}`,
-      },
-    }).then(() => {
-      if (updateStateFunction) {
-        updateStateFunction();
-      }
-    });
+  const deleteComment = (_comment) => {
+    axios
+      .delete(`/api/comments/${_comment.id}/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      })
+      .then(() => {
+        if (updateStateFunction) {
+          updateStateFunction();
+        }
+      });
   };
 
   return (
     <Container>
-      <div className="list-group-item bg-light justify-content-center">
+      <div className="list-group-item bg-light justify-content-center preserve-line-breaks">
         <p>{comment.content}</p>
-        <div className="list-group-item p-auto  m-auto d-flex justify-content-between align-items-center ">
+        <div className="list-group-item p-auto m-auto d-flex justify-content-between align-items-center">
           <div>
             <span className="text-muted">by </span>
             <Link to={`/user/${comment.username}`}>{comment.username}</Link>

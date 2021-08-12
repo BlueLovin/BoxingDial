@@ -1,13 +1,10 @@
-from django.http import response
-from rest_framework import viewsets, permissions, generics, status, views
+from rest_framework import viewsets, generics
 from .models import Post, PostComment, Fight
 from .serializers import CreatePostSerializer, PostSerializer, CommentSerializer, SmallFightSerializer, UserSerializer, FightSerializer, SmallPostSerializer
-from django.shortcuts import get_object_or_404
-from .permissions import IsAdminUserOrReadOnly, IsOwnerOrReadOnly
+from .permissions import IsOwnerOrReadOnly
 from django.contrib.auth.models import User
 from django.db.models import Count, Prefetch
 from accounts.serializers import UserFollowingSerializer, FollowersSerializer
-from accounts.models import UserFollowing
 from rest_framework.response import Response
 
 
