@@ -1,7 +1,8 @@
 [x] fight optional on posts
 [x] pressing enter logs in on login page
-[] like button on posts/comments
+[x] like button on posts
 [] fix register page
+[] upvote/downvote comments
 [] reply to other comments
 [] user inbox
 [] delete account, account settings, more account control
