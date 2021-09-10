@@ -1,6 +1,7 @@
 from django.db.models.fields import json
 from django.http.response import JsonResponse
 from rest_framework import viewsets, generics, views, status
+from rest_framework.compat import distinct
 from .models import Post, PostComment, Fight, PostLike
 from .serializers import CreatePostSerializer, PostLikeSerializer, PostSerializer, CommentSerializer, SmallFightSerializer, UserSerializer, FightSerializer, SmallPostSerializer
 from .permissions import IsOwnerOrReadOnly
@@ -79,8 +80,9 @@ class UserPostListView(generics.ListAPIView):
     serializer_class = SmallPostSerializer
 
     def get_queryset(self):
-        return Post.objects.filter(username=self.kwargs['user']).annotate(like_count=Count('post_likes')).annotate(
-            comment_count=Count('comments')).order_by('-id')
+        return Post.objects.filter(username=self.kwargs['user']).annotate(
+            like_count=Count('post_likes'),
+            comment_count=Count('comments'), distinct=True).order_by('-id')
 
 
 # all posts /api/posts
@@ -89,8 +91,8 @@ class PostsView(generics.ListAPIView):
 
     def get_queryset(self):
         return Post.objects.all().annotate(
-            like_count=Count('post_likes')).annotate(
-                comment_count=Count('comments'))
+            like_count=Count('post_likes', distinct=True),
+                comment_count=Count('comments', distinct=True))
 
 
 class CreatePostView(viewsets.ModelViewSet):
@@ -121,8 +123,8 @@ class PopularPostsView(generics.ListAPIView):
     serializer_class = SmallPostSerializer
 
     def get_queryset(self):
-        return Post.objects.annotate(like_count=Count('post_likes')).annotate(
-            comment_count=Count('comments')).order_by('-comment_count')[:5]
+        return Post.objects.annotate(like_count=Count('post_likes'),
+            comment_count=Count('comments', distinct=True)).order_by('-comment_count')[:5]
 
 
 # all comments /api/comments
@@ -139,9 +141,9 @@ class FightView(generics.RetrieveAPIView):
     def get_queryset(self):
         return Fight.objects.filter(id=self.kwargs['pk']).prefetch_related(
             Prefetch('posts',
-                     Post.objects.annotate(like_count=Count('post_likes')).annotate(
-                         comment_count=Count('comments')).order_by('-id'))).annotate(
-                             posts_count=Count('posts'))
+                     Post.objects.annotate(like_count=Count('post_likes', distinct=True)).annotate(
+                         comment_count=Count('comments', distinct=True)).order_by('-id'))).annotate(
+                             posts_count=Count('posts', distinct=True))
 
 
 # all fights /api/fights
@@ -150,7 +152,8 @@ class FightsView(generics.ListAPIView):
     query = Fight.objects.all().prefetch_related(
         Prefetch(
             'posts',
-            Post.objects.annotate(like_count=Count('post_likes')).annotate(comment_count=Count('comments')))).annotate(
+            Post.objects.annotate(like_count=Count('post_likes', distinct=True)).annotate(
+                comment_count=Count('comments', distinct=True)))).annotate(
                 posts_count=Count('posts')).order_by('-id')
     queryset = query[:5]  # five most recent fights
 
@@ -161,9 +164,11 @@ class PopularFightsView(generics.ListAPIView):
     queryset = Fight.objects.all().prefetch_related(
         Prefetch(
             'posts',
-            Post.objects.annotate(comment_count=Count('comments')).annotate(
-                like_count=Count('post_likes')))).annotate(
-                posts_count=Count('posts')).order_by('-posts_count')[:5]
+            Post.objects.annotate(comment_count=Count('comments', distinct=True),
+                like_count=Count('post_likes', distinct=True)
+                )
+                )).annotate(
+                posts_count=Count('posts', distinct=True)).order_by('-posts_count')[:5]
 
 
 # all fights without posts field

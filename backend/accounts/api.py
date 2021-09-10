@@ -1,3 +1,4 @@
+from django.db.models.expressions import Exists, OuterRef, Subquery
 from socialmediasite.serializers import FeedCommentSerializer, SmallPostSerializer
 from django.db.models.aggregates import Count
 from django.db.models.query import Prefetch
@@ -7,8 +8,8 @@ from knox.models import AuthToken
 from itertools import chain
 from django.contrib.auth.models import User
 from .models import UserFollowing
-from socialmediasite.models import Post, PostComment
-from .serializers import UserSerializer, UserFollowingSerializer, RegisterSerializer, LoginSerializer
+from socialmediasite.models import Post, PostComment, PostLike
+from .serializers import SmallUserSerializer, UserSerializer, UserFollowingSerializer, RegisterSerializer, LoginSerializer
 
 
 class RegisterAPI(generics.GenericAPIView):
@@ -21,7 +22,7 @@ class RegisterAPI(generics.GenericAPIView):
         token = AuthToken.objects.create(user)
         return Response({
             "user":
-            UserSerializer(user, context=self.get_serializer_context()).data,
+            SmallUserSerializer(user, context=self.get_serializer_context()).data,
             "token":
             token[1]
         })
@@ -37,7 +38,7 @@ class LoginAPI(generics.GenericAPIView):
         token = AuthToken.objects.create(user)
         return Response({
             "user":
-            UserSerializer(user, context=self.get_serializer_context()).data,
+            SmallUserSerializer(user, context=self.get_serializer_context()).data,
             "token":
             token[1]  # must be subscripted
         })
@@ -98,17 +99,23 @@ class UserFeedByRecentView(generics.GenericAPIView):
 
         # get posts and comments from following users
         posts = Post.objects.filter(owner__in=follower_user_ids).annotate(
-            like_count=Count('post_likes')).annotate(
+            like_count=Count('post_likes'),
+            #liked=(Exists(PostLike.objects.get())),
             comment_count=Count('comments')).order_by('-id')
+
         comments = PostComment.objects.filter(
             owner__in=follower_user_ids).order_by('-id')
 
         # get posts and comments from logged in user
         user_posts = Post.objects.filter(owner__in=[request.user]).annotate(
-            like_count=Count('post_likes')).annotate(
+            like_count=Count('post_likes'),
+            #liked=Exists(Subquery(PostLike.objects.get(user=request.user, post=OuterRef('pk')))),
             comment_count=Count('comments')).order_by('-id')
+
         user_comments = PostComment.objects.filter(
             owner__in=[request.user]).order_by('-id')
+
+#        like_object = PostLike.objects.get(user=request.user, post=)
 
         # combine post list and comment list
         combined = list(chain(SmallPostSerializer(

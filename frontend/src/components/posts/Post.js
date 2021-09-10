@@ -34,7 +34,10 @@ const Post = (props) => {
   useEffect(() => {}, [likeCount]);
 
   const likePost = (_post) => {
-    console.log(likeCount);
+    if(!user){
+      alert("login to be able to like posts!");
+      return;
+    }
     axios
       .post(
         `/api/posts/${_post.id}/like`,
