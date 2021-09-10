@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Post, PostComment, Fight
+
+from accounts.serializers import SmallUserSerializer
+from .models import Post, PostComment, Fight, PostLike
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -41,15 +43,23 @@ class FeedCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostComment
         fields = ('id', 'post', 'date', 'content', 'owner', 'username')
+
+class PostLikeSerializer(serializers.ModelSerializer):
+    # user = SmallUserSerializer(many=False)
+    class Meta:
+        model = PostLike
+        fields = ('liked_on',)
         
 class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True)
     fight = SmallFightSerializer(many=False)
+    likes = PostLikeSerializer(many=True)
     comment_count = serializers.IntegerField()
+    like_count = serializers.IntegerField()
 
     class Meta:
         model = Post
-        fields = ('id', 'date', 'fight', 'comment_count', 'content', 'comments', 'owner', 'username')
+        fields = ('id', 'date', 'fight', 'likes', 'comment_count', 'like_count', 'content', 'comments', 'owner', 'username')
         
 class CreatePostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True)
@@ -67,12 +77,18 @@ class CreatePostSerializer(serializers.ModelSerializer):
             PostComment.objects.create(Post=post, **comments, owner=owner, username=username)
         return post
 
+
+
 class SmallPostSerializer(serializers.ModelSerializer):
     fight = TinyFightSerializer(many=False)
     comment_count = serializers.IntegerField()
+    like_count = serializers.IntegerField()
+
     class Meta:
         model = Post
-        fields = ('id', 'date', 'fight', 'content', 'comment_count', 'owner', 'username')
+        fields = ('id', 'date', 'fight', 'content', 'comment_count', 'like_count', 'owner', 'username')
+
+
                 
 class FightSerializer(serializers.ModelSerializer):
     posts = SmallPostSerializer(many=True)

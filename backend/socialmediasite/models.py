@@ -26,6 +26,12 @@ class Fight(models.Model):
     def __str__(self):
         return self.title
 
+class PostLike(models.Model):
+    user = models.ForeignKey(User, related_name="user_likes", on_delete=models.CASCADE)
+
+    post = models.ForeignKey("Post", related_name="post_likes", on_delete=models.CASCADE)
+
+    liked_on = models.DateTimeField(auto_now_add=True)
 
 class Post(models.Model):
     fight = models.ForeignKey(
@@ -34,7 +40,12 @@ class Post(models.Model):
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='posts', null=True)
     username = models.TextField()
+    likes = models.ManyToManyField(
+        User, related_name="user", blank=True, through=PostLike
+    )
+
     date = models.DateTimeField(auto_now_add=True)
+
 
     @property
     def truncated_content(self):
@@ -45,3 +56,4 @@ class Post(models.Model):
 
     def __str__(self):
         return self.content
+
