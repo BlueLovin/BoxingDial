@@ -1,13 +1,16 @@
 import { Link, useHistory } from "react-router-dom";
 import { Container } from "reactstrap";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { UserContext } from "../../UserContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
 
 const Post = (props) => {
   const { commentsButton = true } = props;
   const { updateStateFunction = null } = props;
   const post = props.post;
+  const [likeCount, setLikeCount] = useState(post.like_count);
   const { userVal, tokenVal } = useContext(UserContext);
   const [user] = userVal;
   const [token] = tokenVal;
@@ -28,6 +31,34 @@ const Post = (props) => {
       });
   };
 
+  useEffect(() => {}, [likeCount]);
+
+  const likePost = (_post) => {
+    console.log(likeCount);
+    axios
+      .post(
+        `/api/posts/${_post.id}/like`,
+        {},
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        // LIKE
+        if (res.data["result"] === "liked") {
+          // increment like count if server responds "liked"
+          setLikeCount(likeCount + 1);
+        }
+        // UNLIKE
+        if (res.data["result"] === "unliked") {
+          // vice versa with "unliked"
+          setLikeCount(likeCount - 1);
+        }
+      });
+  };
+
   const formatDateTime = (date) => {
     const dateTime = new Date(date);
     return dateTime.toLocaleString();
@@ -44,6 +75,13 @@ const Post = (props) => {
         <span className="font-weight-light list-group-item bg-light p-2 m-1 preserve-line-breaks">
           {post.content}
         </span>
+
+        <div className="text-left m-1">
+          <button className="btn-sm btn-danger" onClick={() => likePost(post)}>
+            <FontAwesomeIcon icon={faHeart} />
+            {" " + likeCount}
+          </button>
+        </div>
         <div className="text-right m-1">{formatDateTime(post.date)}</div>
 
         <div className="text-right m-1">

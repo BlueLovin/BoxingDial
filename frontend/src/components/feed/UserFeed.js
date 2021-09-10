@@ -80,7 +80,6 @@ export default function UserFeed() {
     }
 
     if (feed) {
-      console.log(feed);
       // the following ternary is
       // to determine if the current item
       // is a post or a comment.
