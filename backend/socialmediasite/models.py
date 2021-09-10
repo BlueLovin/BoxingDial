@@ -41,7 +41,7 @@ class Post(models.Model):
         User, on_delete=models.CASCADE, related_name='posts', null=True)
     username = models.TextField()
     likes = models.ManyToManyField(
-        User, related_name="user", blank=True, through=PostLike
+        User, related_name="user", through=PostLike
     )
 
     date = models.DateTimeField(auto_now_add=True)

@@ -45,21 +45,19 @@ class FeedCommentSerializer(serializers.ModelSerializer):
         fields = ('id', 'post', 'date', 'content', 'owner', 'username')
 
 class PostLikeSerializer(serializers.ModelSerializer):
-    # user = SmallUserSerializer(many=False)
     class Meta:
         model = PostLike
-        fields = ('liked_on',)
+        fields = '__all__'
         
 class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True)
     fight = SmallFightSerializer(many=False)
-    likes = PostLikeSerializer(many=True)
     comment_count = serializers.IntegerField()
     like_count = serializers.IntegerField()
 
     class Meta:
         model = Post
-        fields = ('id', 'date', 'fight', 'likes', 'comment_count', 'like_count', 'content', 'comments', 'owner', 'username')
+        fields = ('id', 'date', 'fight', 'comment_count', 'like_count', 'content', 'comments', 'owner', 'username')
         
 class CreatePostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True)

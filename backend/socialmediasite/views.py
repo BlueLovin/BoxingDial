@@ -5,7 +5,7 @@ from .models import Post, PostComment, Fight, PostLike
 from .serializers import CreatePostSerializer, PostLikeSerializer, PostSerializer, CommentSerializer, SmallFightSerializer, UserSerializer, FightSerializer, SmallPostSerializer
 from .permissions import IsOwnerOrReadOnly
 from django.contrib.auth.models import User
-from django.db.models import Count, Prefetch
+from django.db.models import Count, Prefetch, query
 from accounts.serializers import UserFollowingSerializer, FollowersSerializer
 from rest_framework.response import Response
 
@@ -111,8 +111,9 @@ class PostView(generics.RetrieveDestroyAPIView):
     def get_queryset(self):
         return Post.objects.annotate(
                 like_count=Count('likes', distinct=True)).filter(id=self.kwargs['pk']).prefetch_related(
-            Prefetch('comments', queryset=PostComment.objects.order_by('-id'))).annotate(
-                comment_count=Count('comments'))
+            Prefetch('comments', queryset=PostComment.objects.order_by('-id')),
+            ).annotate(
+                comment_count=Count('comments', distinct=True))
 
 
 # 5 most popular posts, popularity determined by number of comments
@@ -176,20 +177,28 @@ class PostLikeApiView(views.APIView):
     def post(self, request, post, format=None):
 
         user = request.user
-        post = Post.objects.filter(id=post)[0]
+
+        # if not logged in
+        if not user.is_authenticated:
+            return Response(
+                {
+                    'result': "not logged in"
+                },
+            )
+
+        post = Post.objects.get(id=post)
     
         post_like_obj = PostLike.objects.filter(user=user, post=post)
         if post_like_obj.exists():
             post_like_obj.delete()
             result = 'unliked'
         else:
-            post_like_obj = PostLike.objects.create(user=user, post=post)
+            PostLike.objects.create(user=user, post=post)
             result = 'liked'
         
-        result = JsonResponse(user.id, safe=False)
         return Response(
             {
-                'result': PostLikeSerializer(post_like_obj).data,
+                'result': result,
             },
             status=status.HTTP_200_OK
         )
