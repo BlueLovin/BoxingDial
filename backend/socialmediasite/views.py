@@ -82,7 +82,7 @@ class UserPostListView(generics.ListAPIView):
     def get_queryset(self):
         return Post.objects.filter(username=self.kwargs['user']).annotate(
             like_count=Count('post_likes'),
-            comment_count=Count('comments'), distinct=True).order_by('-id')
+            comment_count=Count('comments', distinct=True)).order_by('-id')
 
 
 # all posts /api/posts
