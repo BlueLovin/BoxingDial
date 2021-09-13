@@ -26,9 +26,24 @@ export default function Comments() {
   });
   const history = useHistory();
 
-  const getPost = useCallback(async () => {
+  //get post WITH auth headers
+  const getLoggedInPost = useCallback(async () => {
     await axios
-      .get(`/api/posts/${postID}`) // get current post
+      .get(`/api/posts/${postID}`, {
+        headers: {
+        "Authorization": `Token ${token}`
+      }}) // get current post
+      .then((res) => {
+        setCurrentPost(res.data);
+        setCommentList(res.data.comments);
+      })
+      .catch(() => history.push("/404"));
+  }, [postID, history, token]);
+
+  //get post WITHOUT auth headers
+  const getLoggedOutPost = useCallback(async () => {
+    await axios
+      .get(`/api/posts/${postID}`)
       .then((res) => {
         setCurrentPost(res.data);
         setCommentList(res.data.comments);
@@ -37,8 +52,15 @@ export default function Comments() {
   }, [postID, history]);
 
   useEffect(() => {
-    getPost();
-  }, [getPost]);
+    //LOGGED OUT
+    if(token === null){
+      getLoggedOutPost();
+    }
+    // LOGGED IN 
+    if(token !== undefined && token !== null){
+      getLoggedInPost();
+    }
+  }, [getLoggedInPost, getLoggedOutPost, token]);
 
   var handleChange = (e) => {
     let { name, value } = e.target;
@@ -60,7 +82,7 @@ export default function Comments() {
           Authorization: `Token ${token}`,
         },
       })
-      .then(() => getPost());
+      .then(() => getLoggedInPost());
 
     setActiveItem({
       // RESET TEXT BOX
@@ -119,7 +141,7 @@ export default function Comments() {
           comment={comment}
           user={user}
           token={token}
-          updateStateFunction={getPost}
+          updateStateFunction={getLoggedInPost}
           key={i}
         />
       ));

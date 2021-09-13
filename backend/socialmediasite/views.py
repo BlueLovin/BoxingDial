@@ -1,3 +1,4 @@
+from django.db.models.expressions import Exists
 from django.db.models.fields import json
 from django.http.response import JsonResponse
 from rest_framework import viewsets, generics, views, status
@@ -94,7 +95,7 @@ class UserPostListView(generics.ListAPIView):
             Post.objects.filter(username=self.kwargs["user"])
             .annotate(
                 like_count=Count("post_likes", distinct=True),
-                comment_count=Count("comments", distinct=True)
+                comment_count=Count("comments", distinct=True),
             )
             .order_by("-id")
         )
@@ -127,14 +128,34 @@ class PostView(generics.RetrieveDestroyAPIView):
     serializer_class = PostSerializer
     # get current post, and order the comments by their ID descending. or recent, in other words
     def get_queryset(self):
-        return (
-            Post.objects.filter(id=self.kwargs["pk"])
-            .annotate(like_count=Count("likes", distinct=True))
-            .prefetch_related(
-                Prefetch("comments", queryset=PostComment.objects.order_by("-id")),
+        logged_in = self.request.user.is_authenticated
+        if(logged_in):
+            return (
+                Post.objects.filter(id=self.kwargs["pk"])
+                .annotate(like_count=Count("likes", distinct=True))
+                .prefetch_related(
+                    Prefetch("comments", queryset=PostComment.objects.order_by("-id")),
+                )
+                .annotate(
+                    comment_count=Count("comments", distinct=True),
+                    liked=Exists(
+                        PostLike.objects.filter(
+                            post=self.kwargs["pk"], user=self.request.user
+                        )
+                    ),
+                )
             )
-            .annotate(comment_count=Count("comments", distinct=True))
-        )
+        else:
+            return (
+                Post.objects.filter(id=self.kwargs["pk"])
+                .annotate(like_count=Count("likes", distinct=True))
+                .prefetch_related(
+                    Prefetch("comments", queryset=PostComment.objects.order_by("-id")),
+                )
+                .annotate(
+                    comment_count=Count("comments", distinct=True),
+                )
+            )
 
 
 # 5 most popular posts, popularity determined by number of comments

@@ -14,7 +14,7 @@ export default function ShowUser() {
     setUser(null);
     axios
       .post(
-        "api/token-auth/logout",
+        "/api/token-auth/logout",
         {},
         {
           headers: {
