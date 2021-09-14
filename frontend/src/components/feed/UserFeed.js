@@ -23,12 +23,17 @@ export default function UserFeed() {
       },
     };
     setHeaders(config);
-    if (token) {
+    if (token && user && user.following.length !== 0) {
       await axios.get("/api/feed/recent", config).then((res) => {
         setFeed(res.data);
       });
     }
-  }, [token]);
+    else if (token && user && user.following.length === 0){
+      await axios.get(`/api/users/${user.username}/posts`, config).then((res) => {
+        setFeed(res.data);
+      });
+    }
+  }, [token, user]);
 
   useEffect(() => {
     let config = {
@@ -78,40 +83,33 @@ export default function UserFeed() {
   };
 
   const renderPosts = () => {
-    //logged in, not following anybody feed
-    if (user && user.following.length === 0) {
-      //link here to see all the users of the site?
-      //maybe an explore page?
-      return (
-        <p className="text-center p-3 m-3">
-          Welcome to your feed! Follow somebody to see their posts here.
-        </p>
-      );
-    }
-
-    if (feed) {
-      // the following ternary is
-      // to determine if the current item
-      // is a post or a comment.
-      return feed.map((item, i) => (
-        <div key={i}>
-          {/* if the item contains a "comment_count" field, it is a post */}
-          {item.comment_count != null ? (
-            <Post post={item} updateStateFunction={fetchPostsAndComments} />
-          ) : (
-            <FeedComment comment={item} user={user} contextButton={true} />
-          )}
-          <hr />
-        </div>
-      ));
-    }
+    return feed.map((item, i) => (
+      <div key={i}>
+        {/* if the item contains a "comment_count" field, it is a post */}
+        {item.comment_count != null ? (
+          <Post post={item} updateStateFunction={fetchPostsAndComments} />
+        ) : (
+          <FeedComment comment={item} user={user} contextButton={true} />
+        )}
+        <hr />
+      </div>
+    ));
   };
 
   return (
     <>
       <Container>
         {renderCreatePost()}
+        
         <Card className="p-3 m-3">
+        {
+          user && user.following.length === 0 ? 
+          <p className="text-center p-3 m-3">
+            Welcome to your feed! Follow somebody to see their posts here.
+          </p>
+          :
+          null
+        }
           <div>{feed ? renderPosts() : "loading"}</div>
         </Card>
       </Container>
