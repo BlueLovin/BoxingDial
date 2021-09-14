@@ -28,7 +28,6 @@ urlpatterns = [
     url(r"api/posts/(?P<pk>[0-9]+)/$", socialmediasite_views.PostView.as_view()),
     path("api/post/create/", socialmediasite_views.CreatePostView.as_view()),
     path("api/posts/popular", socialmediasite_views.PopularPostsView.as_view()),
-    #path("api/comments/", socialmediasite_views.PostCommentsView.as_view()),
     path("api/posts/<int:post>/like", socialmediasite_views.PostLikeApiView.as_view()),
     path("", include("accounts.urls")),
 ]
