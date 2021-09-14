@@ -23,13 +23,8 @@ export default function UserFeed() {
       },
     };
     setHeaders(config);
-    if (token && user && user.following.length !== 0) {
+    if (token && user) {
       await axios.get("/api/feed/recent", config).then((res) => {
-        setFeed(res.data);
-      });
-    }
-    else if (token && user && user.following.length === 0){
-      await axios.get(`/api/users/${user.username}/posts`, config).then((res) => {
         setFeed(res.data);
       });
     }
@@ -110,7 +105,7 @@ export default function UserFeed() {
           :
           null
         }
-          <div>{feed ? renderPosts() : "loading"}</div>
+          <div>{feed && feed.length > 0 ? renderPosts() : "nothing to see here... make a post!"}</div>
         </Card>
       </Container>
 
