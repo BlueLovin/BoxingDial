@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from accounts.serializers import UserSerializer, SmallUserSerializer
-from .models import Post, PostComment, Fight, PostLike
+from fights.serializers.common import SmallFightSerializer, TinyFightSerializer
+from .models import Post, PostComment, PostLike
 from django.contrib.auth.models import User
 
 
@@ -20,16 +21,6 @@ class CommentSerializer(serializers.ModelSerializer):
         return comment
 
 
-class SmallFightSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Fight
-        fields = ("id", "title", "description", "result", "date", "image_URL")
-
-
-class TinyFightSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Fight
-        fields = ("id", "title", "result", "date", "image_URL")
 
 
 class MicroPostSerializer(serializers.ModelSerializer):
@@ -93,7 +84,6 @@ class CreatePostSerializer(serializers.ModelSerializer):
             )
         return post
 
-
 class SmallPostSerializer(serializers.ModelSerializer):
     fight = TinyFightSerializer(many=False)
     comment_count = serializers.IntegerField()
@@ -114,29 +104,3 @@ class SmallPostSerializer(serializers.ModelSerializer):
             "owner",
             "username",
         )
-
-
-class FightSerializer(serializers.ModelSerializer):
-    posts = SmallPostSerializer(many=True)
-    posts_count = serializers.IntegerField()
-
-    class Meta:
-        model = Fight
-        fields = (
-            "id",
-            "title",
-            "description",
-            "result",
-            "date",
-            "image_URL",
-            "posts_count",
-            "posts",
-        )
-
-    def create(self, validated_data):
-        posts_data = validated_data.pop("posts")
-        fight = Fight.objects.create(**validated_data)
-        for posts in posts_data:
-            Post.objects.create(Fight=self.title, **posts)
-        return fight
-

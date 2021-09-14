@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import Post, PostComment, Fight
+from fights.models import Fight
+from .models import Post, PostComment
 from django.contrib.auth.models import User
 
 class UserAdmin(BaseUserAdmin):

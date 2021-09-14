@@ -4,15 +4,16 @@ from django.http.response import JsonResponse
 from rest_framework import viewsets, generics, views, status
 from rest_framework.compat import distinct
 from rest_framework.permissions import IsAuthenticated
-from .models import Post, PostComment, Fight, PostLike
+from .models import Post, PostComment, PostLike
+from fights.models import Fight
+from fights.serializers.nested import FightSerializer
+from fights.serializers.common import SmallFightSerializer
 from .serializers import (
     CreatePostSerializer,
     PostLikeSerializer,
     PostSerializer,
     CommentSerializer,
-    SmallFightSerializer,
     UserSerializer,
-    FightSerializer,
     SmallPostSerializer,
 )
 from .permissions import IsOwnerOrReadOnly
@@ -170,100 +171,12 @@ class PopularPostsView(generics.ListAPIView):
 
 
 # all comments /api/comments
-class PostCommentsView(generics.ListAPIView):
+class PostCommentsView(viewsets.ModelViewSet):
     permission_classes = [IsOwnerOrReadOnly]
     serializer_class = CommentSerializer
     queryset = PostComment.objects.all()
 
 
-# single fight /api/fights/{id}
-class FightView(generics.RetrieveAPIView):
-    serializer_class = FightSerializer
-
-    def get_queryset(self):
-
-        user = self.request.user
-
-        # if not logged in
-        if not user.is_authenticated:
-            return (
-                Fight.objects.filter(id=self.kwargs["pk"])
-                .prefetch_related(
-                    Prefetch(
-                        "posts",
-                        Post.objects.annotate(
-                            like_count=Count("post_likes", distinct=True),
-                            comment_count=Count("comments", distinct=True),
-                        ).order_by("-id"),
-                    )
-                )
-                .annotate(posts_count=Count("posts", distinct=True))
-            )
-
-        elif self.request.user.is_authenticated:
-            return (
-                Fight.objects.filter(id=self.kwargs["pk"])
-                .prefetch_related(
-                    Prefetch(
-                        "posts",
-                        Post.objects.annotate(
-                            like_count=Count("post_likes", distinct=True),
-                            comment_count=Count("comments", distinct=True),
-                            liked=Exists(
-                                PostLike.objects.filter(
-                                    post=OuterRef("pk"), user=self.request.user
-                                )
-                            ),
-                        ).order_by("-id"),
-                    )
-                )
-                .annotate(posts_count=Count("posts", distinct=True))
-            )
-
-
-# all fights /api/fights
-class FightsView(generics.ListAPIView):
-    serializer_class = FightSerializer
-    query = (
-        Fight.objects.all()
-        .prefetch_related(
-            Prefetch(
-                "posts",
-                Post.objects.annotate(
-                    like_count=Count("post_likes", distinct=True),
-                    comment_count=Count("comments", distinct=True),
-                ),
-            )
-        )
-        .annotate(posts_count=Count("posts"))
-        .order_by("-id")
-    )
-    queryset = query[:5]  # five most recent fights
-
-
-# 5 most popular fights, popularity determined by number of posts
-class PopularFightsView(generics.ListAPIView):
-    serializer_class = FightSerializer
-    queryset = (
-        Fight.objects.all()
-        .prefetch_related(
-            Prefetch(
-                "posts",
-                Post.objects.annotate(
-                    comment_count=Count("comments", distinct=True),
-                    like_count=Count("post_likes", distinct=True),
-                ),
-            )
-        )
-        .annotate(posts_count=Count("posts", distinct=True))
-        .order_by("-posts_count")[:5]
-    )
-
-
-# all fights without posts field
-class SmallFightView(generics.ListAPIView):
-    serializer_class = SmallFightSerializer
-    queryset = Fight.objects.all().order_by("-id")
 
 
 class PostLikeApiView(views.APIView):

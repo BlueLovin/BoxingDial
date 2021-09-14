@@ -2,36 +2,33 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from socialmediasite import views
+from socialmediasite import views as socialmediasite_views
+from fights import views as fight_views
 
 router = routers.DefaultRouter()
-
+router.register('comments', socialmediasite_views.PostCommentsView)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-
+    path("admin/", admin.site.urls),
+    path("api/", include(router.urls)),
     # accounts
-    path('api/users/<str:user>/posts/', views.UserPostListView.as_view()),
-    path('api/users/<str:user>/', views.UserView.as_view()),
-    path('api/users/<str:user>/comments/', views.UserCommentListView.as_view()),
-    path('api/users', views.UsersView.as_view()),
-    path('api/users/<str:user>/following/', views.UserFollowingView.as_view()),
-    path('api/users/<str:user>/followers/', views.UserFollowersView.as_view()),
-
+    path("api/users/<str:user>/posts/", socialmediasite_views.UserPostListView.as_view()),
+    path("api/users/<str:user>/", socialmediasite_views.UserView.as_view()),
+    path("api/users/<str:user>/comments/", socialmediasite_views.UserCommentListView.as_view()),
+    path("api/users", socialmediasite_views.UsersView.as_view()),
+    path("api/users/<str:user>/following/", socialmediasite_views.UserFollowingView.as_view()),
+    path("api/users/<str:user>/followers/", socialmediasite_views.UserFollowersView.as_view()),
     # fights
-    path('api/fights/', views.FightsView.as_view()),
-    url(r'api/fights/(?P<pk>[0-9]+)/$', views.FightView.as_view()),
-    path('api/fights/small', views.SmallFightView.as_view()),
-    path('api/fights/popular', views.PopularFightsView.as_view()),
-
+    path("api/fights/", fight_views.FightsView.as_view()),
+    url(r"api/fights/(?P<pk>[0-9]+)/$", fight_views.FightView.as_view()),
+    path("api/fights/small", fight_views.SmallFightView.as_view()),
+    path("api/fights/popular", fight_views.PopularFightsView.as_view()),
     # posts
-    path('api/posts/', views.PostsView.as_view()),
-    url(r'api/posts/(?P<pk>[0-9]+)/$', views.PostView.as_view()),
-    path('api/post/create/', views.CreatePostView.as_view()),
-    path('api/posts/popular', views.PopularPostsView.as_view()),
-    path('api/comments', views.PostCommentsView.as_view()),
-    path('api/posts/<int:post>/like', views.PostLikeApiView.as_view()),
-
-    path('', include('accounts.urls')),
+    path("api/posts/", socialmediasite_views.PostsView.as_view()),
+    url(r"api/posts/(?P<pk>[0-9]+)/$", socialmediasite_views.PostView.as_view()),
+    path("api/post/create/", socialmediasite_views.CreatePostView.as_view()),
+    path("api/posts/popular", socialmediasite_views.PopularPostsView.as_view()),
+    #path("api/comments/", socialmediasite_views.PostCommentsView.as_view()),
+    path("api/posts/<int:post>/like", socialmediasite_views.PostLikeApiView.as_view()),
+    path("", include("accounts.urls")),
 ]
