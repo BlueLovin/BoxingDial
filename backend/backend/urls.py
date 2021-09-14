@@ -4,6 +4,7 @@ from django.urls import path, include
 from rest_framework import routers
 from socialmediasite import views as socialmediasite_views
 from fights import views as fight_views
+from accounts import views as user_views
 
 router = routers.DefaultRouter()
 router.register('comments', socialmediasite_views.PostCommentsView)
@@ -12,12 +13,12 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
     # accounts
-    path("api/users/<str:user>/posts/", socialmediasite_views.UserPostListView.as_view()),
-    path("api/users/<str:user>/", socialmediasite_views.UserView.as_view()),
-    path("api/users/<str:user>/comments/", socialmediasite_views.UserCommentListView.as_view()),
-    path("api/users", socialmediasite_views.UsersView.as_view()),
-    path("api/users/<str:user>/following/", socialmediasite_views.UserFollowingView.as_view()),
-    path("api/users/<str:user>/followers/", socialmediasite_views.UserFollowersView.as_view()),
+    path("api/users/<str:user>/posts/", user_views.UserPostListView.as_view()),
+    path("api/users/<str:user>/", user_views.UserView.as_view()),
+    path("api/users/<str:user>/comments/", user_views.UserCommentListView.as_view()),
+    path("api/users", user_views.UsersView.as_view()),
+    path("api/users/<str:user>/following/", user_views.UserFollowingView.as_view()),
+    path("api/users/<str:user>/followers/", user_views.UserFollowersView.as_view()),
     # fights
     path("api/fights/", fight_views.FightsView.as_view()),
     url(r"api/fights/(?P<pk>[0-9]+)/$", fight_views.FightView.as_view()),
