@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Button } from "reactstrap";
@@ -14,9 +14,15 @@ export default function Register() {
   const { userVal, tokenVal } = useContext(UserContext);
   const [error, setError] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
-  const [, setUser] = userVal;
+  const [user, setUser] = userVal;
   const [, setToken] = tokenVal;
   const history = useHistory();
+
+  useEffect(()=>{
+    if(user !== null && user !== undefined){
+      history.push('/');
+    }
+  }, [user, history]);
 
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -38,18 +44,11 @@ export default function Register() {
         localStorage.removeItem("token");
         localStorage.setItem("token", res.data.token);
         setUser(res.data.user);
-        history.goBack();
       })
       .catch((err) => {
         setErrorMessages([]);
         let data = err.response.data;
-        if (data.username[0] === "This field may not be blank") {
-          setErrorMessages((oldArray) => [
-            ...oldArray,
-            "Username can not be blank",
-          ]);
-        }
-        if (data.username[0] === "A user with that username already exists.") {
+        if (data.username) {
           setErrorMessages((oldArray) => [...oldArray, data.username[0]]);
         }
 

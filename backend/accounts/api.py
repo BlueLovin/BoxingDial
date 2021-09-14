@@ -18,7 +18,6 @@ from .serializers import (
     UserWithFollowersSerializer,
 )
 
-
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
