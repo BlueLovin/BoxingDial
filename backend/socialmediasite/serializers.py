@@ -1,15 +1,7 @@
 from rest_framework import serializers
-from accounts.serializers import SmallUserSerializer
+from accounts.serializers import UserSerializer, SmallUserSerializer
 from .models import Post, PostComment, Fight, PostLike
 from django.contrib.auth.models import User
-
-
-class UserSerializer(serializers.ModelSerializer):
-    posts_count = serializers.IntegerField()
-
-    class Meta:
-        model = User
-        fields = ["id", "username", "posts_count"]
 
 
 class TinyPostSerializer(serializers.ModelSerializer):

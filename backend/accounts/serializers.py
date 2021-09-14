@@ -4,6 +4,13 @@ from .models import UserFollowing
 from django.contrib.auth import authenticate
 
 #User Serializer
+class UserSerializer(serializers.ModelSerializer):
+    posts_count = serializers.IntegerField()
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "posts_count"]
+
 
 class SmallUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,7 +29,7 @@ class FollowersSerializer(serializers.ModelSerializer):
         model = UserFollowing
         fields = ("user_id", "followed_on")
 
-class UserSerializer(serializers.ModelSerializer):
+class UserWithFollowersSerializer(serializers.ModelSerializer):
     following = UserFollowingSerializer(many=True)
     followers = FollowersSerializer(many=True)
     class Meta:

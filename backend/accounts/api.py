@@ -15,6 +15,7 @@ from .serializers import (
     UserFollowingSerializer,
     RegisterSerializer,
     LoginSerializer,
+    UserWithFollowersSerializer,
 )
 
 
@@ -58,7 +59,7 @@ class UserAPI(generics.RetrieveAPIView):
     permission_classes = [
         permissions.IsAuthenticated,
     ]
-    serializer_class = UserSerializer
+    serializer_class = UserWithFollowersSerializer
 
     def get_object(self):
         return self.request.user

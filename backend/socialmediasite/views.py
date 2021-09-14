@@ -3,6 +3,7 @@ from django.db.models.fields import json
 from django.http.response import JsonResponse
 from rest_framework import viewsets, generics, views, status
 from rest_framework.compat import distinct
+from rest_framework.permissions import IsAuthenticated
 from .models import Post, PostComment, Fight, PostLike
 from .serializers import (
     CreatePostSerializer,
@@ -112,7 +113,8 @@ class PostsView(generics.ListAPIView):
         )
 
 
-class CreatePostView(viewsets.ModelViewSet):
+class CreatePostView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = CreatePostSerializer
 
     def get_queryset(self):
@@ -138,7 +140,7 @@ class PostView(generics.RetrieveDestroyAPIView):
                 )
                 .annotate(
                     comment_count=Count("comments", distinct=True),
-                    liked=Exists(
+                    liked=Exists( # see if a PostLike object exists matching the client user and post.
                         PostLike.objects.filter(
                             post=self.kwargs["pk"], user=self.request.user
                         )
@@ -168,7 +170,7 @@ class PopularPostsView(generics.ListAPIView):
 
 
 # all comments /api/comments
-class PostCommentsView(viewsets.ModelViewSet):
+class PostCommentsView(generics.ListAPIView):
     permission_classes = [IsOwnerOrReadOnly]
     serializer_class = CommentSerializer
     queryset = PostComment.objects.all()

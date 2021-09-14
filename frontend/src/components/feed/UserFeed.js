@@ -1,6 +1,6 @@
 import { UserContext } from "../../UserContext";
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import Post from "../posts/Post";
 import FeedComment from "../comments/FeedComment";
 import Modal from "../posts/PostModal";
@@ -8,17 +8,18 @@ import { Button, Card, Container } from "reactstrap";
 
 export default function UserFeed() {
   const [feed, setFeed] = useState(null);
-  const { userVal } = useContext(UserContext);
+  const { userVal, tokenVal } = useContext(UserContext);
+  const [token] = tokenVal;  
   const [modal, setModal] = useState(false);
   const [headers, setHeaders] = useState({});
   const [user] = userVal;
   const [activeItem, setActiveItem] = useState({});
 
-  const fetchPostsAndComments = async () => {
-    let token = localStorage.getItem("token");
+  const fetchPostsAndComments = useCallback(async () => {
+    let this_token = localStorage.getItem("token");
     let config = {
       headers: {
-        Authorization: `Token ${token}`,
+        Authorization: `Token ${this_token}`,
       },
     };
     setHeaders(config);
@@ -27,18 +28,27 @@ export default function UserFeed() {
         setFeed(res.data);
       });
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    let config = {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    };
+    setHeaders(config);
+  }, [token]);
 
   useEffect(() => {
     fetchPostsAndComments();
-  }, []);
+  }, [fetchPostsAndComments]);
 
   const toggleModal = () => {
     setModal(!modal);
   };
   const submitPost = async (item) => {
     await axios
-      .post("/api/post/create/", item, { headers: headers })
+      .post("/api/post/create/", item, headers)
       .then(() => {
         toggleModal();
         fetchPostsAndComments();
