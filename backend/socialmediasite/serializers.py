@@ -106,6 +106,8 @@ class SmallPostSerializer(serializers.ModelSerializer):
     fight = TinyFightSerializer(many=False)
     comment_count = serializers.IntegerField()
     like_count = serializers.IntegerField()
+    liked = serializers.BooleanField(default=False)
+
 
     class Meta:
         model = Post
@@ -114,6 +116,7 @@ class SmallPostSerializer(serializers.ModelSerializer):
             "date",
             "fight",
             "content",
+            "liked",
             "comment_count",
             "like_count",
             "owner",

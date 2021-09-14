@@ -111,7 +111,15 @@ class UserFeedByRecentView(generics.GenericAPIView):
         # get posts and comments from following users
         posts = (
             Post.objects.filter(owner__in=follower_user_ids)
-            .annotate(like_count=Count("post_likes", distinct=True), comment_count=Count("comments", distinct=True))
+            .annotate(
+                    comment_count=Count("comments", distinct=True),
+                    liked=Exists(
+                        PostLike.objects.filter(
+                            post=OuterRef('pk'), user=self.request.user
+                        )
+                    ),
+                    like_count=Count("post_likes", distinct=True),
+                )
             .order_by("-id")
         )
 
@@ -122,12 +130,19 @@ class UserFeedByRecentView(generics.GenericAPIView):
         # get posts and comments from logged in user
         user_posts = (
             Post.objects.filter(owner__in=[request.user])
-            .annotate(like_count=Count("post_likes", distinct=True), comment_count=Count("comments", distinct=True))
+            .annotate(
+                like_count=Count("post_likes", distinct=True),
+                liked=Exists(
+                        PostLike.objects.filter(
+                            post=OuterRef('pk'), user=self.request.user
+                        )
+                    ),
+                comment_count=Count("comments", distinct=True),
+            )
             .order_by("-id")
         )
 
-        user_comments = PostComment.objects.filter(
-            owner__in=[request.user]).order_by(
+        user_comments = PostComment.objects.filter(owner__in=[request.user]).order_by(
             "-id"
         )
 

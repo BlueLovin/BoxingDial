@@ -29,12 +29,25 @@ export default function FightPage() {
     setLoading(true);
     let data = {};
     //fetch fight data
-    await axios.get(`/api/fights/${fightID}/`).then((res) => {
-      data = res.data;
-    });
+    if(token !== null && token !== undefined){
+      await axios.get(`/api/fights/${fightID}/`, {
+        headers: {
+          "Authorization": `Token ${token}`
+        }
+      })
+      .then((res) => {
+        data = res.data;
+      });
+    }
+    else{
+      await axios.get(`/api/fights/${fightID}/`)
+      .then((res) => {
+        data = res.data;
+      });
+    }
     setFightData(data); // set local fight object
     setLoading(false);
-  }, [fightID]);
+  }, [fightID, token]);
 
   useEffect(() => {
     fetchFightData();

@@ -1,4 +1,4 @@
-from django.db.models.expressions import Exists
+from django.db.models.expressions import Exists, OuterRef, Subquery
 from django.db.models.fields import json
 from django.http.response import JsonResponse
 from rest_framework import viewsets, generics, views, status
@@ -129,7 +129,7 @@ class PostView(generics.RetrieveDestroyAPIView):
     # get current post, and order the comments by their ID descending. or recent, in other words
     def get_queryset(self):
         logged_in = self.request.user.is_authenticated
-        if(logged_in):
+        if logged_in:
             return (
                 Post.objects.filter(id=self.kwargs["pk"])
                 .annotate(like_count=Count("likes", distinct=True))
@@ -152,9 +152,7 @@ class PostView(generics.RetrieveDestroyAPIView):
                 .prefetch_related(
                     Prefetch("comments", queryset=PostComment.objects.order_by("-id")),
                 )
-                .annotate(
-                    comment_count=Count("comments", distinct=True),
-                )
+                .annotate(comment_count=Count("comments", distinct=True),)
             )
 
 
@@ -181,19 +179,44 @@ class FightView(generics.RetrieveAPIView):
     serializer_class = FightSerializer
 
     def get_queryset(self):
-        return (
-            Fight.objects.filter(id=self.kwargs["pk"])
-            .prefetch_related(
-                Prefetch(
-                    "posts",
-                    Post.objects.annotate(
-                        like_count=Count("post_likes", distinct=True),
-                        comment_count=Count("comments", distinct=True),
-                    ).order_by("-id"),
+
+        user = self.request.user
+
+        # if not logged in
+        if not user.is_authenticated:
+            return (
+                Fight.objects.filter(id=self.kwargs["pk"])
+                .prefetch_related(
+                    Prefetch(
+                        "posts",
+                        Post.objects.annotate(
+                            like_count=Count("post_likes", distinct=True),
+                            comment_count=Count("comments", distinct=True),
+                        ).order_by("-id"),
+                    )
                 )
+                .annotate(posts_count=Count("posts", distinct=True))
             )
-            .annotate(posts_count=Count("posts", distinct=True))
-        )
+
+        elif self.request.user.is_authenticated:
+            return (
+                Fight.objects.filter(id=self.kwargs["pk"])
+                .prefetch_related(
+                    Prefetch(
+                        "posts",
+                        Post.objects.annotate(
+                            like_count=Count("post_likes", distinct=True),
+                            comment_count=Count("comments", distinct=True),
+                            liked=Exists(
+                                PostLike.objects.filter(
+                                    post=OuterRef("pk"), user=self.request.user
+                                )
+                            ),
+                        ).order_by("-id"),
+                    )
+                )
+                .annotate(posts_count=Count("posts", distinct=True))
+            )
 
 
 # all fights /api/fights
@@ -205,8 +228,9 @@ class FightsView(generics.ListAPIView):
             Prefetch(
                 "posts",
                 Post.objects.annotate(
-                    like_count=Count("post_likes", distinct=True)
-                ).annotate(comment_count=Count("comments", distinct=True)),
+                    like_count=Count("post_likes", distinct=True),
+                    comment_count=Count("comments", distinct=True),
+                ),
             )
         )
         .annotate(posts_count=Count("posts"))

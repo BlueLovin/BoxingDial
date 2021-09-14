@@ -12,6 +12,8 @@ const Post = (props) => {
   const post = props.post;
   const [likeCount, setLikeCount] = useState(post.like_count);
   const { userVal, tokenVal } = useContext(UserContext);
+  const [buttonClass, setButtonClass] = useState("btn-sm btn-primary");
+
   const [user] = userVal;
   const [token] = tokenVal;
   const history = useHistory();
@@ -31,10 +33,19 @@ const Post = (props) => {
       });
   };
 
-  useEffect(() => {}, [likeCount]);
+  useEffect(() => {
+  }, [likeCount, post]);
+
+  useEffect(() => {
+    if (post.liked) {
+      setButtonClass("btn-sm btn-danger");
+    }
+  },[post]);
+
+
 
   const likePost = (_post) => {
-    if(!user){
+    if (!user) {
       alert("login to be able to like posts!");
       return;
     }
@@ -53,11 +64,13 @@ const Post = (props) => {
         if (res.data["result"] === "liked") {
           // increment like count if server responds "liked"
           setLikeCount(likeCount + 1);
+          setButtonClass("btn-sm btn-danger");
         }
         // UNLIKE
         if (res.data["result"] === "unliked") {
           // vice versa with "unliked"
           setLikeCount(likeCount - 1);
+          setButtonClass("btn-sm btn-primary");
         }
       });
   };
@@ -79,8 +92,9 @@ const Post = (props) => {
           {post.content}
         </span>
 
+        {/* like button */}
         <div className="text-left m-1">
-          <button className="btn-sm btn-danger" onClick={() => likePost(post)}>
+          <button className={buttonClass} onClick={() => likePost(post)}>
             <FontAwesomeIcon icon={faHeart} />
             {" " + likeCount}
           </button>
