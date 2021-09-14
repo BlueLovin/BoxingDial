@@ -2,12 +2,12 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from socialmediasite import views as socialmediasite_views
+from posts import views as posts_views
 from fights import views as fight_views
 from accounts import views as user_views
 
 router = routers.DefaultRouter()
-router.register('comments', socialmediasite_views.PostCommentsView)
+router.register('comments', posts_views.PostCommentsView)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -25,10 +25,10 @@ urlpatterns = [
     path("api/fights/small", fight_views.SmallFightView.as_view()),
     path("api/fights/popular", fight_views.PopularFightsView.as_view()),
     # posts
-    path("api/posts/", socialmediasite_views.PostsView.as_view()),
-    url(r"api/posts/(?P<pk>[0-9]+)/$", socialmediasite_views.PostView.as_view()),
-    path("api/post/create/", socialmediasite_views.CreatePostView.as_view()),
-    path("api/posts/popular", socialmediasite_views.PopularPostsView.as_view()),
-    path("api/posts/<int:post>/like", socialmediasite_views.PostLikeApiView.as_view()),
+    path("api/posts/", posts_views.PostsView.as_view()),
+    url(r"api/posts/(?P<pk>[0-9]+)/$", posts_views.PostView.as_view()),
+    path("api/post/create/", posts_views.CreatePostView.as_view()),
+    path("api/posts/popular", posts_views.PopularPostsView.as_view()),
+    path("api/posts/<int:post>/like", posts_views.PostLikeApiView.as_view()),
     path("", include("accounts.urls")),
 ]

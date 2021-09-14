@@ -28,8 +28,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "rest_framework",
-    "socialmediasite",
     "fights",
+    "posts",
     "accounts",
     "knox",
 ]

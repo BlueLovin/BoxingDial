@@ -6,8 +6,8 @@ from django.views.generic import ListView
 from rest_framework.response import Response
 
 from accounts.serializers import FollowersSerializer, UserFollowingSerializer, UserSerializer
-from socialmediasite.models import Post, PostComment
-from socialmediasite.serializers import CommentSerializer, SmallPostSerializer
+from posts.models import Post, PostComment
+from posts.serializers import CommentSerializer, SmallPostSerializer
 
 # all users - /api/users
 class UsersView(generics.ListAPIView):

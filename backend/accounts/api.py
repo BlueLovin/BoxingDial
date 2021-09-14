@@ -1,5 +1,5 @@
 from django.db.models.expressions import Exists, OuterRef, Subquery
-from socialmediasite.serializers import FeedCommentSerializer, SmallPostSerializer
+from posts.serializers import FeedCommentSerializer, SmallPostSerializer
 from django.db.models.aggregates import Count
 from django.db.models.query import Prefetch
 from rest_framework import generics, permissions
@@ -8,7 +8,7 @@ from knox.models import AuthToken
 from itertools import chain
 from django.contrib.auth.models import User
 from .models import UserFollowing
-from socialmediasite.models import Post, PostComment, PostLike
+from posts.models import Post, PostComment, PostLike
 from .serializers import (
     SmallUserSerializer,
     UserSerializer,

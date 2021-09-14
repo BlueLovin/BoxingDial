@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from socialmediasite.serializers import SmallPostSerializer
-from socialmediasite.models import Post
+from posts.serializers import SmallPostSerializer
+from posts.models import Post
 from ..models import Fight
 
 class FightSerializer(serializers.ModelSerializer):

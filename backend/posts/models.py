@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-
 from fights.models import Fight
 
 
@@ -16,9 +15,6 @@ class PostComment(models.Model):
 
     def __str__(self):
         return self.content
-
-
-
 
 class PostLike(models.Model):
     user = models.ForeignKey(User, related_name="user_likes", on_delete=models.CASCADE)
@@ -51,4 +47,3 @@ class Post(models.Model):
 
     def __str__(self):
         return self.content
-

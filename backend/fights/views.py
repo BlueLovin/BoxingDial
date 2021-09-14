@@ -6,7 +6,7 @@ from rest_framework import generics
 
 from fights.serializers.common import SmallFightSerializer
 from .models import Fight
-from socialmediasite.models import Post, PostLike
+from posts.models import Post, PostLike
 from .serializers.nested import FightSerializer
 
 # single fight /api/fights/{id}
