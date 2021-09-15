@@ -112,7 +112,7 @@ export default function FightPage() {
         "loading"
       ) : (
         <>
-          <div className="container w-75 bg-light bg-gradient">
+          <div className="container w-75 bg-light bg-gradient preserve-line-breaks">
             <Fight fightData={fightData} />
             <br />
             {renderCreatePost()}
