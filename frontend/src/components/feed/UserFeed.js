@@ -16,7 +16,6 @@ export default function UserFeed() {
   const [headers, setHeaders] = useState({});
   const [user] = userVal;
   const [activeItem, setActiveItem] = useState({});
-  let v = 0;
 
   const fetchPostsAndComments = useCallback(async () => {
     let this_token = localStorage.getItem("token");
@@ -81,8 +80,6 @@ export default function UserFeed() {
   };
 
   const renderPosts = () => {
-    console.log("render posts v=" + v);
-    v++;
     return feed.map((item, i) => (
       <div key={i}>
         {item.comment_count != null ? (

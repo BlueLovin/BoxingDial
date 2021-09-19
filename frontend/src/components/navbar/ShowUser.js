@@ -46,8 +46,8 @@ export default function ShowUser() {
           {"! "}
           <br/>
           <Button onClick={() => Logout()} to="/">
-            {"Logout "}
           <FontAwesomeIcon icon={faHandPeace}/>
+            {" Logout "}
           </Button>
         </span>
       );
