@@ -82,7 +82,7 @@ class PopularPostsView(generics.ListAPIView):
         return Post.objects.annotate(
             like_count=Count("post_likes", distinct=True),
             comment_count=Count("comments", distinct=True),
-        ).order_by("-comment_count")[:5]
+        ).order_by("-comment_count", "-like_count")[:5]
 
 
 # all comments /api/comments

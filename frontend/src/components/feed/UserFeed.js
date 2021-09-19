@@ -5,15 +5,18 @@ import Post from "../posts/Post";
 import FeedComment from "../comments/FeedComment";
 import Modal from "../posts/PostModal";
 import { Button, Card, Container } from "reactstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 
 export default function UserFeed() {
   const [feed, setFeed] = useState(null);
   const { userVal, tokenVal } = useContext(UserContext);
-  const [token] = tokenVal;  
+  const [token] = tokenVal;
   const [modal, setModal] = useState(false);
   const [headers, setHeaders] = useState({});
   const [user] = userVal;
   const [activeItem, setActiveItem] = useState({});
+  let v = 0;
 
   const fetchPostsAndComments = useCallback(async () => {
     let this_token = localStorage.getItem("token");
@@ -51,7 +54,7 @@ export default function UserFeed() {
       .post("/api/post/create/", item, headers)
       .then(() => {
         toggleModal();
-        fetchPostsAndComments();
+        window.location.reload(false);
       })
       .catch(() => alert("Error creating your post. Please try again."));
   };
@@ -66,25 +69,31 @@ export default function UserFeed() {
     setActiveItem(item);
     toggleModal();
   };
-
   const renderCreatePost = () => {
     return (
       <div className="text-center">
         <Button size="lg" color="primary" onClick={createItem}>
-          Create Post
+          <FontAwesomeIcon icon={faPencilAlt} />
+          {" Create Post"}
         </Button>
       </div>
     );
   };
 
   const renderPosts = () => {
+    console.log("render posts v=" + v);
+    v++;
     return feed.map((item, i) => (
       <div key={i}>
-        {/* if the item contains a "comment_count" field, it is a post */}
         {item.comment_count != null ? (
-          <Post post={item} updateStateFunction={fetchPostsAndComments} />
+          // if the item contains a "comment_count" field, it is a post
+          <Post
+            post={item}
+            updateStateFunction={() => window.location.reload(false)}
+          />
         ) : (
-          <FeedComment comment={item} user={user} contextButton={true} />
+          // and if it doesn't... it is definitely a comment
+          <FeedComment comment={item} contextButton={true} />
         )}
         <hr />
       </div>
@@ -95,17 +104,18 @@ export default function UserFeed() {
     <>
       <Container>
         {renderCreatePost()}
-        
+
         <Card className="p-3 m-3">
-        {
-          user && user.following.length === 0 ? 
-          <p className="text-center p-3 m-3">
-            Welcome to your feed! Follow somebody to see their posts here.
-          </p>
-          :
-          null
-        }
-          <div>{feed && feed.length > 0 ? renderPosts() : "nothing to see here... make a post!"}</div>
+          {user && user.following.length === 0 ? (
+            <p className="text-center p-3 m-3">
+              Welcome to your feed! Follow somebody to see their posts here.
+            </p>
+          ) : null}
+          <div>
+            {feed && feed.length > 0
+              ? renderPosts()
+              : "nothing to see here... make a post!"}
+          </div>
         </Card>
       </Container>
 

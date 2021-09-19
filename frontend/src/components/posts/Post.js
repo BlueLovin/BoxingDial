@@ -34,22 +34,22 @@ const Post = (props) => {
   };
 
   useEffect(() => {
-  }, [likeCount, post]);
-
-  useEffect(() => {
     if (post.liked) {
       setButtonClass("btn-sm btn-danger");
+    }
+    else{
+      setButtonClass("btn-sm btn-primary");
     }
   },[post]);
 
 
 
-  const likePost = (_post) => {
+  const likePost = async (_post) => {
     if (!user) {
       alert("login to be able to like posts!");
       return;
     }
-    axios
+    await axios
       .post(
         `/api/posts/${_post.id}/like`,
         {},

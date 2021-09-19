@@ -1,14 +1,17 @@
 import { useContext } from "react";
 import axios from "axios";
-import { NavLink } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { faHandPeace } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "reactstrap";
 
 export default function ShowUser() {
   const { userVal, tokenVal } = useContext(UserContext);
   const [token, setToken] = tokenVal;
   const [user, setUser] = userVal;
   const history = useHistory();
+
 
   const Logout = async () => {
     setUser(null);
@@ -39,11 +42,13 @@ export default function ShowUser() {
     if (user) {
       return (
         <span>
-          Welcome, <a href={`/user/${user.username}`}>{user.username}</a>
+          {"Welcome, "}<a href={`/user/${user.username}`}>{user.username}</a>
           {"! "}
-          <NavLink onClick={() => Logout()} to="/">
-            Logout
-          </NavLink>
+          <br/>
+          <Button onClick={() => Logout()} to="/">
+            {"Logout "}
+          <FontAwesomeIcon icon={faHandPeace}/>
+          </Button>
         </span>
       );
     } else {

@@ -14,6 +14,8 @@ import {
   DropdownToggle,
 } from "reactstrap";
 import ShowUser from "./ShowUser";
+import { faHome, faPenFancy,faFistRaised } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function NavigationBar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,14 +29,21 @@ export default function NavigationBar() {
         <Collapse isOpen={isOpen} navbar>
           <Nav className="mr-auto" navbar>
             <NavItem>
-              <NavLink href="/">Home</NavLink>
+              <NavLink href="/">
+                <FontAwesomeIcon icon={faHome} />
+                {" Home"}
+              </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href="/posts/popular">Popular Posts</NavLink>
+              <NavLink href="/posts/popular">
+                <FontAwesomeIcon icon={faPenFancy} />
+                {" Popular Posts"}
+              </NavLink>
             </NavItem>
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>
-                Fights
+                <FontAwesomeIcon icon={faFistRaised}/>
+                {" Fights"}
               </DropdownToggle>
               <DropdownMenu right>
                 <DropdownItem href="/fights/popular">Popular</DropdownItem>
