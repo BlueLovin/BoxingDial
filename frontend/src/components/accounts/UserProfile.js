@@ -19,9 +19,9 @@ export default function UserProfile() {
   const [profile, setProfile] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("1");
-  const { userVal, tokenVal } = useContext(UserContext);
+  const { userVal, headersVal } = useContext(UserContext);
+  const [headers] = headersVal;
   const [user] = userVal;
-  const [token] = tokenVal;
 
   const fetchUserPosts = useCallback(async () => {
     setLoading(true);
@@ -36,19 +36,10 @@ export default function UserProfile() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      let this_token = localStorage.token;
-      let CONFIG = {};
-      if (this_token !== null) {
-        CONFIG = {
-          headers: {
-            Authorization: `Token ${this_token}`,
-          },
-        };
-      }
       //fetch profile with token
       //if token fails, fetch without token
       await axios
-        .get(`/api/users/${username}/`, CONFIG)
+        .get(`/api/users/${username}/`, headers)
         .then((res) => {
           setProfile(res.data);
           setFollowing(res.data.following);
@@ -73,40 +64,30 @@ export default function UserProfile() {
     };
     fetchUserPosts();
     fetchProfile();
-  }, [fetchUserPosts, username, followButtonPressed]);
+  }, [fetchUserPosts, username, followButtonPressed, headers]);
 
   const follow = async () => {
-    let config = {
-      headers: {
-        Authorization: `Token ${token}`,
-      },
-    };
     let data = {
       follow: profile.id,
     };
     await axios
-      .post(`/api/users/follow`, data, config)
+      .post(`/api/users/follow`, data, headers)
       .then(() => setFollowing(true));
   };
 
   const unfollow = async () => {
-    let config = {
-      headers: {
-        Authorization: `Token ${token}`,
-      },
-    };
     let data = {
       unfollow: profile.id,
     };
     await axios
-      .post(`/api/users/unfollow`, data, config)
+      .post(`/api/users/unfollow`, data, headers)
       .then(() => setFollowing(false));
   };
   const renderProfilePosts = () => {
     return postsList.map((post, i) => (
       <div key={i}>
         <br />
-        <Post post={post} user={user} updateStateFunction={fetchUserPosts} />
+        <Post post={post} updateStateFunction={fetchUserPosts} />
       </div>
     ));
   };
@@ -115,7 +96,7 @@ export default function UserProfile() {
     return commentsList.map((comment, i) => (
       <div key={i}>
         <br />
-        <Comment comment={comment} user={user} contextButton={true} />
+        <Comment comment={comment} contextButton={true} />
       </div>
     ));
   };

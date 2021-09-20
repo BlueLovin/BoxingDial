@@ -75,13 +75,9 @@ class AddFollowerView(generics.GenericAPIView):
                 user_id=user, following_user_id=follow
             )[0]
         else:
-            return Response("User can not follow themself u dumb shit")
+            return Response("User can not follow themself, u dumb shit")
         return Response(
-            {
-                "follow_object": UserFollowingSerializer(
-                    new_follower, context=self.get_serializer_context()
-                ).data,
-            }
+            {"response": "followed",}
         )
 
 
@@ -93,7 +89,7 @@ class DeleteFollowerView(generics.GenericAPIView):
         unfollow = User.objects.get(id=self.request.data.get("unfollow"))
         UserFollowing.objects.get(user_id=user, following_user_id=unfollow).delete()
         return Response(
-            {"user": UserSerializer(user, context=self.get_serializer_context()).data,}
+            {"response": "unfollowed",}
         )
 
 

@@ -7,24 +7,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "reactstrap";
 
 export default function ShowUser() {
-  const { userVal, tokenVal } = useContext(UserContext);
-  const [token, setToken] = tokenVal;
+  const { userVal, tokenVal, loggedInVal, headersVal } =
+    useContext(UserContext);
+  const [, setToken] = tokenVal;
   const [user, setUser] = userVal;
+  const [loggedIn] = loggedInVal;
+  const [headers] = headersVal;
   const history = useHistory();
-
 
   const Logout = async () => {
     setUser(null);
     axios
-      .post(
-        "/api/token-auth/logout",
-        {},
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
-      )
+      .post("/api/token-auth/logout", {}, headers)
       .then(() => {
         localStorage.removeItem("token");
         setToken(undefined);
@@ -39,14 +33,15 @@ export default function ShowUser() {
   };
 
   const renderUsername = () => {
-    if (user) {
+    if (loggedIn) {
       return (
         <span>
-          {"Welcome, "}<a href={`/user/${user.username}`}>{user.username}</a>
+          {"Welcome, "}
+          <a href={`/user/${user.username}`}>{user.username}</a>
           {"! "}
-          <br/>
+          <br />
           <Button onClick={() => Logout()} to="/">
-          <FontAwesomeIcon icon={faHandPeace}/>
+            <FontAwesomeIcon icon={faHandPeace} />
             {" Logout "}
           </Button>
         </span>

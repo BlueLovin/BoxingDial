@@ -16,9 +16,10 @@ export default function Comments() {
     content: "",
   });
 
-  const { tokenVal, userVal } = useContext(UserContext);
-  const [token] = tokenVal;
+  const { loggedInVal, userVal, headersVal } = useContext(UserContext);
   const [user] = userVal;
+  const [loggedIn] = loggedInVal;
+  const [headers] = headersVal;
   const [activeItem, setActiveItem] = useState({
     post: postID,
     content: "",
@@ -29,16 +30,13 @@ export default function Comments() {
   //get post WITH auth headers
   const getLoggedInPost = useCallback(async () => {
     await axios
-      .get(`/api/posts/${postID}`, {
-        headers: {
-        "Authorization": `Token ${token}`
-      }}) // get current post
+      .get(`/api/posts/${postID}`, headers) // get current post
       .then((res) => {
         setCurrentPost(res.data);
         setCommentList(res.data.comments);
       })
       .catch(() => history.push("/404"));
-  }, [postID, history, token]);
+  }, [postID, history, headers]);
 
   //get post WITHOUT auth headers
   const getLoggedOutPost = useCallback(async () => {
@@ -53,14 +51,14 @@ export default function Comments() {
 
   useEffect(() => {
     //LOGGED OUT
-    if(token === null){
+    if (!loggedIn) {
       getLoggedOutPost();
     }
-    // LOGGED IN 
-    if(token !== undefined && token !== null){
+    // LOGGED IN
+    if (loggedIn) {
       getLoggedInPost();
     }
-  }, [getLoggedInPost, getLoggedOutPost, token]);
+  }, [getLoggedInPost, getLoggedOutPost, loggedIn]);
 
   var handleChange = (e) => {
     let { name, value } = e.target;
@@ -76,12 +74,7 @@ export default function Comments() {
 
   const submitComment = (item) => {
     axios // create
-      .post("/api/comments/", item, {
-        headers: {
-          "content-type": "application/json",
-          Authorization: `Token ${token}`,
-        },
-      })
+      .post("/api/comments/", item, headers)
       .then(() => getLoggedInPost());
 
     setActiveItem({
@@ -94,11 +87,7 @@ export default function Comments() {
   const renderPost = (post) => {
     return (
       <>
-        {post.content ? (
-          <Post post={post} commentsButton={false} user={user} token={token} />
-        ) : (
-          "loading"
-        )}
+        {post.content ? <Post post={post} commentsButton={false} /> : "loading"}
       </>
     );
   };
@@ -135,16 +124,13 @@ export default function Comments() {
   };
 
   const renderComments = () => {
-    return commentList
-      .map((comment, i) => (
-        <Comment
-          comment={comment}
-          user={user}
-          token={token}
-          updateStateFunction={getLoggedInPost}
-          key={i}
-        />
-      ));
+    return commentList.map((comment, i) => (
+      <Comment
+        comment={comment}
+        updateStateFunction={getLoggedInPost}
+        key={i}
+      />
+    ));
   };
 
   return (

@@ -11,9 +11,10 @@ export default function FightPage() {
   const params = useParams();
   const fightID = params.fightID;
 
-  const { tokenVal, userVal } = useContext(UserContext);
+  const { tokenVal, userVal, headersVal } = useContext(UserContext);
   const [user] = userVal;
   const [token] = tokenVal;
+  const [headers] = headersVal;
   const [modal, setModal] = useState(false);
   const [fightData, setFightData] = useState();
   const [loading, setLoading] = useState(true);
@@ -29,34 +30,25 @@ export default function FightPage() {
     setLoading(true);
     let data = {};
     //fetch fight data
-    if(token !== null && token !== undefined){
-      await axios.get(`/api/fights/${fightID}/`, {
-        headers: {
-          "Authorization": `Token ${token}`
-        }
-      })
-      .then((res) => {
-        data = res.data;
-      });
-    }
-    else{
-      await axios.get(`/api/fights/${fightID}/`)
-      .then((res) => {
+    if (token !== null && token !== undefined) {
+      await axios
+        .get(`/api/fights/${fightID}/`, headers)
+        .then((res) => {
+          data = res.data;
+        });
+    } else {
+      await axios.get(`/api/fights/${fightID}/`).then((res) => {
         data = res.data;
       });
     }
     setFightData(data); // set local fight object
     setLoading(false);
-  }, [fightID, token]);
+  }, [fightID, token, headers]);
 
   useEffect(() => {
     fetchFightData();
   }, [fetchFightData]);
 
-  const options = {
-    "content-type": "application/json",
-    Authorization: `Token ${token}`,
-  };
   const renderPosts = () => {
     return fightData.posts.map((post, i) => (
       <div key={i}>
@@ -71,7 +63,7 @@ export default function FightPage() {
     toggle();
 
     await axios
-      .post("/api/post/create/", item, { headers: options })
+      .post("/api/post/create/", item, headers)
       .then(() => fetchFightData());
   };
   const createItem = () => {

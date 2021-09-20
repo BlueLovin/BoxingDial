@@ -19,13 +19,23 @@ function App() {
   const [user, setUser] = useState(); // set to undefined initially
   const [token, setToken] = useState();
   const [loggedIn, setLoggedIn] = useState(null);
+  const [headers, setHeaders] = useState(null);
 
   useEffect(() => {
-    const getToken = async () => {
+    const getTokenAndSetHeaders = async () => {
       let tokenValue = localStorage.getItem("token");
       setToken(tokenValue);
+
+      if (tokenValue !== null && tokenValue !== undefined) {
+        const _headers = {
+          "content-type": "application/json",
+          Authorization: `Token ${tokenValue}`,
+        };
+
+        setHeaders({ headers: _headers });
+      }
     };
-    getToken();
+    getTokenAndSetHeaders();
   }, []);
 
   useEffect(() => {
@@ -65,6 +75,7 @@ function App() {
           userVal: [user, setUser],
           tokenVal: [token, setToken],
           loggedInVal: [loggedIn, setLoggedIn],
+          headersVal: [headers, setHeaders],
         }}
       >
         <NavigationBar />

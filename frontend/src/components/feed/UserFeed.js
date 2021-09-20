@@ -10,36 +10,20 @@ import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 
 export default function UserFeed() {
   const [feed, setFeed] = useState(null);
-  const { userVal, tokenVal } = useContext(UserContext);
+  const { userVal, tokenVal, headersVal } = useContext(UserContext);
   const [token] = tokenVal;
   const [modal, setModal] = useState(false);
-  const [headers, setHeaders] = useState({});
+  const [headers] = headersVal;
   const [user] = userVal;
   const [activeItem, setActiveItem] = useState({});
 
   const fetchPostsAndComments = useCallback(async () => {
-    let this_token = localStorage.getItem("token");
-    let config = {
-      headers: {
-        Authorization: `Token ${this_token}`,
-      },
-    };
-    setHeaders(config);
     if (token && user) {
-      await axios.get("/api/feed/recent", config).then((res) => {
+      await axios.get("/api/feed/recent", headers).then((res) => {
         setFeed(res.data);
       });
     }
-  }, [token, user]);
-
-  useEffect(() => {
-    let config = {
-      headers: {
-        Authorization: `Token ${token}`,
-      },
-    };
-    setHeaders(config);
-  }, [token]);
+  }, [token, user, headers]);
 
   useEffect(() => {
     fetchPostsAndComments();
@@ -90,7 +74,11 @@ export default function UserFeed() {
           />
         ) : (
           // and if it doesn't... it is definitely a comment
-          <FeedComment comment={item} contextButton={true} />
+          <FeedComment
+            comment={item}
+            contextButton={true}
+            updateStateFunction={() => window.location.reload(false)}
+          />
         )}
         <hr />
       </div>

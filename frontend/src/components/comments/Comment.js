@@ -1,27 +1,25 @@
 import axios from "axios";
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { UserContext } from "../../UserContext";
 import { Container } from "reactstrap";
 
 const Comment = (props) => {
+  //props
   const { contextButton = false } = props;
   const { updateStateFunction = null } = props;
   const comment = props.comment;
-  const user = props.user;
-  const token = props.token;
+  //context
+  const { userVal, headersVal } = useContext(UserContext);
+  const [user] = userVal;
+  const [headers] = headersVal;
 
   const deleteComment = (_comment) => {
-    axios
-      .delete(`/api/comments/${_comment.id}/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      })
-      .then(() => {
-        if (updateStateFunction) {
-          updateStateFunction();
-        }
-      });
+    axios.delete(`/api/comments/${_comment.id}/`, headers).then(() => {
+      if (updateStateFunction) {
+        updateStateFunction();
+      }
+    });
   };
 
   return (

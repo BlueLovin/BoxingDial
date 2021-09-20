@@ -11,68 +11,49 @@ const Post = (props) => {
   const { updateStateFunction = null } = props;
   const post = props.post;
   const [likeCount, setLikeCount] = useState(post.like_count);
-  const { userVal, tokenVal } = useContext(UserContext);
+  const { userVal, headersVal } = useContext(UserContext);
   const [buttonClass, setButtonClass] = useState("btn-sm btn-primary");
 
   const [user] = userVal;
-  const [token] = tokenVal;
+  const [headers] = headersVal;
   const history = useHistory();
   const deletePost = (_post) => {
-    axios
-      .delete(`/api/posts/${_post.id}/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      })
-      .then(() => {
-        if (updateStateFunction != null) {
-          updateStateFunction();
-        } else {
-          history.goBack();
-        }
-      });
+    axios.delete(`/api/posts/${_post.id}/`, headers).then(() => {
+      if (updateStateFunction != null) {
+        updateStateFunction();
+      } else {
+        history.goBack();
+      }
+    });
   };
 
   useEffect(() => {
     if (post.liked) {
       setButtonClass("btn-sm btn-danger");
-    }
-    else{
+    } else {
       setButtonClass("btn-sm btn-primary");
     }
-  },[post]);
-
-
+  }, [post]);
 
   const likePost = async (_post) => {
     if (!user) {
       alert("login to be able to like posts!");
       return;
     }
-    await axios
-      .post(
-        `/api/posts/${_post.id}/like`,
-        {},
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
-      )
-      .then((res) => {
-        // LIKE
-        if (res.data["result"] === "liked") {
-          // increment like count if server responds "liked"
-          setLikeCount(likeCount + 1);
-          setButtonClass("btn-sm btn-danger");
-        }
-        // UNLIKE
-        if (res.data["result"] === "unliked") {
-          // vice versa with "unliked"
-          setLikeCount(likeCount - 1);
-          setButtonClass("btn-sm btn-primary");
-        }
-      });
+    await axios.post(`/api/posts/${_post.id}/like`, {}, headers).then((res) => {
+      // LIKE
+      if (res.data["result"] === "liked") {
+        // increment like count if server responds "liked"
+        setLikeCount(likeCount + 1);
+        setButtonClass("btn-sm btn-danger");
+      }
+      // UNLIKE
+      if (res.data["result"] === "unliked") {
+        // vice versa with "unliked"
+        setLikeCount(likeCount - 1);
+        setButtonClass("btn-sm btn-primary");
+      }
+    });
   };
 
   const formatDateTime = (date) => {
