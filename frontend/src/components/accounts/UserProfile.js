@@ -35,6 +35,7 @@ export default function UserProfile() {
   }, [username]);
 
   useEffect(() => {
+    setLoading(true);
     const fetchProfile = async () => {
       //fetch profile with token
       //if token fails, fetch without token
@@ -45,7 +46,7 @@ export default function UserProfile() {
           setFollowing(res.data.following);
         })
         .catch(async () => {
-          await axios.get(`/api/users/${username}`).then((res) => {
+          await axios.get(`/api/users/${username}/`).then((res) => {
             setProfile(res.data);
             setFollowing(res.data.following);
           });
@@ -54,16 +55,19 @@ export default function UserProfile() {
           window.location = "/404/"; //404 if user doesnt exist
         });
       // set profile followers list
-      await axios.get(`/api/users/${username}/following`).then((res) => {
+      await axios.get(`/api/users/${username}/following/`).then((res) => {
         setFollowingList(res.data);
       });
       // set profile following list
-      await axios.get(`/api/users/${username}/followers`).then((res) => {
+      await axios.get(`/api/users/${username}/followers/`).then((res) => {
         setFollowersList(res.data);
       });
+      setLoading(false);
     };
-    fetchUserPosts();
-    fetchProfile();
+    if (headers !== null) {
+      fetchUserPosts();
+      fetchProfile();
+    }
   }, [fetchUserPosts, username, followButtonPressed, headers]);
 
   const follow = async () => {
