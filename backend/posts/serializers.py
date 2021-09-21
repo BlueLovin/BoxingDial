@@ -37,6 +37,7 @@ class FeedCommentSerializer(serializers.ModelSerializer):
 
 class PostLikeSerializer(serializers.ModelSerializer):
     user = SmallUserSerializer(many=False)
+
     class Meta:
         model = PostLike
         fields = ("user", "liked_on", "post")

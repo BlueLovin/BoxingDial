@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Fight(models.Model):
     title = models.TextField()
     description = models.TextField()

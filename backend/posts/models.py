@@ -16,6 +16,7 @@ class PostComment(models.Model):
     def __str__(self):
         return self.content
 
+
 class PostLike(models.Model):
     user = models.ForeignKey(User, related_name="user_likes", on_delete=models.CASCADE)
 

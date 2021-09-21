@@ -18,6 +18,7 @@ from .serializers import (
     UserWithFollowersSerializer,
 )
 
+
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
@@ -71,14 +72,12 @@ class AddFollowerView(generics.GenericAPIView):
         user = self.request.user
         follow = User.objects.get(id=self.request.data.get("follow"))
         if user != follow:
-            new_follower = UserFollowing.objects.get_or_create(
-                user_id=user, following_user_id=follow
-            )[0]
+            UserFollowing.objects.get_or_create(user_id=user, following_user_id=follow)[
+                0
+            ]
         else:
             return Response("User can not follow themself, u dumb shit")
-        return Response(
-            {"response": "followed",}
-        )
+        return Response({"response": "followed",})
 
 
 class DeleteFollowerView(generics.GenericAPIView):
@@ -88,9 +87,7 @@ class DeleteFollowerView(generics.GenericAPIView):
         user = self.request.user
         unfollow = User.objects.get(id=self.request.data.get("unfollow"))
         UserFollowing.objects.get(user_id=user, following_user_id=unfollow).delete()
-        return Response(
-            {"response": "unfollowed",}
-        )
+        return Response({"response": "unfollowed",})
 
 
 class UserFeedByRecentView(generics.GenericAPIView):
@@ -108,14 +105,12 @@ class UserFeedByRecentView(generics.GenericAPIView):
         posts = (
             Post.objects.filter(owner__in=follower_user_ids)
             .annotate(
-                    comment_count=Count("comments", distinct=True),
-                    liked=Exists(
-                        PostLike.objects.filter(
-                            post=OuterRef('pk'), user=self.request.user
-                        )
-                    ),
-                    like_count=Count("post_likes", distinct=True),
-                )
+                comment_count=Count("comments", distinct=True),
+                liked=Exists(
+                    PostLike.objects.filter(post=OuterRef("pk"), user=self.request.user)
+                ),
+                like_count=Count("post_likes", distinct=True),
+            )
             .order_by("-id")
         )
 
@@ -129,10 +124,8 @@ class UserFeedByRecentView(generics.GenericAPIView):
             .annotate(
                 like_count=Count("post_likes", distinct=True),
                 liked=Exists(
-                        PostLike.objects.filter(
-                            post=OuterRef('pk'), user=self.request.user
-                        )
-                    ),
+                    PostLike.objects.filter(post=OuterRef("pk"), user=self.request.user)
+                ),
                 comment_count=Count("comments", distinct=True),
             )
             .order_by("-id")

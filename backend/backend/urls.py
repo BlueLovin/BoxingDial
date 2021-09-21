@@ -7,24 +7,30 @@ from fights import views as fight_views
 from accounts import views as user_views
 
 router = routers.DefaultRouter()
-router.register('comments', posts_views.PostCommentsView)
+router.register("comments", posts_views.PostCommentsView)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
-    # accounts
+    ############
+    # accounts #
+    ############
     path("api/users/<str:user>/posts/", user_views.UserPostListView.as_view()),
     path("api/users/<str:user>/", user_views.UserView.as_view()),
     path("api/users/<str:user>/comments/", user_views.UserCommentListView.as_view()),
     path("api/users", user_views.UsersView.as_view()),
     path("api/users/<str:user>/following/", user_views.UserFollowingView.as_view()),
     path("api/users/<str:user>/followers/", user_views.UserFollowersView.as_view()),
-    # fights
+    ##########
+    # fights #
+    ##########
     path("api/fights/", fight_views.FightsView.as_view()),
     url(r"api/fights/(?P<pk>[0-9]+)/$", fight_views.FightView.as_view()),
     path("api/fights/small", fight_views.SmallFightView.as_view()),
     path("api/fights/popular", fight_views.PopularFightsView.as_view()),
-    # posts
+    #########
+    # posts #
+    #########
     path("api/posts/", posts_views.PostsView.as_view()),
     url(r"api/posts/(?P<pk>[0-9]+)/$", posts_views.PostView.as_view()),
     path("api/posts/<int:pk>/likes", posts_views.PostLikesView.as_view()),

@@ -75,15 +75,14 @@ class PostView(generics.RetrieveDestroyAPIView):
                 .annotate(comment_count=Count("comments", distinct=True),)
             )
 
+
 # single post - /api/posts/{postID}/likes
 class PostLikesView(generics.ListAPIView):
     serializer_class = PostLikeSerializer
+
     def get_queryset(self):
         post = Post.objects.get(id=self.kwargs["pk"])
-        print(post)
-
-        return PostLike.objects.filter(post=post)
-
+        return PostLike.objects.filter(post=post).order_by("-liked_on")
 
 
 # 5 most popular posts, popularity determined by number of comments

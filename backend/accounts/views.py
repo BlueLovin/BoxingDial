@@ -5,7 +5,11 @@ from django.contrib.auth.models import User
 from django.views.generic import ListView
 from rest_framework.response import Response
 
-from accounts.serializers import FollowersSerializer, UserFollowingSerializer, UserSerializer
+from accounts.serializers import (
+    FollowersSerializer,
+    UserFollowingSerializer,
+    UserSerializer,
+)
 from posts.models import Post, PostComment
 from posts.serializers import CommentSerializer, SmallPostSerializer
 
@@ -87,5 +91,4 @@ class UserPostListView(generics.ListAPIView):
             )
             .order_by("-id")
         )
-
 
