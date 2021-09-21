@@ -173,52 +173,50 @@ export default function UserProfile() {
           <br />
 
           <br />
-          <div className="">
-            <Nav tabs className="justify-content-center">
-              <NavItem>
-                <NavLink
-                  className={activeTab === "1" ? "active" : ""}
-                  onClick={() => setActiveTab("1")}
-                >
-                  Posts
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={activeTab === "2" ? "active" : ""}
-                  onClick={() => setActiveTab("2")}
-                >
-                  Comments and Replies
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={activeTab === "3" ? "active" : ""}
-                  onClick={() => {
-                    setActiveTab("3");
-                  }}
-                >
-                  Following
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={activeTab === "4" ? "active" : ""}
-                  onClick={() => {
-                    setActiveTab("4");
-                  }}
-                >
-                  Followers
-                </NavLink>
-              </NavItem>
-            </Nav>
-            <TabContent activeTab={activeTab}>
-              <TabPane tabId="1">{renderProfilePosts()}</TabPane>
-              <TabPane tabId="2">{renderProfileComments()}</TabPane>
-              <TabPane tabId="3">{renderProfileFollowing()}</TabPane>
-              <TabPane tabId="4">{renderProfileFollowers()}</TabPane>
-            </TabContent>
-          </div>
+          <Nav tabs className="justify-content-center">
+            <NavItem>
+              <NavLink
+                className={activeTab === "1" ? "active" : ""}
+                onClick={() => setActiveTab("1")}
+              >
+                Posts
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink
+                className={activeTab === "2" ? "active" : ""}
+                onClick={() => setActiveTab("2")}
+              >
+                Comments and Replies
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink
+                className={activeTab === "3" ? "active" : ""}
+                onClick={() => {
+                  setActiveTab("3");
+                }}
+              >
+                Following
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink
+                className={activeTab === "4" ? "active" : ""}
+                onClick={() => {
+                  setActiveTab("4");
+                }}
+              >
+                Followers
+              </NavLink>
+            </NavItem>
+          </Nav>
+          <TabContent activeTab={activeTab}>
+            <TabPane tabId="1">{renderProfilePosts()}</TabPane>
+            <TabPane tabId="2">{renderProfileComments()}</TabPane>
+            <TabPane tabId="3">{renderProfileFollowing()}</TabPane>
+            <TabPane tabId="4">{renderProfileFollowers()}</TabPane>
+          </TabContent>
         </>
       )}
     </>

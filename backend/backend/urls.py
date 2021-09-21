@@ -27,6 +27,7 @@ urlpatterns = [
     # posts
     path("api/posts/", posts_views.PostsView.as_view()),
     url(r"api/posts/(?P<pk>[0-9]+)/$", posts_views.PostView.as_view()),
+    path("api/posts/<int:pk>/likes", posts_views.PostLikesView.as_view()),
     path("api/post/create/", posts_views.CreatePostView.as_view()),
     path("api/posts/popular", posts_views.PopularPostsView.as_view()),
     path("api/posts/<int:post>/like", posts_views.PostLikeApiView.as_view()),

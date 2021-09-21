@@ -1,5 +1,6 @@
 from django.db.models.expressions import Exists
 from rest_framework import viewsets, generics, views, status
+from rest_framework import permissions
 from rest_framework.compat import distinct
 from rest_framework.permissions import IsAuthenticated
 from .models import Post, PostComment, PostLike
@@ -8,6 +9,7 @@ from fights.models import Fight
 from fights.serializers.nested import FightSerializer
 from .serializers import (
     CreatePostSerializer,
+    PostLikeSerializer,
     PostSerializer,
     CommentSerializer,
     SmallPostSerializer,
@@ -72,6 +74,16 @@ class PostView(generics.RetrieveDestroyAPIView):
                 )
                 .annotate(comment_count=Count("comments", distinct=True),)
             )
+
+# single post - /api/posts/{postID}/likes
+class PostLikesView(generics.ListAPIView):
+    serializer_class = PostLikeSerializer
+    def get_queryset(self):
+        post = Post.objects.get(id=self.kwargs["pk"])
+        print(post)
+
+        return PostLike.objects.filter(post=post)
+
 
 
 # 5 most popular posts, popularity determined by number of comments
