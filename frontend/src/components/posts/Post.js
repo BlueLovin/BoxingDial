@@ -7,8 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 
 const Post = (props) => {
-  const { commentsButton = true } = props;
-  const { updateStateFunction = null } = props;
+  const { fullPostPage = false, updateStateFunction = null, toggleModal = null, } = props;
   const post = props.post;
   const [likeCount, setLikeCount] = useState(post.like_count);
   const { userVal, headersVal } = useContext(UserContext);
@@ -73,22 +72,48 @@ const Post = (props) => {
           {post.content}
         </span>
 
-        {/* like button */}
-        <div className="text-left m-1">
-          <button className={buttonClass} onClick={() => likePost(post)}>
-            <FontAwesomeIcon icon={faHeart} />
-            {" " + likeCount}
-          </button>
-        </div>
         <div className="text-right m-1">{formatDateTime(post.date)}</div>
 
         <div className="text-right m-1">
-          {/* if the component was called with a comments button */}
-          {commentsButton ? (
-            <p>
-              <Link to={`/post/${post.id}`}>{post.comment_count} comments</Link>
-            </p>
-          ) : null}
+          {/* if the component was called on the post page or not */}
+          {fullPostPage ? (
+            <>
+              <div className="list-group-item p-auto m-auto d-flex justify-content-between align-items-center">
+                <p>
+                  <button
+                    className={buttonClass}
+                    onClick={() => likePost(post)}
+                  >
+                    <FontAwesomeIcon icon={faHeart} />
+                  </button>{" "}
+                  {/* likes area */}
+                  <Link onClick={() => toggleModal()} to="#">
+                    {likeCount > 1 || likeCount === 0
+                      ? `${likeCount} likes`
+                      : `${likeCount} like`}
+                  </Link>
+                </p>
+                <p>ass</p>
+                <p>ass</p>
+                <p>ass</p>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* like button */}
+              <div className="text-left m-1">
+                <button className={buttonClass} onClick={() => likePost(post)}>
+                  <FontAwesomeIcon icon={faHeart} />
+                  {" " + likeCount}
+                </button>
+              </div>
+              <p>
+                <Link to={`/post/${post.id}`}>
+                  {post.comment_count} comments
+                </Link>
+              </p>
+            </>
+          )}
 
           {/* if the post has a fight */}
           {post.fight !== null ? (

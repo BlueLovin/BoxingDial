@@ -4,16 +4,16 @@ import { useParams, Link } from "react-router-dom/cjs/react-router-dom.min";
 import { UserContext } from "../../UserContext";
 import Post from "../posts/Post";
 import Fight from "./Fight";
-import Modal from "../posts/PostModal";
+import Modal from "../modals/PostModal";
 import { Button } from "reactstrap";
 
 export default function FightPage() {
   const params = useParams();
   const fightID = params.fightID;
 
-  const { tokenVal, userVal, headersVal } = useContext(UserContext);
+  const { loggedInVal, userVal, headersVal } = useContext(UserContext);
   const [user] = userVal;
-  const [token] = tokenVal;
+  const [loggedIn] = loggedInVal;
   const [headers] = headersVal;
   const [modal, setModal] = useState(false);
   const [fightData, setFightData] = useState();
@@ -30,7 +30,7 @@ export default function FightPage() {
     setLoading(true);
     let data = {};
     //fetch fight data
-    if (token !== null && token !== undefined) {
+    if (loggedIn) {
       await axios
         .get(`/api/fights/${fightID}/`, headers)
         .then((res) => {
@@ -43,7 +43,7 @@ export default function FightPage() {
     }
     setFightData(data); // set local fight object
     setLoading(false);
-  }, [fightID, token, headers]);
+  }, [fightID, loggedIn, headers]);
 
   useEffect(() => {
     fetchFightData();

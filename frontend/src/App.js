@@ -5,7 +5,7 @@ import Home from "./components/HomePage";
 import Comments from "./components/posts/PostPage";
 import PopularPosts from "./components/posts/PopularPosts";
 import Login from "./components/accounts/Login";
-import UserProfile from "./components/accounts/UserProfile";
+import UserProfile from "./components/profiles/UserProfile";
 import ShowUser from "./components/navbar/ShowUser";
 import FightPage from "./components/fights/FightPage";
 import PopularFights from "./components/fights/PopularFights";

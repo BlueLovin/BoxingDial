@@ -5,6 +5,7 @@ import { UserContext } from "../../UserContext";
 import { Button, FormGroup, Input, Container } from "reactstrap";
 import Post from "./Post";
 import Comment from "../comments/Comment";
+import PostLikesModal from "../modals/PostLikesModal";
 
 export default function Comments() {
   const params = useParams();
@@ -25,7 +26,11 @@ export default function Comments() {
     content: "",
     owner: user ? user.id : null,
   });
+  const [modal, setModal] = useState(false);
   const history = useHistory();
+  const toggleModal = () => {
+    setModal(!modal);
+  };
 
   //get post WITH auth headers
   const getLoggedInPost = useCallback(async () => {
@@ -86,9 +91,7 @@ export default function Comments() {
 
   const renderPost = (post) => {
     return (
-      <>
-        {post.content ? <Post post={post} commentsButton={false} /> : "loading"}
-      </>
+      <>{post.content ? <Post post={post} fullPostPage={true} toggleModal={() => toggleModal()} /> : "loading"}</>
     );
   };
 
@@ -151,6 +154,7 @@ export default function Comments() {
           </Container>
           <br />
           <div>{commentList != null ? renderComments() : null}</div>
+          {modal ? <PostLikesModal toggle={toggleModal} postID={postID} /> : null}
         </>
       ) : (
         "loading"

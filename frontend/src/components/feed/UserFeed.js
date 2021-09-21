@@ -3,27 +3,27 @@ import axios from "axios";
 import { useContext, useEffect, useState, useCallback } from "react";
 import Post from "../posts/Post";
 import FeedComment from "../comments/FeedComment";
-import Modal from "../posts/PostModal";
+import Modal from "../modals/PostModal";
 import { Button, Card, Container } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 
 export default function UserFeed() {
   const [feed, setFeed] = useState(null);
-  const { userVal, tokenVal, headersVal } = useContext(UserContext);
-  const [token] = tokenVal;
+  const { userVal, loggedInVal, headersVal } = useContext(UserContext);
+  const [loggedIn] = loggedInVal;
   const [modal, setModal] = useState(false);
   const [headers] = headersVal;
   const [user] = userVal;
   const [activeItem, setActiveItem] = useState({});
 
   const fetchPostsAndComments = useCallback(async () => {
-    if (token && user) {
+    if (loggedIn) {
       await axios.get("/api/feed/recent", headers).then((res) => {
         setFeed(res.data);
       });
     }
-  }, [token, user, headers]);
+  }, [loggedIn, headers]);
 
   useEffect(() => {
     fetchPostsAndComments();
