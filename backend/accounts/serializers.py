@@ -10,7 +10,14 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "username", "posts_count"]
-
+# User Serializer
+class UserWithFollowageSerializer(serializers.ModelSerializer):
+    posts_count = serializers.IntegerField()
+    following = serializers.BooleanField(default=False)
+    follows_you = serializers.BooleanField(default=False)
+    class Meta:
+        model = User
+        fields = ["id", "username", "posts_count", "following", "follows_you"]
 
 class SmallUserSerializer(serializers.ModelSerializer):
     class Meta:

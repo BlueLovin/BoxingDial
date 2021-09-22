@@ -5,34 +5,32 @@ import Post from "../posts/Post";
 import { Nav, NavItem, TabContent, TabPane, NavLink, Button } from "reactstrap";
 import Comment from "../comments/Comment";
 import { UserContext } from "../../UserContext";
+import FollowButton from "./FollowButton";
 
 export default function UserProfile() {
   const params = useParams();
   const username = params.username;
-
-  const [postsList, setPostsList] = useState({});
-  const [commentsList, setCommentsList] = useState({});
+  const [postsList, setPostsList] = useState([]);
+  const [commentsList, setCommentsList] = useState([]);
   const [profileFollowingList, setFollowingList] = useState(null);
   const [profileFollowersList, setFollowersList] = useState(null);
-  const [following, setFollowing] = useState(null);
-  const [followButtonPressed, setFollowButtonPressed] = useState(false);
+
   const [profile, setProfile] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("1");
-  const { userVal, headersVal } = useContext(UserContext);
+  const { headersVal } = useContext(UserContext);
   const [headers] = headersVal;
-  const [user] = userVal;
 
   const fetchUserPosts = useCallback(async () => {
     setLoading(true);
-    await axios.get(`/api/users/${username}/posts`).then((res) => {
+    await axios.get(`/api/users/${username}/posts`, headers).then((res) => {
       setPostsList(res.data);
     });
     await axios.get(`/api/users/${username}/comments`).then((res) => {
       setCommentsList(res.data);
       setLoading(false);
     });
-  }, [username]);
+  }, [username, headers]);
 
   useEffect(() => {
     setLoading(true);
@@ -43,13 +41,6 @@ export default function UserProfile() {
         .get(`/api/users/${username}/`, headers)
         .then((res) => {
           setProfile(res.data);
-          setFollowing(res.data.following);
-        })
-        .catch(async () => {
-          await axios.get(`/api/users/${username}/`).then((res) => {
-            setProfile(res.data);
-            setFollowing(res.data.following);
-          });
         })
         .catch(() => {
           window.location = "/404/"; //404 if user doesnt exist
@@ -64,29 +55,10 @@ export default function UserProfile() {
       });
       setLoading(false);
     };
-    if (headers !== null) {
-      fetchUserPosts();
-      fetchProfile();
-    }
-  }, [fetchUserPosts, username, followButtonPressed, headers]);
+    fetchUserPosts();
+    fetchProfile();
+  }, [fetchUserPosts, username, headers]);
 
-  const follow = async () => {
-    let data = {
-      follow: profile.id,
-    };
-    await axios
-      .post(`/api/users/follow`, data, headers)
-      .then(() => setFollowing(true));
-  };
-
-  const unfollow = async () => {
-    let data = {
-      unfollow: profile.id,
-    };
-    await axios
-      .post(`/api/users/unfollow`, data, headers)
-      .then(() => setFollowing(false));
-  };
   const renderProfilePosts = () => {
     return postsList.map((post, i) => (
       <div key={i}>
@@ -127,39 +99,6 @@ export default function UserProfile() {
     return "loading...";
   };
 
-  const renderFollowButton = () => {
-    if (user && user.username !== profile.username) {
-      if (following === false) {
-        return (
-          <>
-            <Button
-              onClick={async () => {
-                await follow();
-                setFollowButtonPressed(!followButtonPressed);
-              }}
-            >
-              Follow
-            </Button>
-          </>
-        );
-      } else if (following != null) {
-        return (
-          <>
-            <Button
-              onClick={async () => {
-                await unfollow();
-                setFollowButtonPressed(!followButtonPressed);
-              }}
-            >
-              Unfollow
-            </Button>
-          </>
-        );
-      }
-    }
-    return null;
-  };
-
   return (
     <>
       {loading || !profile ? (
@@ -168,7 +107,7 @@ export default function UserProfile() {
         <>
           <h1 className="text-center">
             {`${username}'s Profile `}
-            {renderFollowButton()}
+            <FollowButton profile={profile} />
           </h1>
           <br />
 

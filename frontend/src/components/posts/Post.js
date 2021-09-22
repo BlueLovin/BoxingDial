@@ -30,6 +30,7 @@ const Post = (props) => {
     if (post.liked) {
       setButtonClass("btn-sm btn-danger");
     } else {
+      console.log("fuck!")
       setButtonClass("btn-sm btn-primary");
     }
   }, [post]);

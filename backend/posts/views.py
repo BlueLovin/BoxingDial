@@ -1,10 +1,11 @@
-from django.db.models.expressions import Exists
+from django.db.models.expressions import Exists, OuterRef
+from django.db.models.fields import BooleanField
 from rest_framework import viewsets, generics, views, status
 from rest_framework import permissions
 from rest_framework.compat import distinct
 from rest_framework.permissions import IsAuthenticated
 from .models import Post, PostComment, PostLike
-from accounts.serializers import UserSerializer
+from accounts.serializers import UserSerializer, UserWithFollowageSerializer
 from fights.models import Fight
 from fights.serializers.nested import FightSerializer
 from .serializers import (
@@ -82,7 +83,32 @@ class PostLikesView(generics.ListAPIView):
 
     def get_queryset(self):
         post = Post.objects.get(id=self.kwargs["pk"])
-        return PostLike.objects.filter(post=post).order_by("-liked_on")
+        this_user = post.owner
+
+        if self.request.user.is_authenticated:
+            following = this_user.followers.filter(user_id=self.request.user).exists()
+
+            follows_you = self.request.user.followers.filter(user_id=this_user).exists()
+            return (
+                PostLike.objects.filter(post=post)
+                .prefetch_related(
+                    Prefetch("user", User.objects.annotate(
+                        posts_count=Count("posts"),
+                        following=following,
+                        follows_you=follows_you,
+                    )
+                ))
+                .order_by("-liked_on")
+            )
+        else:
+            return (
+                PostLike.objects.filter(post=post)
+                .prefetch_related(
+                    Prefetch("user", User.objects.annotate(
+                        posts_count=Count("posts"),
+                    )
+                ))
+                .order_by("-liked_on"))
 
 
 # 5 most popular posts, popularity determined by number of comments

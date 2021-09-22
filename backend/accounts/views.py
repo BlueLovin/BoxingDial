@@ -1,4 +1,5 @@
 from django.db.models.aggregates import Count
+from django.db.models.expressions import Exists, OuterRef
 from django.shortcuts import render
 from rest_framework import generics, viewsets, permissions
 from django.contrib.auth.models import User
@@ -10,7 +11,7 @@ from accounts.serializers import (
     UserFollowingSerializer,
     UserSerializer,
 )
-from posts.models import Post, PostComment
+from posts.models import Post, PostComment, PostLike
 from posts.serializers import CommentSerializer, SmallPostSerializer
 
 # all users - /api/users
@@ -83,12 +84,28 @@ class UserPostListView(generics.ListAPIView):
     serializer_class = SmallPostSerializer
 
     def get_queryset(self):
-        return (
-            Post.objects.filter(username=self.kwargs["user"])
-            .annotate(
-                like_count=Count("post_likes", distinct=True),
-                comment_count=Count("comments", distinct=True),
+        user = self.request.user
+        if user.is_authenticated:
+            return (
+                Post.objects.filter(username=self.kwargs["user"])
+                .annotate(
+                    like_count=Count("post_likes", distinct=True),
+                    comment_count=Count("comments", distinct=True),
+                    liked=Exists(
+                        PostLike.objects.filter(
+                            post=OuterRef("pk"), user=self.request.user
+                        )
+                    ),
+                )
+                .order_by("-id")
             )
-            .order_by("-id")
-        )
+        else:
+            return (
+                Post.objects.filter(username=self.kwargs["user"])
+                .annotate(
+                    like_count=Count("post_likes", distinct=True),
+                    comment_count=Count("comments", distinct=True),
+                )
+                .order_by("-id")
+            )
 

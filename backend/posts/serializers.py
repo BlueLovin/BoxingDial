@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from accounts.serializers import UserSerializer, SmallUserSerializer
+from accounts.serializers import UserSerializer, SmallUserSerializer, UserWithFollowageSerializer
 from fights.serializers.common import SmallFightSerializer, TinyFightSerializer
 from .models import Post, PostComment, PostLike
 from django.contrib.auth.models import User
@@ -36,7 +36,7 @@ class FeedCommentSerializer(serializers.ModelSerializer):
 
 
 class PostLikeSerializer(serializers.ModelSerializer):
-    user = SmallUserSerializer(many=False)
+    user = UserWithFollowageSerializer(many=False)
 
     class Meta:
         model = PostLike
