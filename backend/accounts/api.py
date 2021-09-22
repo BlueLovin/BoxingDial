@@ -1,4 +1,4 @@
-from django.db.models.expressions import Exists, OuterRef, Subquery
+from django.db.models.expressions import Exists, OuterRef
 from posts.serializers import FeedCommentSerializer, SmallPostSerializer
 from django.db.models.aggregates import Count
 from django.db.models.query import Prefetch
@@ -11,7 +11,6 @@ from .models import UserFollowing
 from posts.models import Post, PostComment, PostLike
 from .serializers import (
     SmallUserSerializer,
-    UserSerializer,
     UserFollowingSerializer,
     RegisterSerializer,
     LoginSerializer,

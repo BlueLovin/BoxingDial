@@ -1,8 +1,7 @@
 from rest_framework import serializers
-from accounts.serializers import UserSerializer, SmallUserSerializer, UserWithFollowageSerializer
+from accounts.serializers import UserWithFollowageSerializer
 from fights.serializers.common import SmallFightSerializer, TinyFightSerializer
 from .models import Post, PostComment, PostLike
-from django.contrib.auth.models import User
 
 
 class TinyPostSerializer(serializers.ModelSerializer):

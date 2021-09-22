@@ -1,9 +1,7 @@
 from django.db.models.aggregates import Count
 from django.db.models.expressions import Exists, OuterRef
-from django.shortcuts import render
-from rest_framework import generics, viewsets, permissions
+from rest_framework import generics
 from django.contrib.auth.models import User
-from django.views.generic import ListView
 from rest_framework.response import Response
 
 from accounts.serializers import (
