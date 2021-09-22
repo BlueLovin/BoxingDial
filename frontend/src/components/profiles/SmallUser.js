@@ -9,7 +9,7 @@ export default function SmallUser(props) {
         <img className="avatar" src="/default_images/lion.jpg" alt="avatar" />
       </div>
       <div className="small-user-name">
-        <Link to={`/user/${user.id}`}>{user.username}</Link>
+        <Link to={`/user/${user.username}`}>{user.username}</Link>
         <br />
         <p>placeholder bio</p>
       </div>
