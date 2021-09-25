@@ -1,4 +1,5 @@
-from django.db.models.expressions import Exists
+from accounts.models import UserFollowing
+from django.db.models.expressions import Exists, OuterRef, Subquery
 from rest_framework import viewsets, generics, views, status
 from rest_framework.permissions import IsAuthenticated
 from .models import Post, PostComment, PostLike
@@ -77,34 +78,27 @@ class PostLikesView(generics.ListAPIView):
 
     def get_queryset(self):
         post = Post.objects.get(id=self.kwargs["pk"])
-        this_user = post.owner
+        client_user_id = self.request.user.id
+        
+        #check to see if a 'following' object exists matching the client user and current user in iteration, or vice versa
+        follows_you = Exists(UserFollowing.objects.filter(user_id=OuterRef("pk"), following_user_id=client_user_id))
+        following = Exists(UserFollowing.objects.filter(user_id=client_user_id, following_user_id=OuterRef("pk")))
 
-        if self.request.user.is_authenticated:
-            following = this_user.followers.filter(user_id=self.request.user).exists()
-
-            follows_you = self.request.user.followers.filter(user_id=this_user).exists()
-            return (
-                PostLike.objects.filter(post=post)
-                .prefetch_related(
-                    Prefetch(
-                        "user",
-                        User.objects.annotate(
-                            posts_count=Count("posts"),
-                            following=following,
-                            follows_you=follows_you,
-                        ),
-                    )
+        return (
+            PostLike.objects.filter(post=post)
+            .prefetch_related(
+                Prefetch(
+                    "user",
+                    User.objects.annotate(
+                        posts_count=Count("posts"),
+                        is_following=following,
+                        follows_you=follows_you,
+                    ),
                 )
-                .order_by("-liked_on")
             )
-        else:
-            return (
-                PostLike.objects.filter(post=post)
-                .prefetch_related(
-                    Prefetch("user", User.objects.annotate(posts_count=Count("posts"),))
-                )
-                .order_by("-liked_on")
-            )
+            .order_by("-liked_on")
+        )
+        
 
 
 # 5 most popular posts, popularity determined by number of comments

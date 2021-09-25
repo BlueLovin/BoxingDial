@@ -47,7 +47,7 @@ class UserView(generics.GenericAPIView):
                     "id": this_user.id,
                     "username": this_user.username,
                     "posts_count": this_user.posts.count(),
-                    "following": following,
+                    "is_following": following,
                     "follows_you": follows_you,
                 }
             )

@@ -6,7 +6,7 @@ import { UserContext } from "../../UserContext";
 export default function FollowButton(props) {
   const { profile } = props;
 
-  const [following, setFollowing] = useState(profile.following);
+  const [is_following, setFollowing] = useState(profile.is_following);
 
   const [followButtonPressed, setFollowButtonPressed] = useState(false);
   const { headersVal, userVal } = useContext(UserContext);
@@ -33,7 +33,7 @@ export default function FollowButton(props) {
 
   const renderFollowButton = () => {
     if (user && user.username !== profile.username) {
-      if (following === false) {
+      if (is_following === false) {
         return (
           <>
             <Button
@@ -46,7 +46,7 @@ export default function FollowButton(props) {
             </Button>
           </>
         );
-      } else if (following != null) {
+      } else if (is_following != null) {
         return (
           <>
             <Button
