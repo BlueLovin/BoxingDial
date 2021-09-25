@@ -20,14 +20,14 @@ class CommentSerializer(serializers.ModelSerializer):
         return comment
 
 
-class MicroPostSerializer(serializers.ModelSerializer):
+class TruncatedPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ("id", "username", "truncated_content")
 
 
 class FeedCommentSerializer(serializers.ModelSerializer):
-    post = MicroPostSerializer(many=False)
+    post = TruncatedPostSerializer(many=False)
 
     class Meta:
         model = PostComment
