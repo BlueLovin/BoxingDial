@@ -30,7 +30,6 @@ const Post = (props) => {
     if (post.liked) {
       setButtonClass("btn-sm btn-danger");
     } else {
-      console.log("fuck!")
       setButtonClass("btn-sm btn-primary");
     }
   }, [post]);
@@ -41,14 +40,15 @@ const Post = (props) => {
       return;
     }
     await axios.post(`/api/posts/${_post.id}/like`, {}, headers).then((res) => {
+      const result = res.data["result"];
       // LIKE
-      if (res.data["result"] === "liked") {
+      if (result === "liked") {
         // increment like count if server responds "liked"
         setLikeCount(likeCount + 1);
         setButtonClass("btn-sm btn-danger");
       }
       // UNLIKE
-      if (res.data["result"] === "unliked") {
+      if (result === "unliked") {
         // vice versa with "unliked"
         setLikeCount(likeCount - 1);
         setButtonClass("btn-sm btn-primary");
