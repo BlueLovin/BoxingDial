@@ -24,7 +24,7 @@ export default function NavigationBar() {
   return (
     <>
       <Navbar color="light" light expand="md">
-        <NavbarBrand href="/">BoxOffice</NavbarBrand>
+        <NavbarBrand href="/">BoxingDial</NavbarBrand>
         <NavbarToggler onClick={toggle} />
         <Collapse isOpen={isOpen} navbar>
           <Nav className="mr-auto" navbar>
