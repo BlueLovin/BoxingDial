@@ -13,21 +13,24 @@ export default function Comments() {
 
   const [commentList, setCommentList] = useState([]);
 
-  const [currentPost, setCurrentPost] = useState({
-    content: "",
-  });
+  
 
   const { loggedInVal, userVal, headersVal } = useContext(UserContext);
   const [user] = userVal;
   const [loggedIn] = loggedInVal;
   const [headers] = headersVal;
+  const [modal, setModal] = useState(false);
+  const history = useHistory();
+
+  const [currentPost, setCurrentPost] = useState({
+    content: "",
+  });
   const [activeItem, setActiveItem] = useState({
     post: postID,
     content: "",
     owner: user ? user.id : null,
   });
-  const [modal, setModal] = useState(false);
-  const history = useHistory();
+
   const toggleModal = () => {
     setModal(!modal);
   };
@@ -35,7 +38,7 @@ export default function Comments() {
   //get post WITH auth headers
   const getLoggedInPost = useCallback(async () => {
     await axios
-      .get(`/api/posts/${postID}`, headers) // get current post
+      .get(`/api/posts/${postID}/`, headers) // get current post
       .then((res) => {
         setCurrentPost(res.data);
         setCommentList(res.data.comments);
@@ -46,7 +49,7 @@ export default function Comments() {
   //get post WITHOUT auth headers
   const getLoggedOutPost = useCallback(async () => {
     await axios
-      .get(`/api/posts/${postID}`)
+      .get(`/api/posts/${postID}/`)
       .then((res) => {
         setCurrentPost(res.data);
         setCommentList(res.data.comments);
@@ -55,13 +58,16 @@ export default function Comments() {
   }, [postID, history]);
 
   useEffect(() => {
-    //LOGGED OUT
-    if (!loggedIn) {
-      getLoggedOutPost();
-    }
-    // LOGGED IN
-    if (loggedIn) {
-      getLoggedInPost();
+    if (loggedIn !== null) {
+      console.log("logged in val = " + loggedIn);
+      //LOGGED OUT
+      if (!loggedIn) {
+        getLoggedOutPost();
+      }
+      // LOGGED IN
+      if (loggedIn) {
+        getLoggedInPost();
+      }
     }
   }, [getLoggedInPost, getLoggedOutPost, loggedIn]);
 
@@ -91,7 +97,17 @@ export default function Comments() {
 
   const renderPost = (post) => {
     return (
-      <>{post.content ? <Post post={post} fullPostPage={true} toggleModal={() => toggleModal()} /> : "loading"}</>
+      <>
+        {post.content ? (
+          <Post
+            post={post}
+            fullPostPage={true}
+            toggleModal={() => toggleModal()}
+          />
+        ) : (
+          "loading"
+        )}
+      </>
     );
   };
 
@@ -154,7 +170,9 @@ export default function Comments() {
           </Container>
           <br />
           <div>{commentList != null ? renderComments() : null}</div>
-          {modal ? <PostLikesModal toggle={toggleModal} postID={postID} /> : null}
+          {modal ? (
+            <PostLikesModal toggle={toggleModal} postID={postID} />
+          ) : null}
         </>
       ) : (
         "loading"

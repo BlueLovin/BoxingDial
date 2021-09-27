@@ -23,10 +23,10 @@ export default function UserProfile() {
 
   const fetchUserPosts = useCallback(async () => {
     setLoading(true);
-    await axios.get(`/api/users/${username}/posts`, headers).then((res) => {
+    await axios.get(`/api/users/${username}/posts/`, headers).then((res) => {
       setPostsList(res.data);
     });
-    await axios.get(`/api/users/${username}/comments`).then((res) => {
+    await axios.get(`/api/users/${username}/comments/`).then((res) => {
       setCommentsList(res.data);
       setLoading(false);
     });
