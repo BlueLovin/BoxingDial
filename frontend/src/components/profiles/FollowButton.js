@@ -7,7 +7,6 @@ export default function FollowButton(props) {
   const { profile } = props;
 
   const [is_following, setFollowing] = useState(profile.is_following);
-
   const [followButtonPressed, setFollowButtonPressed] = useState(false);
   const { headersVal, userVal } = useContext(UserContext);
   const [user] = userVal;
@@ -60,11 +59,13 @@ export default function FollowButton(props) {
           </>
         );
       }
-    } else if (!user){
+    } else if (!user) {
       return (
         <Button
           onClick={() => alert("login to be able to follow other users!")}
-        >Follow</Button>
+        >
+          Follow
+        </Button>
       );
     }
     return null;

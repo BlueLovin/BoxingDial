@@ -14,7 +14,6 @@ import { UserContext } from "./UserContext";
 import Register from "./components/accounts/Register";
 import NavigationBar from "./components/navbar/NavBar";
 import { NotFound } from "./NotFound404";
-import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
 
 function App() {
   const [user, setUser] = useState(); // set to undefined initially
@@ -70,11 +69,12 @@ function App() {
     }
   }, [token]);
 
+  // SET GLOBAL LOADING STATE
   useEffect(() => {
-    if (loggedIn !== null) {
+    if (loggedIn !== null && user !== undefined) {
       setLoading(false);
     }
-  }, [loggedIn]);
+  }, [loggedIn, user]);
 
   if (!loading) {
     return (

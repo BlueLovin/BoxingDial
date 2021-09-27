@@ -6,15 +6,12 @@ import { Row, Col } from "reactstrap";
 import UserFeed from "./feed/UserFeed";
 
 function App() {
-  const { userVal, loggedInVal } = useContext(UserContext);
-  const [user] = userVal;
+  const { loggedInVal } = useContext(UserContext);
   const [loggedIn] = loggedInVal;
 
   const renderHome = () => {
-    if (loggedIn !== null && user) {
-      if (loggedIn) {
-        return <UserFeed />;
-      }
+    if (loggedIn) {
+      return <UserFeed />;
     }
     if (loggedIn === false) {
       return (
