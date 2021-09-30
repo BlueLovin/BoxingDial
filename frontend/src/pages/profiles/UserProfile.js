@@ -1,11 +1,11 @@
 import { useState, useEffect, useContext, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import Post from "../posts/Post";
-import { Nav, NavItem, TabContent, TabPane, NavLink, Button } from "reactstrap";
-import Comment from "../comments/Comment";
+import Post from "../../components/posts/Post";
+import { Nav, NavItem, TabContent, TabPane, NavLink } from "reactstrap";
+import Comment from "../../components/comments/Comment";
 import { UserContext } from "../../UserContext";
-import FollowButton from "./FollowButton";
+import FollowButton from "../../components/profiles/FollowButton";
 
 export default function UserProfile() {
   const params = useParams();

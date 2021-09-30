@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import axios from "axios";
-import Home from "./components/HomePage";
-import Comments from "./components/posts/PostPage";
+import Home from "./pages/home/HomePage";
+import Comments from "./pages/posts/PostPage";
 import PopularPosts from "./components/posts/PopularPosts";
 import Login from "./components/accounts/Login";
-import UserProfile from "./components/profiles/UserProfile";
+import UserProfile from "./pages/profiles/UserProfile";
 import ShowUser from "./components/navbar/ShowUser";
-import FightPage from "./components/fights/FightPage";
+import FightPage from "./pages/fights/FightPage";
 import PopularFights from "./components/fights/PopularFights";
 import RecentFights from "./components/fights/RecentFights";
 import { UserContext } from "./UserContext";

@@ -2,9 +2,9 @@ import React, { useEffect, useState, useContext, useCallback } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom/cjs/react-router-dom.min";
 import { UserContext } from "../../UserContext";
-import Post from "../posts/Post";
-import Fight from "./Fight";
-import Modal from "../modals/PostModal";
+import Post from "../../components/posts/Post";
+import Fight from "../../components/fights/Fight";
+import Modal from "../../components/modals/PostModal";
 import { Button } from "reactstrap";
 
 export default function FightPage() {
