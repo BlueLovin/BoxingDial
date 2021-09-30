@@ -7,7 +7,7 @@ from fights import views as fight_views
 from accounts import views as user_views
 
 router = routers.DefaultRouter()
-router.register("comments", posts_views.PostCommentsView)
+router.register("comments", posts_views.PostCommentsView, basename="postcomment")
 
 urlpatterns = [
     path("admin/", admin.site.urls),

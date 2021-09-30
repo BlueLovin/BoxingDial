@@ -1,10 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 from fights.models import Fight
+from vote.models import VoteModel
 
-
-class PostComment(models.Model):
+class PostComment(VoteModel, models.Model):
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="comments")
+
     content = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(

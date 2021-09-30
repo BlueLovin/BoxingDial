@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "fights",
     "posts",
     "accounts",
+    "vote",
     "knox",
 ]
 

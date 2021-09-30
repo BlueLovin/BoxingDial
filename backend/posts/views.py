@@ -1,3 +1,5 @@
+from vote.managers import UP
+from vote.models import DOWN, Vote
 from accounts.models import UserFollowing
 from django.db.models.expressions import Exists, OuterRef, Subquery
 from rest_framework import viewsets, generics, views, status
@@ -14,7 +16,7 @@ from backend.permissions import IsOwnerOrReadOnly
 from django.contrib.auth.models import User
 from django.db.models import Count, Prefetch
 from rest_framework.response import Response
-
+from vote.views import VoteMixin
 
 # all posts /api/posts
 class PostsView(generics.ListAPIView):
@@ -68,7 +70,9 @@ class PostView(generics.RetrieveDestroyAPIView):
                 .prefetch_related(
                     Prefetch("comments", queryset=PostComment.objects.order_by("-id")),
                 )
-                .annotate(comment_count=Count("comments", distinct=True),)
+                .annotate(
+                    comment_count=Count("comments", distinct=True),
+                )
             )
 
 
@@ -79,10 +83,18 @@ class PostLikesView(generics.ListAPIView):
     def get_queryset(self):
         post = Post.objects.get(id=self.kwargs["pk"])
         client_user_id = self.request.user.id
-        
-        #check to see if a 'following' object exists matching the client user and current user in iteration, or vice versa
-        follows_you = Exists(UserFollowing.objects.filter(user_id=OuterRef("pk"), following_user_id=client_user_id))
-        following = Exists(UserFollowing.objects.filter(user_id=client_user_id, following_user_id=OuterRef("pk")))
+
+        # check to see if a 'following' object exists matching the client user and current user in iteration, or vice versa
+        follows_you = Exists(
+            UserFollowing.objects.filter(
+                user_id=OuterRef("pk"), following_user_id=client_user_id
+            )
+        )
+        following = Exists(
+            UserFollowing.objects.filter(
+                user_id=client_user_id, following_user_id=OuterRef("pk")
+            )
+        )
 
         return (
             PostLike.objects.filter(post=post)
@@ -98,7 +110,6 @@ class PostLikesView(generics.ListAPIView):
             )
             .order_by("-liked_on")
         )
-        
 
 
 # 5 most popular posts, popularity determined by number of comments
@@ -113,10 +124,22 @@ class PopularPostsView(generics.ListAPIView):
 
 
 # all comments /api/comments
-class PostCommentsView(viewsets.ModelViewSet):
+class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
     permission_classes = [IsOwnerOrReadOnly]
     serializer_class = CommentSerializer
     queryset = PostComment.objects.all()
+
+    def retrieve(self, request, pk):
+        comment = PostComment.objects.annotate(
+            is_voted_down=Exists(
+                Vote.objects.filter(user_id=request.user.id, action=DOWN)
+            ),
+            is_voted_up=Exists(
+                Vote.objects.filter(user_id=request.user.id, action=UP)
+            ),
+        ).get(pk=pk)
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data)
 
 
 class PostLikeApiView(views.APIView):
@@ -126,7 +149,9 @@ class PostLikeApiView(views.APIView):
 
         # if not logged in
         if not user.is_authenticated:
-            return Response({"result": "not logged in"},)
+            return Response(
+                {"result": "not logged in"},
+            )
 
         post = Post.objects.get(id=post)
 
@@ -138,4 +163,14 @@ class PostLikeApiView(views.APIView):
             PostLike.objects.create(user=user, post=post)
             result = "liked"
 
-        return Response({"result": result,}, status=status.HTTP_200_OK)
+        return Response(
+            {
+                "result": result,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class PostCommentViewSet(viewsets.ModelViewSet, VoteMixin):
+    queryset = PostComment.objects.all()
+    serializer_class = CommentSerializer
