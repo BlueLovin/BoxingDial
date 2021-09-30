@@ -3,6 +3,7 @@ from accounts.serializers import UserWithFollowageSerializer
 from fights.serializers.common import SmallFightSerializer, TinyFightSerializer
 from .models import Post, PostComment, PostLike
 
+
 class TinyPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
@@ -12,7 +13,16 @@ class TinyPostSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostComment
-        fields = ("id", "post", "content", "owner", "username", "vote_score", "is_voted_up", "is_voted_down")
+        fields = (
+            "id",
+            "post",
+            "content",
+            "owner",
+            "username",
+            "vote_score",
+            "is_voted_up",
+            "is_voted_down",
+        )
 
     def create(self, validated_data):
         comment = PostComment.objects.create(**validated_data)

@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from fights.models import Fight
 from vote.models import VoteModel
 
+
 class PostComment(VoteModel, models.Model):
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="comments")
 

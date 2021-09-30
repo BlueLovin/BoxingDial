@@ -48,7 +48,7 @@ export default function NavigationBar() {
               <FontAwesomeIcon icon={faFistRaised} />
               {" Fights"}
             </DropdownToggle>
-            <DropdownMenu left>
+            <DropdownMenu>
               <DropdownItem href="/fights/popular">Popular</DropdownItem>
               <DropdownItem href="/fights/recent">Recently Added</DropdownItem>
               <DropdownItem divider />

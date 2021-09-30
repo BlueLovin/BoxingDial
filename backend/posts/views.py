@@ -134,9 +134,7 @@ class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
             is_voted_down=Exists(
                 Vote.objects.filter(user_id=request.user.id, action=DOWN)
             ),
-            is_voted_up=Exists(
-                Vote.objects.filter(user_id=request.user.id, action=UP)
-            ),
+            is_voted_up=Exists(Vote.objects.filter(user_id=request.user.id, action=UP)),
         ).get(pk=pk)
         serializer = CommentSerializer(comment)
         return Response(serializer.data)
