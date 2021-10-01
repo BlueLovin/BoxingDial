@@ -1,10 +1,10 @@
 [x] fight optional on posts
 [x] pressing enter logs in on login page
 [x] like button on posts
-[] fix register page
-[] upvote/downvote comments
+[x] upvote/downvote comments
 [] reply to other comments
 [] user inbox
+[] fix register page
 [] delete account, account settings, more account control
 [] add bio/picture and other info to user profiles
 [] block/mute/report other users

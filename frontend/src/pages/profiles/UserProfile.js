@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import Post from "../../components/posts/Post";
 import { Nav, NavItem, TabContent, TabPane, NavLink } from "reactstrap";
-import Comment from "../../components/comments/Comment";
 import { UserContext } from "../../UserContext";
 import FollowButton from "../../components/profiles/FollowButton";
 import ProfileComments from "../../components/profiles/ProfileComments";
