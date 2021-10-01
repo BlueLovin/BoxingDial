@@ -47,13 +47,18 @@ class PostView(generics.RetrieveDestroyAPIView):
     # get current post, and order the comments by their ID descending. or recent, in other words
     def get_queryset(self):
         logged_in = self.request.user.is_authenticated
+        user_id = self.request.user.id
         if logged_in:
             return (
                 Post.objects.filter(id=self.kwargs["pk"])
                 .annotate(like_count=Count("likes", distinct=True))
                 .prefetch_related(
-                    Prefetch("comments", queryset=PostComment.objects.order_by("-id")),
-                )
+                    Prefetch("comments", queryset=PostComment.objects.annotate(
+                is_voted_down=Exists(
+                    Vote.objects.filter(user_id=user_id, action=DOWN)
+                ),
+                is_voted_up=Exists(Vote.objects.filter(user_id=user_id, action=UP))).order_by("-id")),
+                    )
                 .annotate(
                     comment_count=Count("comments", distinct=True),
                     liked=Exists(  # see if a PostLike object exists matching the client user and post.
