@@ -8,7 +8,7 @@ import {
   faArrowUp,
   faArrowDown,
   faArrowAltCircleDown,
-  faArrowAltCircleUp
+  faArrowAltCircleUp,
 } from "@fortawesome/free-solid-svg-icons";
 
 const DIRECTION = {
@@ -24,7 +24,7 @@ export default function Comment(props) {
   const comment = props.comment;
   //context
   const { userVal, headersVal } = useContext(UserContext);
-  const [commentScore, setCommentScore] = useState(comment.vote_score)
+  const [commentScore, setCommentScore] = useState(comment.vote_score);
   const [scoreBeforeVote, setScoreBeforeVote] = useState();
   const [voteDirection, setVoteDirection] = useState(DIRECTION.NEUTRAL);
   const [user] = userVal;
@@ -41,19 +41,18 @@ export default function Comment(props) {
         setScoreBeforeVote(comment.vote_score + 1);
         setVoteDirection(DIRECTION.DOWN);
         return;
-      }
-      else{
+      } else {
         setScoreBeforeVote(comment.vote_score);
         setVoteDirection(DIRECTION.NEUTRAL);
       }
     };
     checkVoteDirection();
-  }, [])
+  }, [comment.vote_score, comment.is_voted_down, comment.is_voted_up]);
 
   const serializeDirection = (direction) => {
     if (direction === "up" || direction === "down") {
       return {
-        "action": direction,
+        action: direction,
       };
     }
   };
@@ -61,50 +60,42 @@ export default function Comment(props) {
   const renderVotingButtons = () => {
     if (voteDirection === DIRECTION.UP) {
       return (
-        <>
-          <a href="#" onClick={() => unvote(-1)}>
+        <div className="text-center">
+          <button className="btn btn-link" onClick={() => unvote(-1)}>
             <FontAwesomeIcon icon={faArrowAltCircleUp} />
-          </a>
+          </button>
 
-          <a href="#" onClick={() => vote("down")}>
+          <button className="btn" onClick={() => vote("down")}>
             <FontAwesomeIcon icon={faArrowDown} />
-          </a>
-          <h4>
-            {commentScore}
-          </h4>
-        </>
+          </button>
+          <h4>{commentScore}</h4>
+        </div>
       );
-    }
-    else if (voteDirection === DIRECTION.DOWN) {
+    } else if (voteDirection === DIRECTION.DOWN) {
       return (
-        <>
-          <a href="#" onClick={() => vote("up")}>
+        <div className="text-center">
+          <button className="btn" onClick={() => vote("up")}>
             <FontAwesomeIcon icon={faArrowUp} />
-          </a>
+          </button>
 
-          <a href="#" onClick={() => unvote(1)}>
+          <button className="btn btn-link" onClick={() => unvote(1)}>
             <FontAwesomeIcon icon={faArrowAltCircleDown} />
-          </a>
-          <h4>
-            {commentScore}
-          </h4>
-        </>
+          </button>
+          <h4>{commentScore}</h4>
+        </div>
       );
-    }
-    else {
+    } else {
       return (
-        <>
-          <a href="#" onClick={() => vote("up")}>
+        <div className="text-center">
+          <button className="btn" onClick={() => vote("up")}>
             <FontAwesomeIcon icon={faArrowUp} />
-          </a>
+          </button>
 
-          <a href="#" onClick={() => vote("down")}>
+          <button className="btn" onClick={() => vote("down")}>
             <FontAwesomeIcon icon={faArrowDown} />
-          </a>
-          <h4>
-            {commentScore}
-          </h4>
-        </>
+          </button>
+          <h4>{commentScore}</h4>
+        </div>
       );
     }
   };
@@ -124,7 +115,7 @@ export default function Comment(props) {
   const unvote = async (unvoteValue) => {
     await axios.delete(`/api/comments/${comment.id}/vote/`, headers);
     setVoteDirection(DIRECTION.NEUTRAL);
-    setCommentScore(scoreBeforeVote)
+    setCommentScore(scoreBeforeVote);
   };
 
   const deleteComment = () => {
@@ -149,9 +140,7 @@ export default function Comment(props) {
               <span className="">context</span>
             </Link>
           ) : null}
-          <div className="h1">
-            {renderVotingButtons()}
-          </div>
+          <div className="h1">{renderVotingButtons()}</div>
           {user && user.username === comment.username ? (
             <React.Fragment>
               <button
@@ -167,4 +156,4 @@ export default function Comment(props) {
       <hr />
     </Container>
   );
-};
+}

@@ -53,12 +53,24 @@ class PostView(generics.RetrieveDestroyAPIView):
                 Post.objects.filter(id=self.kwargs["pk"])
                 .annotate(like_count=Count("likes", distinct=True))
                 .prefetch_related(
-                    Prefetch("comments", queryset=PostComment.objects.annotate(
-                is_voted_down=Exists(
-                    Vote.objects.filter(user_id=user_id, action=DOWN)
-                ),
-                is_voted_up=Exists(Vote.objects.filter(user_id=user_id, action=UP))).order_by("-id")),
-                    )
+                    Prefetch(
+                        "comments",
+                        queryset=PostComment.objects.annotate(
+                            is_voted_down=Exists(
+                                Vote.objects.filter(
+                                    user_id=user_id,
+                                    action=DOWN,
+                                    object_id=OuterRef("pk"),
+                                )
+                            ),
+                            is_voted_up=Exists(
+                                Vote.objects.filter(
+                                    user_id=user_id, action=UP, object_id=OuterRef("pk")
+                                )
+                            ),
+                        ).order_by("-vote_score"),
+                    ),
+                )
                 .annotate(
                     comment_count=Count("comments", distinct=True),
                     liked=Exists(  # see if a PostLike object exists matching the client user and post.
