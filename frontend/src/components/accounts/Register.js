@@ -11,18 +11,22 @@ export default function Register() {
     email: "",
     password: "",
   });
-  const { userVal, tokenVal } = useContext(UserContext);
+  const { userVal, tokenVal, loggedInVal } = useContext(UserContext);
   const [error, setError] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
-  const [user, setUser] = userVal;
+  const [, setUser] = userVal;
   const [, setToken] = tokenVal;
+  const [loggedIn] = loggedInVal;
+
+
   const history = useHistory();
 
   useEffect(()=>{
-    if(user !== null && user !== undefined){
+    if(loggedIn){        
       history.push('/');
+      window.location.reload();
     }
-  }, [user, history]);
+  }, [history, loggedIn]);
 
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -40,10 +44,9 @@ export default function Register() {
       .post("/api/token-auth/register", item)
       .then((res) => {
         setError(false);
-        setToken(res.data.token);
-        localStorage.removeItem("token");
-        localStorage.setItem("token", res.data.token);
         setUser(res.data.user);
+        setToken(res.data.token);
+        localStorage.setItem("token", res.data.token);
       })
       .catch((err) => {
         setErrorMessages([]);

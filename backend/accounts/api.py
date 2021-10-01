@@ -16,6 +16,7 @@ from .serializers import (
     LoginSerializer,
     UserWithFollowersSerializer,
 )
+from vote.models import Vote, DOWN, UP
 
 
 class RegisterAPI(generics.GenericAPIView):
@@ -93,6 +94,8 @@ class UserFeedByRecentView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, format=None):
+        user_id = request.user.id
+
         # get following user IDs
         follower_user_ids = (
             UserFollowing.objects.filter(user_id=request.user)
@@ -113,7 +116,20 @@ class UserFeedByRecentView(generics.GenericAPIView):
             .order_by("-id")
         )
 
-        comments = PostComment.objects.filter(owner__in=follower_user_ids).order_by(
+        comments = PostComment.objects.filter(owner__in=follower_user_ids).annotate(
+                            is_voted_down=Exists(
+                                Vote.objects.filter(
+                                    user_id=user_id,
+                                    action=DOWN,
+                                    object_id=OuterRef("pk"),
+                                )
+                            ),
+                            is_voted_up=Exists(
+                                Vote.objects.filter(
+                                    user_id=user_id, action=UP, object_id=OuterRef("pk")
+                                )
+                            ),
+                        ).order_by(
             "-id"
         )
 
@@ -130,7 +146,20 @@ class UserFeedByRecentView(generics.GenericAPIView):
             .order_by("-id")
         )
 
-        user_comments = PostComment.objects.filter(owner__in=[request.user]).order_by(
+        user_comments = PostComment.objects.filter(owner__in=[request.user]).annotate(
+                            is_voted_down=Exists(
+                                Vote.objects.filter(
+                                    user_id=user_id,
+                                    action=DOWN,
+                                    object_id=OuterRef("pk"),
+                                )
+                            ),
+                            is_voted_up=Exists(
+                                Vote.objects.filter(
+                                    user_id=user_id, action=UP, object_id=OuterRef("pk")
+                                )
+                            ),
+                        ).order_by(
             "-id"
         )
 

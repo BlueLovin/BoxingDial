@@ -40,7 +40,17 @@ class FeedCommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PostComment
-        fields = ("id", "post", "date", "content", "owner", "username")
+        fields = (
+            "id",
+            "post",
+            "date",
+            "content",
+            "owner",
+            "username",
+            "vote_score",
+            "is_voted_up",
+            "is_voted_down",
+        )
 
 
 class PostLikeSerializer(serializers.ModelSerializer):
