@@ -3,6 +3,7 @@ from django.db.models.expressions import Exists, OuterRef
 from rest_framework import generics
 from django.contrib.auth.models import User
 from rest_framework.response import Response
+from vote.models import DOWN, UP, Vote
 
 from accounts.serializers import (
     FollowersSerializer,
@@ -74,7 +75,25 @@ class UserCommentListView(generics.ListAPIView):
     serializer_class = CommentSerializer
 
     def get_queryset(self):
-        return PostComment.objects.filter(username=self.kwargs["user"]).order_by("-id")
+        user_id = self.request.user.id
+        return (
+            PostComment.objects.filter(username=self.kwargs["user"])
+            .annotate(
+                is_voted_down=Exists(
+                    Vote.objects.filter(
+                        user_id=user_id,
+                        action=DOWN,
+                        object_id=OuterRef("pk"),
+                    )
+                ),
+                is_voted_up=Exists(
+                    Vote.objects.filter(
+                        user_id=user_id, action=UP, object_id=OuterRef("pk")
+                    )
+                ),
+            )
+            .order_by("-id")
+        )
 
 
 # user's posts - /api/users/{username}/posts
@@ -106,4 +125,3 @@ class UserPostListView(generics.ListAPIView):
                 )
                 .order_by("-id")
             )
-

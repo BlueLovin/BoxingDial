@@ -6,12 +6,12 @@ import { Nav, NavItem, TabContent, TabPane, NavLink } from "reactstrap";
 import Comment from "../../components/comments/Comment";
 import { UserContext } from "../../UserContext";
 import FollowButton from "../../components/profiles/FollowButton";
+import ProfileComments from "../../components/profiles/ProfileComments";
 
 export default function UserProfile() {
   const params = useParams();
   const username = params.username;
   const [postsList, setPostsList] = useState([]);
-  const [commentsList, setCommentsList] = useState([]);
   const [profileFollowingList, setFollowingList] = useState(null);
   const [profileFollowersList, setFollowersList] = useState(null);
 
@@ -26,10 +26,7 @@ export default function UserProfile() {
     await axios.get(`/api/users/${username}/posts/`, headers).then((res) => {
       setPostsList(res.data);
     });
-    await axios.get(`/api/users/${username}/comments/`).then((res) => {
-      setCommentsList(res.data);
-      setLoading(false);
-    });
+    setLoading(false);
   }, [username, headers]);
 
   useEffect(() => {
@@ -68,14 +65,6 @@ export default function UserProfile() {
     ));
   };
 
-  const renderProfileComments = () => {
-    return commentsList.map((comment, i) => (
-      <div key={i}>
-        <br />
-        <Comment comment={comment} contextButton={true} />
-      </div>
-    ));
-  };
   const renderProfileFollowers = () => {
     if (profileFollowersList !== null) {
       return profileFollowersList.map((follower, i) => (
@@ -152,7 +141,11 @@ export default function UserProfile() {
           </Nav>
           <TabContent activeTab={activeTab}>
             <TabPane tabId="1">{renderProfilePosts()}</TabPane>
-            <TabPane tabId="2">{renderProfileComments()}</TabPane>
+            <TabPane tabId="2">
+              {activeTab === "2" ? (
+                <ProfileComments username={username} />
+              ) : null}
+            </TabPane>
             <TabPane tabId="3">{renderProfileFollowing()}</TabPane>
             <TabPane tabId="4">{renderProfileFollowers()}</TabPane>
           </TabContent>
