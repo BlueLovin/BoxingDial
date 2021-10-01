@@ -13,8 +13,6 @@ export default function Comments() {
 
   const [commentList, setCommentList] = useState([]);
 
-  
-
   const { loggedInVal, userVal, headersVal } = useContext(UserContext);
   const [user] = userVal;
   const [loggedIn] = loggedInVal;

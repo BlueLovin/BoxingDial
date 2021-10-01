@@ -26,7 +26,7 @@ export default function NavigationBar() {
 
   const toggle = () => setIsOpen(!isOpen);
   return (
-    <Navbar color="light" light expand="md"  >
+    <Navbar color="light" light expand="md">
       <NavbarBrand href="/">BoxingDial</NavbarBrand>
       <NavbarToggler onClick={toggle} />
       <Collapse isOpen={isOpen} navbar>

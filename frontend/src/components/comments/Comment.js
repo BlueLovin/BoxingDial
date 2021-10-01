@@ -11,6 +11,7 @@ import {
   faArrowAltCircleUp,
 } from "@fortawesome/free-solid-svg-icons";
 
+// javascript doesn't have ENUMs? oh brother. . .
 const DIRECTION = {
   UP: "UP",
   DOWN: "DOWN",
@@ -31,6 +32,11 @@ export default function Comment(props) {
   const [headers] = headersVal;
 
   useEffect(() => {
+    // this function calculates the "score before vote". This is useful over
+    // simply using the {comment.vote_score}, because the user could have
+    // already voted on this comment. So we take the score, take the vote
+    // direction, and can calculate the comment's score "before" the user's
+    // vote.
     const checkVoteDirection = () => {
       if (comment.is_voted_up) {
         setScoreBeforeVote(comment.vote_score - 1);
@@ -40,7 +46,6 @@ export default function Comment(props) {
       if (comment.is_voted_down) {
         setScoreBeforeVote(comment.vote_score + 1);
         setVoteDirection(DIRECTION.DOWN);
-        return;
       } else {
         setScoreBeforeVote(comment.vote_score);
         setVoteDirection(DIRECTION.NEUTRAL);
@@ -49,6 +54,7 @@ export default function Comment(props) {
     checkVoteDirection();
   }, [comment.vote_score, comment.is_voted_down, comment.is_voted_up]);
 
+  //this function serializes the direction that we will send to the API to vote
   const serializeDirection = (direction) => {
     if (direction === "up" || direction === "down") {
       return {
@@ -61,7 +67,7 @@ export default function Comment(props) {
     if (voteDirection === DIRECTION.UP) {
       return (
         <div className="text-center">
-          <button className="btn btn-link" onClick={() => unvote(-1)}>
+          <button className="btn btn-link" onClick={() => unvote()}>
             <FontAwesomeIcon icon={faArrowAltCircleUp} />
           </button>
 
@@ -78,13 +84,14 @@ export default function Comment(props) {
             <FontAwesomeIcon icon={faArrowUp} />
           </button>
 
-          <button className="btn btn-link" onClick={() => unvote(1)}>
+          <button className="btn btn-link" onClick={() => unvote()}>
             <FontAwesomeIcon icon={faArrowAltCircleDown} />
           </button>
           <h4>{commentScore}</h4>
         </div>
       );
     } else {
+      // neutral vote direction
       return (
         <div className="text-center">
           <button className="btn" onClick={() => vote("up")}>
@@ -99,7 +106,7 @@ export default function Comment(props) {
       );
     }
   };
-
+  //post voting data to server and set DOM state for better UX
   const vote = async (direction) => {
     const data = serializeDirection(direction);
     await axios.post(`/api/comments/${comment.id}/vote/`, data, headers);
@@ -112,7 +119,8 @@ export default function Comment(props) {
       setVoteDirection(DIRECTION.DOWN);
     }
   };
-  const unvote = async (unvoteValue) => {
+  //unvote sets the state back to the "scoreBeforeVote" variable
+  const unvote = async () => {
     await axios.delete(`/api/comments/${comment.id}/vote/`, headers);
     setVoteDirection(DIRECTION.NEUTRAL);
     setCommentScore(scoreBeforeVote);
