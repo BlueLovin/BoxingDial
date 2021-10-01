@@ -76,7 +76,6 @@ export default function UserFeed() {
           // and if it doesn't... it is definitely a comment
           <FeedComment
             comment={item}
-            contextButton={true}
             updateStateFunction={() => window.location.reload(false)}
           />
         )}

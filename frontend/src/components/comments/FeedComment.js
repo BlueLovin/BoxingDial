@@ -18,7 +18,7 @@ export default function FeedComment(props) {
           {comment.post.username}
         </Link>
       </p>
-      <Comment comment={comment} contextButton={true} />
+      <Comment comment={comment} />
     </Container>
   );
 }
