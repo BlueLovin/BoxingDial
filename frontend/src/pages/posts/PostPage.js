@@ -1,8 +1,23 @@
-import React, { useEffect, useState, useContext, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useCallback,
+  useRef,
+} from "react";
 import { useHistory, useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../../UserContext";
-import { Button, FormGroup, Input, Container } from "reactstrap";
+import {
+  Button,
+  FormGroup,
+  Input,
+  Container,
+  DropdownItem,
+  DropdownMenu,
+  UncontrolledDropdown,
+  DropdownToggle,
+} from "reactstrap";
 import Post from "../../components/posts/Post";
 import Comment from "../../components/comments/Comment";
 import PostLikesModal from "../../components/modals/PostLikesModal";
@@ -12,13 +27,15 @@ export default function Comments() {
   const postID = params.id;
 
   const [commentList, setCommentList] = useState([]);
-
-  const { loggedInVal, userVal, headersVal } = useContext(UserContext);
-  const [user] = userVal;
-  const [loggedIn] = loggedInVal;
-  const [headers] = headersVal;
+  const [commentOrder, setCommentOrder] = useState("date");
   const [modal, setModal] = useState(false);
+
+  const { userVal, headersVal } = useContext(UserContext);
+  const [user] = userVal;
+  const [headers] = headersVal;
+
   const history = useHistory();
+  const isMounted = useRef(false);
 
   const [currentPost, setCurrentPost] = useState({
     content: "",
@@ -33,8 +50,27 @@ export default function Comments() {
     setModal(!modal);
   };
 
+  useEffect(() => {
+    if (isMounted.current) {
+      // only if rerender
+      setCommentList([]);
+      if (commentOrder === "date") {
+        axios
+          .get(`/api/posts/${postID}/comments`, headers)
+          .then((res) => setCommentList(res.data));
+      } else if (commentOrder === "score") {
+        axios
+          .get(`/api/posts/${postID}/comments?order_by=score`, headers)
+          .then((res) => setCommentList(res.data));
+      }
+    } else {
+      // DO NOTHING ON MOUNT
+      isMounted.current = true;
+    }
+  }, [commentOrder, headers, postID]);
+
   //get post WITH auth headers
-  const getLoggedInPost = useCallback(async () => {
+  const getPost = useCallback(async () => {
     await axios
       .get(`/api/posts/${postID}/`, headers) // get current post
       .then((res) => {
@@ -44,30 +80,9 @@ export default function Comments() {
       .catch(() => history.push("/404"));
   }, [postID, history, headers]);
 
-  //get post WITHOUT auth headers
-  const getLoggedOutPost = useCallback(async () => {
-    await axios
-      .get(`/api/posts/${postID}/`)
-      .then((res) => {
-        setCurrentPost(res.data);
-        setCommentList(res.data.comments);
-      })
-      .catch(() => history.push("/404"));
-  }, [postID, history]);
-
   useEffect(() => {
-    if (loggedIn !== null) {
-      console.log("logged in val = " + loggedIn);
-      //LOGGED OUT
-      if (!loggedIn) {
-        getLoggedOutPost();
-      }
-      // LOGGED IN
-      if (loggedIn) {
-        getLoggedInPost();
-      }
-    }
-  }, [getLoggedInPost, getLoggedOutPost, loggedIn]);
+    getPost();
+  }, [getPost]);
 
   var handleChange = (e) => {
     let { name, value } = e.target;
@@ -84,7 +99,7 @@ export default function Comments() {
   const submitComment = (item) => {
     axios // create
       .post("/api/comments/", item, headers)
-      .then(() => getLoggedInPost());
+      .then(() => getPost());
 
     setActiveItem({
       // RESET TEXT BOX
@@ -109,12 +124,38 @@ export default function Comments() {
     );
   };
 
+  const renderOrderBy = () => {
+    return (
+      <div className="container text-right">
+        <br />
+        <UncontrolledDropdown>
+          <DropdownToggle caret color="light">
+            Sort by
+          </DropdownToggle>
+          <DropdownMenu right>
+            <DropdownItem
+              active={commentOrder === "date" ? true : false}
+              onClick={() => setCommentOrder("date")}
+            >
+              Date
+            </DropdownItem>
+            <DropdownItem
+              active={commentOrder === "score" ? true : false}
+              onClick={() => setCommentOrder("score")}
+            >
+              Score
+            </DropdownItem>
+          </DropdownMenu>
+        </UncontrolledDropdown>
+      </div>
+    );
+  };
+
   const renderCommentInput = () => {
     if (user) {
       return (
-        <div className="list-group-item text-center align-items-center p-5">
-          <h4>share your thoughts</h4>
-
+        <div class="col-sm-12 my-auto">
+          <h4 className="text-center">share your thoughts</h4>
           <FormGroup>
             <Input
               type="textarea"
@@ -123,8 +164,11 @@ export default function Comments() {
               onChange={handleChange}
             />
           </FormGroup>
-
-          <Button color="success" onClick={() => submitComment(activeItem)}>
+          <Button
+            className="float-right btn-lg"
+            color="success"
+            onClick={() => submitComment(activeItem)}
+          >
             Post
           </Button>
         </div>
@@ -142,11 +186,7 @@ export default function Comments() {
 
   const renderComments = () => {
     return commentList.map((comment, i) => (
-      <Comment
-        comment={comment}
-        updateStateFunction={getLoggedInPost}
-        key={i}
-      />
+      <Comment comment={comment} updateStateFunction={getPost} key={i} />
     ));
   };
 
@@ -156,6 +196,7 @@ export default function Comments() {
       {currentPost ? (
         <>
           {renderPost(currentPost)}
+
           <Container>
             <div className="h3 text-info font-weight-bold">
               <br />
@@ -164,8 +205,9 @@ export default function Comments() {
                 : "loading"}
             </div>
             <br />
-            {renderCommentInput()}
+            <div class="row h-100">{renderCommentInput()}</div>
           </Container>
+          {renderOrderBy()}
           <br />
           <div>{commentList != null ? renderComments() : null}</div>
           {modal ? (

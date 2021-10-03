@@ -1,3 +1,4 @@
+from django.http import request
 from vote.managers import UP
 from vote.models import DOWN, Vote
 from accounts.models import UserFollowing
@@ -40,6 +41,43 @@ class CreatePostView(generics.CreateAPIView):
         serializer.save()
 
 
+# post's comments /api/posts/6/comments
+class SinglePostCommentsView(generics.ListAPIView):
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        post_id = self.kwargs["pk"]
+        user_id = self.request.user.id  # client user
+
+        # looks for '?order_by={score || date}' in the URL
+        request_order = self.request.query_params.get("order_by")
+        order = "-date"  # default: order by newest
+
+        if request_order == "score":
+            order = "-vote_score"
+
+        # get comments related to post passed in through URL,
+        # annotate is_voted_down and is_voted_up
+        return (
+            PostComment.objects.filter(post=post_id)
+            .annotate(
+                is_voted_down=Exists(
+                    Vote.objects.filter(
+                        user_id=user_id,
+                        action=DOWN,
+                        object_id=OuterRef("pk"),
+                    )
+                ),
+                is_voted_up=Exists(
+                    Vote.objects.filter(
+                        user_id=user_id, action=UP, object_id=OuterRef("pk")
+                    )
+                ),
+            )
+            .order_by(order)
+        )
+
+
 # single post - /api/posts/{postID}
 class PostView(generics.RetrieveDestroyAPIView):
     permission_classes = [IsOwnerOrReadOnly]
@@ -68,7 +106,7 @@ class PostView(generics.RetrieveDestroyAPIView):
                                     user_id=user_id, action=UP, object_id=OuterRef("pk")
                                 )
                             ),
-                        ).order_by("-vote_score"),
+                        ).order_by("-date"),
                     ),
                 )
                 .annotate(
