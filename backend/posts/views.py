@@ -1,8 +1,7 @@
-from django.http import request
 from vote.managers import UP
 from vote.models import DOWN, Vote
 from accounts.models import UserFollowing
-from django.db.models.expressions import Exists, OuterRef, Subquery
+from django.db.models.expressions import Exists, OuterRef
 from rest_framework import viewsets, generics, views, status
 from rest_framework.permissions import IsAuthenticated
 from .models import Post, PostComment, PostLike
@@ -18,6 +17,8 @@ from django.contrib.auth.models import User
 from django.db.models import Count, Prefetch
 from rest_framework.response import Response
 from vote.views import VoteMixin
+from vote.signals import post_voted
+
 
 # all posts /api/posts
 class PostsView(generics.ListAPIView):
@@ -51,7 +52,9 @@ class SinglePostCommentsView(generics.ListAPIView):
 
         # looks for '?order_by={score || date}' in the URL
         request_order = self.request.query_params.get("order_by")
-        order = "-date"  # default: order by newest
+
+        # default: order by newest
+        order = "-date"
 
         if request_order == "score":
             order = "-vote_score"
@@ -183,6 +186,13 @@ class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
     permission_classes = [IsOwnerOrReadOnly]
     serializer_class = CommentSerializer
     queryset = PostComment.objects.all()
+
+    def perform_create(self, serializer):
+        # create new comment
+        comment = serializer.save()
+
+        # upvote that comment automatically!
+        self.vote(request=self.request, pk=comment.id)
 
     def retrieve(self, request, pk):
         comment = PostComment.objects.annotate(
