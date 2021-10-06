@@ -187,13 +187,6 @@ class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
     serializer_class = CommentSerializer
     queryset = PostComment.objects.all()
 
-    def perform_create(self, serializer):
-        # create new comment
-        comment = serializer.save()
-
-        # upvote that comment automatically!
-        self.vote(request=self.request, pk=comment.id)
-
     def retrieve(self, request, pk):
         comment = PostComment.objects.annotate(
             is_voted_down=Exists(

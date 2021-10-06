@@ -10,6 +10,7 @@ class TinyPostSerializer(serializers.ModelSerializer):
         fields = ("id", "content", "date", "owner", "username")
 
 
+
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostComment
@@ -26,6 +27,13 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         comment = PostComment.objects.create(**validated_data)
+        
+        # upvote comment
+        comment.votes.up(validated_data["owner"].id)
+
+        #annotate response
+        comment.is_voted_up=True 
+        comment.vote_score=1
         return comment
 
 

@@ -50,9 +50,9 @@ export default function Comments() {
     setModal(!modal);
   };
 
-  useEffect(() => {
+  const reFetchComments = useCallback(() => {
+    // only if rerender, never on mount
     if (isMounted.current) {
-      // only if rerender
       setCommentList([]);
       if (commentOrder === "date") {
         axios
@@ -75,6 +75,7 @@ export default function Comments() {
       .get(`/api/posts/${postID}/`, headers) // get current post
       .then((res) => {
         setCurrentPost(res.data);
+        setCommentList([]);
         setCommentList(res.data.comments);
       })
       .catch(() => history.push("/404"));
@@ -96,10 +97,14 @@ export default function Comments() {
     setActiveItem(item);
   };
 
-  const submitComment = (item) => {
-    axios // create
+  const submitComment = async (item) => {
+    await axios // create
       .post("/api/comments/", item, headers)
-      .then(() => getPost());
+      .then((res) => {
+        let temp_list = commentList;
+        setCommentList([]);
+        setCommentList([res.data, ...temp_list]);
+      });
 
     setActiveItem({
       // RESET TEXT BOX
