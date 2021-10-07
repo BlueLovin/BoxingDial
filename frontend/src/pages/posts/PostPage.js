@@ -84,8 +84,6 @@ export default function Comments() {
     const item = {
       post: postID,
       [name]: value,
-      username: user ? user.username : "null",
-      owner: user ? user.id : null,
     };
     setActiveItem(item);
   };

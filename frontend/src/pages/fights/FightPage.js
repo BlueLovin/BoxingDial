@@ -21,9 +21,6 @@ export default function FightPage() {
   const [activeItem, setActiveItem] = useState({
     fight: null,
     content: "",
-    comments: [],
-    owner: null,
-    username: null,
   });
 
   const fetchFightData = useCallback(async () => {

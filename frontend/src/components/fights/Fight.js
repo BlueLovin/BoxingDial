@@ -1,6 +1,6 @@
 import { Row, Col } from "reactstrap";
 
-const Fight = (props) => {
+export default function Fight(props) {
   let fightData = props.fightData;
   return (
     <>
@@ -22,6 +22,4 @@ const Fight = (props) => {
       </Row>
     </>
   );
-};
-
-export default Fight;
+}

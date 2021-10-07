@@ -5,7 +5,7 @@ import { UserContext } from "../../UserContext";
 import { Row, Col } from "reactstrap";
 import UserFeed from "../../components/feed/UserFeed";
 
-function App() {
+export default function HomePage() {
   const { loggedInVal } = useContext(UserContext);
   const [loggedIn] = loggedInVal;
 
@@ -39,5 +39,3 @@ function App() {
     </main>
   );
 }
-
-export default App;

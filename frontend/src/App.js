@@ -15,7 +15,7 @@ import Register from "./components/accounts/Register";
 import NavigationBar from "./components/navbar/NavBar";
 import { NotFound } from "./NotFound404";
 
-function App() {
+export default function App() {
   const [user, setUser] = useState(); // set to undefined initially
   const [token, setToken] = useState();
   const [loggedIn, setLoggedIn] = useState(null);
@@ -140,4 +140,3 @@ function App() {
     // spinny/pretty loading module will go here.
   }
 }
-export default App;

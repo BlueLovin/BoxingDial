@@ -6,7 +6,7 @@ import { UserContext } from "../../UserContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 
-const Post = (props) => {
+export default function Post(props){
   const { fullPostPage = false, updateStateFunction = null, toggleModal = null, } = props;
   const post = props.post;
   const [likeCount, setLikeCount] = useState(post.like_count);
@@ -145,5 +145,4 @@ const Post = (props) => {
       </div>
     </Container>
   );
-};
-export default Post;
+}
