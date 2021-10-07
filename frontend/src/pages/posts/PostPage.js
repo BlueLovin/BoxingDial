@@ -53,15 +53,9 @@ export default function Comments() {
     // only if rerender, never on mount
     if (isMounted.current) {
       setCommentList([]);
-      if (commentOrder === "date") {
-        axios
-          .get(`/api/posts/${postID}/comments`, headers)
-          .then((res) => setCommentList(res.data));
-      } else if (commentOrder === "score") {
-        axios
-          .get(`/api/posts/${postID}/comments?order_by=score`, headers)
-          .then((res) => setCommentList(res.data));
-      }
+      axios
+        .get(`/api/posts/${postID}/comments?order_by=${commentOrder}`, headers)
+        .then((res) => setCommentList(res.data));
     } else {
       // DO NOTHING ON MOUNT
       isMounted.current = true;
