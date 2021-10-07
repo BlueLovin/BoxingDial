@@ -43,14 +43,13 @@ export default function Comments() {
   const [activeItem, setActiveItem] = useState({
     post: postID,
     content: "",
-    owner: user ? user.id : null,
   });
 
   const toggleModal = () => {
     setModal(!modal);
   };
 
-  const reFetchComments = useCallback(() => {
+  useEffect(() => {
     // only if rerender, never on mount
     if (isMounted.current) {
       setCommentList([]);

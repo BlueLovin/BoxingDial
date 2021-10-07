@@ -13,7 +13,7 @@ class PostComment(VoteModel, models.Model):
         User, on_delete=models.CASCADE, related_name="comments", null=True
     )
 
-    username = models.TextField()
+    username = models.TextField(blank=True)
 
     def __str__(self):
         return self.content

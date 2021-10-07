@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from accounts.serializers import UserWithFollowageSerializer
 from fights.serializers.common import SmallFightSerializer, TinyFightSerializer
 from .models import Post, PostComment, PostLike
@@ -8,7 +10,6 @@ class TinyPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ("id", "content", "date", "owner", "username")
-
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -25,15 +26,26 @@ class CommentSerializer(serializers.ModelSerializer):
             "is_voted_down",
         )
 
-    def create(self, validated_data):
-        comment = PostComment.objects.create(**validated_data)
-        
-        # upvote comment
-        comment.votes.up(validated_data["owner"].id)
+        requires_context = True
 
-        #annotate response
-        comment.is_voted_up=True 
-        comment.vote_score=1
+    def create(self, validated_data):
+        owner = self.context["request"].user
+
+        if owner.is_anonymous:
+            raise serializers.DjangoValidationError("not logged in")
+
+        username = owner.username
+
+        comment = PostComment.objects.create(
+            owner=owner, username=username, **validated_data
+        )
+
+        # upvote comment
+        comment.votes.up(owner.id)
+
+        # annotate response
+        comment.is_voted_up = True
+        comment.vote_score = 1
         return comment
 
 
@@ -93,17 +105,22 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class CreatePostSerializer(serializers.ModelSerializer):
-    comments = CommentSerializer(many=True)
+    requires_context = True
 
     class Meta:
         model = Post
-        fields = ("id", "date", "fight", "content", "comments", "owner", "username")
+        fields = ("id", "date", "fight", "content")
 
     def create(self, validated_data):
-        comment_data = validated_data.pop("comments")
-        post = Post.objects.create(**validated_data)
-        owner = validated_data.pop("owner")
-        username = validated_data.pop("username")
+        owner = self.context["request"].user
+
+        if owner.is_anonymous:
+            raise IsAuthenticated(detail=None, code=None)
+
+        comment_data = []
+        username = owner.username
+        post = Post.objects.create(owner=owner, username=username, **validated_data)
+
         for comments in comment_data:
             PostComment.objects.create(
                 Post=post, **comments, owner=owner, username=username

@@ -45,9 +45,7 @@ export default function UserFeed() {
     const item = {
       fight: null,
       content: "",
-      comments: [],
-      owner: user.id,
-      username: user.username,
+      comments: []
     };
     setActiveItem(item);
     toggleModal();

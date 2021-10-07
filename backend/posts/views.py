@@ -17,7 +17,6 @@ from django.contrib.auth.models import User
 from django.db.models import Count, Prefetch
 from rest_framework.response import Response
 from vote.views import VoteMixin
-from vote.signals import post_voted
 
 
 # all posts /api/posts
@@ -37,9 +36,6 @@ class CreatePostView(generics.CreateAPIView):
 
     def get_queryset(self):
         return Post.objects.all()
-
-    def perform_create(self, serializer):
-        serializer.save()
 
 
 # post's comments /api/posts/6/comments
