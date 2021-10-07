@@ -1,16 +1,20 @@
 import axios from "axios";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button } from "reactstrap";
 import { UserContext } from "../../UserContext";
 
 export default function FollowButton(props) {
   const { profile } = props;
 
-  const [is_following, setFollowing] = useState(profile.is_following);
+  const [isFollowing, setIsFollowing] = useState(profile.is_following);
   const [followButtonPressed, setFollowButtonPressed] = useState(false);
   const { headersVal, userVal } = useContext(UserContext);
   const [user] = userVal;
   const [headers] = headersVal;
+
+  useEffect(()=>{
+    setIsFollowing(profile.is_following);
+  }, [profile]);
 
   const follow = async () => {
     let data = {
@@ -18,7 +22,7 @@ export default function FollowButton(props) {
     };
     await axios
       .post(`/api/users/follow`, data, headers)
-      .then(() => setFollowing(true));
+      .then(() => setIsFollowing(true));
   };
 
   const unfollow = async () => {
@@ -27,12 +31,12 @@ export default function FollowButton(props) {
     };
     await axios
       .post(`/api/users/unfollow`, data, headers)
-      .then(() => setFollowing(false));
+      .then(() => setIsFollowing(false));
   };
 
   const renderFollowButton = () => {
-    if (user && user.username !== profile.username) {
-      if (is_following === false) {
+    if (user.username !== profile.username) {
+      if (isFollowing === false) {
         return (
           <>
             <Button
@@ -45,7 +49,7 @@ export default function FollowButton(props) {
             </Button>
           </>
         );
-      } else if (is_following != null) {
+      } else if (isFollowing != null) {
         return (
           <>
             <Button
@@ -59,7 +63,7 @@ export default function FollowButton(props) {
           </>
         );
       }
-    } else if (!user) {
+    } else if(user === null) {
       return (
         <Button
           onClick={() => alert("login to be able to follow other users!")}
@@ -68,7 +72,6 @@ export default function FollowButton(props) {
         </Button>
       );
     }
-    return null;
   };
 
   return <>{renderFollowButton()}</>;
