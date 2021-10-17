@@ -4,7 +4,9 @@ import Comment from "./Comment";
 
 export default function FeedComment(props) {
   const comment = props.comment;
-
+  if(comment.post === null){
+    return null;
+  }
   return (
     <Container>
       <p>

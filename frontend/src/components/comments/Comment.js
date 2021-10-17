@@ -23,6 +23,16 @@ export default function Comment(props) {
     });
   };
 
+  const renderReplies = () => {
+    if(comment.replies){
+      return comment.replies.map((reply)=>(
+        <>
+          <Comment comment={reply} />
+        </>
+      ));
+    }
+  };
+
   return (
     <Container>
       <div className="list-group-item bg-light justify-content-center preserve-line-breaks">
@@ -32,7 +42,7 @@ export default function Comment(props) {
             <span className="text-muted">by </span>
             <Link to={`/user/${comment.username}`}>{comment.username}</Link>
           </div>
-          {contextButton ? (
+          {contextButton && comment.post !== null ? (
             <Link to={`/post/${comment.post}`}>
               <span className="">context</span>
             </Link>
@@ -41,7 +51,6 @@ export default function Comment(props) {
           <div className="h1">
             <VotingButtons comment={comment} />
           </div>
-
           {user && user.username === comment.username ? (
             <React.Fragment>
               <button
@@ -53,6 +62,7 @@ export default function Comment(props) {
             </React.Fragment>
           ) : null}
         </div>
+          {renderReplies()}
       </div>
       <hr />
     </Container>
