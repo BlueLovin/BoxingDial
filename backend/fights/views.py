@@ -1,7 +1,5 @@
-from django.db.models.expressions import Exists, OuterRef, Subquery
+from django.db.models.expressions import Exists, OuterRef
 from django.db.models import Count, Prefetch
-from django.db.models.fields import json
-from django.http.response import JsonResponse
 from rest_framework import generics
 
 from fights.serializers.common import SmallFightSerializer
@@ -97,4 +95,3 @@ class PopularFightsView(generics.ListAPIView):
 class SmallFightView(generics.ListAPIView):
     serializer_class = SmallFightSerializer
     queryset = Fight.objects.all().order_by("-id")
-

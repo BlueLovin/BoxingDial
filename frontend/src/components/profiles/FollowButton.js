@@ -8,11 +8,13 @@ export default function FollowButton(props) {
 
   const [isFollowing, setIsFollowing] = useState(profile.is_following);
   const [followButtonPressed, setFollowButtonPressed] = useState(false);
-  const { headersVal, userVal } = useContext(UserContext);
+
+  const { headersVal, userVal, loggedInVal } = useContext(UserContext);
   const [user] = userVal;
   const [headers] = headersVal;
+  const [loggedIn] = loggedInVal;
 
-  useEffect(()=>{
+  useEffect(() => {
     setIsFollowing(profile.is_following);
   }, [profile]);
 
@@ -35,35 +37,37 @@ export default function FollowButton(props) {
   };
 
   const renderFollowButton = () => {
-    if (user.username !== profile.username) {
-      if (isFollowing === false) {
-        return (
-          <>
-            <Button
-              onClick={async () => {
-                await follow();
-                setFollowButtonPressed(!followButtonPressed);
-              }}
-            >
-              Follow
-            </Button>
-          </>
-        );
-      } else if (isFollowing != null) {
-        return (
-          <>
-            <Button
-              onClick={async () => {
-                await unfollow();
-                setFollowButtonPressed(!followButtonPressed);
-              }}
-            >
-              Unfollow
-            </Button>
-          </>
-        );
+    if (loggedIn) {
+      if (user.username !== profile.username) {
+        if (isFollowing === false) {
+          return (
+            <>
+              <Button
+                onClick={async () => {
+                  await follow();
+                  setFollowButtonPressed(!followButtonPressed);
+                }}
+              >
+                Follow
+              </Button>
+            </>
+          );
+        } else if (isFollowing != null) {
+          return (
+            <>
+              <Button
+                onClick={async () => {
+                  await unfollow();
+                  setFollowButtonPressed(!followButtonPressed);
+                }}
+              >
+                Unfollow
+              </Button>
+            </>
+          );
+        }
       }
-    } else if(user === null) {
+    } else {
       return (
         <Button
           onClick={() => alert("login to be able to follow other users!")}

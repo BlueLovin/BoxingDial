@@ -77,7 +77,11 @@ class AddFollowerView(generics.GenericAPIView):
             ]
         else:
             return Response("User can not follow themself, u dumb shit")
-        return Response({"response": "followed",})
+        return Response(
+            {
+                "response": "followed",
+            }
+        )
 
 
 class DeleteFollowerView(generics.GenericAPIView):
@@ -87,7 +91,11 @@ class DeleteFollowerView(generics.GenericAPIView):
         user = self.request.user
         unfollow = User.objects.get(id=self.request.data.get("unfollow"))
         UserFollowing.objects.get(user_id=user, following_user_id=unfollow).delete()
-        return Response({"response": "unfollowed",})
+        return Response(
+            {
+                "response": "unfollowed",
+            }
+        )
 
 
 class UserFeedByRecentView(generics.GenericAPIView):
@@ -116,21 +124,23 @@ class UserFeedByRecentView(generics.GenericAPIView):
             .order_by("-id")
         )
 
-        comments = PostComment.objects.filter(owner__in=follower_user_ids).annotate(
-                            is_voted_down=Exists(
-                                Vote.objects.filter(
-                                    user_id=user_id,
-                                    action=DOWN,
-                                    object_id=OuterRef("pk"),
-                                )
-                            ),
-                            is_voted_up=Exists(
-                                Vote.objects.filter(
-                                    user_id=user_id, action=UP, object_id=OuterRef("pk")
-                                )
-                            ),
-                        ).order_by(
-            "-id"
+        comments = (
+            PostComment.objects.filter(owner__in=follower_user_ids)
+            .annotate(
+                is_voted_down=Exists(
+                    Vote.objects.filter(
+                        user_id=user_id,
+                        action=DOWN,
+                        object_id=OuterRef("pk"),
+                    )
+                ),
+                is_voted_up=Exists(
+                    Vote.objects.filter(
+                        user_id=user_id, action=UP, object_id=OuterRef("pk")
+                    )
+                ),
+            )
+            .order_by("-id")
         )
 
         # get posts and comments from logged in user
@@ -146,21 +156,23 @@ class UserFeedByRecentView(generics.GenericAPIView):
             .order_by("-id")
         )
 
-        user_comments = PostComment.objects.filter(owner__in=[request.user]).annotate(
-                            is_voted_down=Exists(
-                                Vote.objects.filter(
-                                    user_id=user_id,
-                                    action=DOWN,
-                                    object_id=OuterRef("pk"),
-                                )
-                            ),
-                            is_voted_up=Exists(
-                                Vote.objects.filter(
-                                    user_id=user_id, action=UP, object_id=OuterRef("pk")
-                                )
-                            ),
-                        ).order_by(
-            "-id"
+        user_comments = (
+            PostComment.objects.filter(owner__in=[request.user])
+            .annotate(
+                is_voted_down=Exists(
+                    Vote.objects.filter(
+                        user_id=user_id,
+                        action=DOWN,
+                        object_id=OuterRef("pk"),
+                    )
+                ),
+                is_voted_up=Exists(
+                    Vote.objects.filter(
+                        user_id=user_id, action=UP, object_id=OuterRef("pk")
+                    )
+                ),
+            )
+            .order_by("-id")
         )
 
         # combine post list and comment list

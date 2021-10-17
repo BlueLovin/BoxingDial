@@ -3,6 +3,7 @@ from posts.serializers import SmallPostSerializer
 from posts.models import Post
 from ..models import Fight
 
+
 class FightSerializer(serializers.ModelSerializer):
     posts = SmallPostSerializer(many=True)
     posts_count = serializers.IntegerField()

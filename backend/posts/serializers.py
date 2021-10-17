@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from accounts.serializers import UserWithFollowageSerializer
 from fights.serializers.common import SmallFightSerializer, TinyFightSerializer
 from .models import Post, PostComment, PostLike
