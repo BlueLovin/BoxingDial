@@ -208,32 +208,34 @@ class CommentReplyView(views.APIView):
         except PostComment.DoesNotExist:
             raise serializers.ValidationError("error getting parent comment")
 
-        post = parent_comment.post
-
         if owner.is_anonymous:
             raise serializers.DjangoValidationError("not logged in")
 
-        username = owner.username
+        if parent_comment.parent == None:
 
-        comment = PostComment.objects.create(
-            owner=owner, username=username, parent=parent_comment, content=request.data["content"], post=post
-        )
+            username = owner.username
 
-        # upvote comment
-        comment.votes.up(owner.id)
+            comment = PostComment.objects.create(
+                owner=owner, username=username, parent=parent_comment, content=request.data["content"]
+            )
 
-        # annotate response
-        comment.vote_score = 1
-        comment.is_voted_up = True
+            # upvote comment
+            comment.votes.up(owner.id)
 
-        result = ReplySerializer(comment).data
+            # annotate response
+            comment.vote_score = 1
+            comment.is_voted_up = True
 
-        return Response(
-            {
-                "result": result,
-            },
-            status=status.HTTP_200_OK,
-        )
+            result = ReplySerializer(comment).data
+
+            return Response(
+                {
+                    "result": result,
+                },
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response({"result": "can not reply to reply"});
 
 class PostLikeApiView(views.APIView):
     def post(self, request, post, format=None):
