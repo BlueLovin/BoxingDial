@@ -24,9 +24,11 @@ export default function Comment(props) {
   };
 
   const renderReplies = () => {
-    if(comment.replies){
-      return comment.replies.map((reply)=>(
+    if (comment.replies) {
+      // if this comment has replies, and is NOT a reply
+      return comment.replies.map((reply) => (
         <>
+          <hr/>
           <Comment comment={reply} />
         </>
       ));
@@ -62,7 +64,7 @@ export default function Comment(props) {
             </React.Fragment>
           ) : null}
         </div>
-          {renderReplies()}
+        {renderReplies()}
       </div>
       <hr />
     </Container>

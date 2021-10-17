@@ -63,9 +63,7 @@ class SinglePostCommentsView(generics.ListAPIView):
             .annotate(
                 is_voted_down=Exists(
                     Vote.objects.filter(
-                        user_id=user_id,
-                        action=DOWN,
-                        object_id=OuterRef("pk"),
+                        user_id=user_id, action=DOWN, object_id=OuterRef("pk"),
                     )
                 ),
                 is_voted_up=Exists(
@@ -86,6 +84,21 @@ class PostView(generics.RetrieveDestroyAPIView):
     def get_queryset(self):
         logged_in = self.request.user.is_authenticated
         user_id = self.request.user.id
+
+        # query to see if the logged in user has upvoted or downvoted the current comment
+        prefetch_query = PostComment.objects.annotate(
+            is_voted_down=Exists(
+                Vote.objects.filter(
+                    user_id=user_id, action=DOWN, object_id=OuterRef("pk"),
+                )
+            ),
+            is_voted_up=Exists(
+                Vote.objects.filter(
+                    user_id=user_id, action=UP, object_id=OuterRef("pk")
+                )
+            ),
+        )
+
         if logged_in:
             return (
                 Post.objects.filter(id=self.kwargs["pk"])
@@ -93,19 +106,8 @@ class PostView(generics.RetrieveDestroyAPIView):
                 .prefetch_related(
                     Prefetch(
                         "comments",
-                        queryset=PostComment.objects.annotate(
-                            is_voted_down=Exists(
-                                Vote.objects.filter(
-                                    user_id=user_id,
-                                    action=DOWN,
-                                    object_id=OuterRef("pk"),
-                                )
-                            ),
-                            is_voted_up=Exists(
-                                Vote.objects.filter(
-                                    user_id=user_id, action=UP, object_id=OuterRef("pk")
-                                )
-                            ),
+                        queryset=prefetch_query.prefetch_related(
+                            Prefetch("replies", queryset=prefetch_query)
                         ).order_by("-date"),
                     ),
                 )
@@ -125,9 +127,7 @@ class PostView(generics.RetrieveDestroyAPIView):
                 .prefetch_related(
                     Prefetch("comments", queryset=PostComment.objects.order_by("-id")),
                 )
-                .annotate(
-                    comment_count=Count("comments", distinct=True),
-                )
+                .annotate(comment_count=Count("comments", distinct=True),)
             )
 
 
@@ -194,6 +194,7 @@ class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
         serializer = CommentSerializer(comment)
         return Response(serializer.data)
 
+
 # all comments /api/comments/{comment_ID}/reply
 class CommentReplyView(views.APIView):
     permission_classes = [IsAuthenticated]
@@ -216,7 +217,10 @@ class CommentReplyView(views.APIView):
             username = owner.username
 
             comment = PostComment.objects.create(
-                owner=owner, username=username, parent=parent_comment, content=request.data["content"]
+                owner=owner,
+                username=username,
+                parent=parent_comment,
+                content=request.data["content"],
             )
 
             # upvote comment
@@ -228,14 +232,10 @@ class CommentReplyView(views.APIView):
 
             result = ReplySerializer(comment).data
 
-            return Response(
-                {
-                    "result": result,
-                },
-                status=status.HTTP_200_OK,
-            )
+            return Response({"result": result,}, status=status.HTTP_200_OK,)
         else:
-            return Response({"result": "can not reply to reply"});
+            return Response({"result": "can not reply to reply"})
+
 
 class PostLikeApiView(views.APIView):
     def post(self, request, post, format=None):
@@ -244,9 +244,7 @@ class PostLikeApiView(views.APIView):
 
         # if not logged in
         if not user.is_authenticated:
-            return Response(
-                {"result": "not logged in"},
-            )
+            return Response({"result": "not logged in"},)
 
         post = Post.objects.get(id=post)
 
@@ -258,12 +256,7 @@ class PostLikeApiView(views.APIView):
             PostLike.objects.create(user=user, post=post)
             result = "liked"
 
-        return Response(
-            {
-                "result": result,
-            },
-            status=status.HTTP_200_OK,
-        )
+        return Response({"result": result,}, status=status.HTTP_200_OK,)
 
 
 class PostCommentViewSet(viewsets.ModelViewSet, VoteMixin):
