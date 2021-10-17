@@ -25,7 +25,7 @@ class ReplySerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    replies = ReplySerializer(many=True)
+    replies = ReplySerializer(read_only=True, many=True)
 
     class Meta:
         model = PostComment
@@ -39,6 +39,7 @@ class CommentSerializer(serializers.ModelSerializer):
             "is_voted_up",
             "is_voted_down",
             "replies",
+            "parent",
         )
 
         requires_context = True

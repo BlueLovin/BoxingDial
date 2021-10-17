@@ -5,7 +5,7 @@ from vote.models import VoteModel
 
 
 class PostComment(VoteModel, models.Model):
-    post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="comments")
+    post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="comments", blank=True, null=True)
 
     content = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
