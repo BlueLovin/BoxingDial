@@ -11,7 +11,22 @@ class TinyPostSerializer(serializers.ModelSerializer):
         fields = ("id", "content", "date", "owner", "username")
 
 
+class ReplySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostComment
+        fields = (
+            "id",
+            "content",
+            "username",
+            "vote_score",
+            "is_voted_up",
+            "is_voted_down",
+        )
+
+
 class CommentSerializer(serializers.ModelSerializer):
+    replies = ReplySerializer(many=True)
+
     class Meta:
         model = PostComment
         fields = (
@@ -23,6 +38,7 @@ class CommentSerializer(serializers.ModelSerializer):
             "vote_score",
             "is_voted_up",
             "is_voted_down",
+            "replies",
         )
 
         requires_context = True

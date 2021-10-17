@@ -38,5 +38,6 @@ urlpatterns = [
     path("api/post/create/", posts_views.CreatePostView.as_view()),
     path("api/posts/popular", posts_views.PopularPostsView.as_view()),
     path("api/posts/<int:post>/like", posts_views.PostLikeApiView.as_view()),
+    path("api/comments/<int:parent>/reply", posts_views.CommentReplyView.as_view()),
     path("", include("accounts.urls")),
 ]

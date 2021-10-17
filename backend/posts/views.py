@@ -2,7 +2,7 @@ from vote.managers import UP
 from vote.models import DOWN, Vote
 from accounts.models import UserFollowing
 from django.db.models.expressions import Exists, OuterRef
-from rest_framework import viewsets, generics, views, status
+from rest_framework import serializers, viewsets, generics, views, status
 from rest_framework.permissions import IsAuthenticated
 from .models import Post, PostComment, PostLike
 from .serializers import (
@@ -10,6 +10,7 @@ from .serializers import (
     PostLikeSerializer,
     PostSerializer,
     CommentSerializer,
+    ReplySerializer,
     SmallPostSerializer,
 )
 from backend.permissions import IsOwnerOrReadOnly
@@ -193,6 +194,46 @@ class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
         serializer = CommentSerializer(comment)
         return Response(serializer.data)
 
+# all comments /api/comments/{comment_ID}/reply
+class CommentReplyView(views.APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReplySerializer
+
+    def post(self, request, parent, format=None):
+        parent_pk = parent
+        owner = request.user
+
+        try:  # try getting the parent comment
+            parent_comment = PostComment.objects.get(id=parent_pk)
+        except PostComment.DoesNotExist:
+            raise serializers.ValidationError("error getting parent comment")
+
+        post = parent_comment.post
+
+        if owner.is_anonymous:
+            raise serializers.DjangoValidationError("not logged in")
+
+        username = owner.username
+
+        comment = PostComment.objects.create(
+            owner=owner, username=username, parent=parent_comment, content=request.data["content"], post=post
+        )
+
+        # upvote comment
+        comment.votes.up(owner.id)
+
+        # annotate response
+        comment.vote_score = 1
+        comment.is_voted_up = True
+
+        result = ReplySerializer(comment).data
+
+        return Response(
+            {
+                "result": result,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 class PostLikeApiView(views.APIView):
     def post(self, request, post, format=None):

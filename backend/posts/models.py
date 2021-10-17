@@ -13,6 +13,8 @@ class PostComment(VoteModel, models.Model):
         User, on_delete=models.CASCADE, related_name="comments", null=True
     )
 
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+
     username = models.TextField(blank=True)
 
     def __str__(self):
