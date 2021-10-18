@@ -1,8 +1,8 @@
 import axios from "axios";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../UserContext";
-import { Container } from "reactstrap";
+import { Button, Container, FormGroup, Input } from "reactstrap";
 import VotingButtons from "./UpvoteButtons";
 
 export default function Comment(props) {
@@ -14,6 +14,7 @@ export default function Comment(props) {
   const { userVal, headersVal } = useContext(UserContext);
   const [user] = userVal;
   const [headers] = headersVal;
+  const [showReplyBox, setShowReplyBox] = useState(false);
 
   const deleteComment = () => {
     axios.delete(`/api/comments/${comment.id}/`, headers).then(() => {
@@ -23,12 +24,43 @@ export default function Comment(props) {
     });
   };
 
+  const renderReplyButton = () => {
+    if (comment.replies) {
+      return (
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowReplyBox(!showReplyBox)}
+        >
+          Reply
+        </button>
+      );
+    }
+  };
+
+  const renderReplyBox = () => {
+    if (showReplyBox) {
+      return (
+        <span class="p-4 ">
+          <h4 className="text-center">share your thoughts</h4>
+          <FormGroup>
+            <Input type="textarea" name="content" />
+          </FormGroup>
+          <Button className="float-right btn-lg" color="success">
+            Post
+          </Button>
+        </span>
+      );
+    } else {
+      return null;
+    }
+  };
+
   const renderReplies = () => {
     if (comment.replies) {
       // if this comment has replies, and is NOT a reply
       return comment.replies.map((reply) => (
         <>
-          <hr/>
+          <hr />
           <Comment comment={reply} />
         </>
       ));
@@ -53,17 +85,21 @@ export default function Comment(props) {
           <div className="h1">
             <VotingButtons comment={comment} />
           </div>
-          {user && user.username === comment.username ? (
-            <React.Fragment>
-              <button
-                className="btn-sm btn-danger"
-                onClick={() => deleteComment()}
-              >
-                Delete
-              </button>
-            </React.Fragment>
-          ) : null}
+          <div>
+            {renderReplyButton()}
+            {user && user.username === comment.username ? (
+              <React.Fragment>
+                <button
+                  className="btn-sm btn-danger"
+                  onClick={() => deleteComment()}
+                >
+                  Delete
+                </button>
+              </React.Fragment>
+            ) : null}
+          </div>
         </div>
+        {renderReplyBox()}
         {renderReplies()}
       </div>
       <hr />
