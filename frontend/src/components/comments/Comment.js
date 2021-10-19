@@ -14,6 +14,8 @@ export default function Comment(props) {
   const { userVal, headersVal } = useContext(UserContext);
   const [user] = userVal;
   const [headers] = headersVal;
+  //state
+  const [activeItem, setActiveItem] = useState({ content: "" });
   const [showReplyBox, setShowReplyBox] = useState(false);
 
   const deleteComment = () => {
@@ -37,21 +39,52 @@ export default function Comment(props) {
     }
   };
 
+  const handleChange = (e) => {
+    let { value } = e.target;
+
+    const item = { content: value };
+    setActiveItem(item);
+  };
+
   const renderReplyBox = () => {
     if (showReplyBox) {
       return (
         <span class="p-4 ">
           <h4 className="text-center">share your thoughts</h4>
           <FormGroup>
-            <Input type="textarea" name="content" />
+            <Input
+              type="textarea"
+              name="content"
+              onChange={handleChange}
+              value={activeItem.content}
+            />
           </FormGroup>
-          <Button className="float-right btn-lg" color="success">
+          <Button
+            className="float-right btn-lg"
+            color="success"
+            onClick={() => postReply()}
+          >
             Post
           </Button>
         </span>
       );
     } else {
       return null;
+    }
+  };
+
+  const postReply = () => {
+    //if five or more characters
+    if (activeItem.content.length >= 5) {
+      axios
+        .post(`/api/comments/${comment.id}/reply`, activeItem, headers)
+        .then(() => {
+          if (updateStateFunction !== null) {
+            updateStateFunction();
+          }
+        });
+    } else {
+      alert("comments must be longer than 5 characters");
     }
   };
 
