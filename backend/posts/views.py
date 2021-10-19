@@ -107,7 +107,7 @@ class PostView(generics.RetrieveDestroyAPIView):
                     Prefetch(
                         "comments",
                         queryset=prefetch_query.prefetch_related(
-                            Prefetch("replies", queryset=prefetch_query)
+                            Prefetch("replies", queryset=prefetch_query.order_by('-date'))
                         ).order_by("-date"),
                     ),
                 )
