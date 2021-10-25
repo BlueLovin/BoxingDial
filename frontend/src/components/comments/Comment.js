@@ -27,7 +27,7 @@ export default function Comment(props) {
   };
 
   const renderReplyButton = () => {
-    if (comment.replies) {
+    if (comment.replies && comment.parent === null) { // if parent comment
       return (
         <button
           className="btn btn-primary"

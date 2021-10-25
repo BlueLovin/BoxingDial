@@ -234,7 +234,7 @@ class CommentReplyView(views.APIView):
 
             return Response({"result": result,}, status=status.HTTP_200_OK,)
         else:
-            return Response({"result": "can not reply to reply"})
+            return Response({"result": "can not reply to reply"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PostLikeApiView(views.APIView):
