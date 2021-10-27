@@ -32,7 +32,7 @@ export default function Comments() {
 
   const { userVal, headersVal } = useContext(UserContext);
   const [user] = userVal;
-  const [headers] = headersVal;
+  const [setHeaders, headers] = headersVal;
 
   const history = useHistory();
   const isMounted = useRef(false);
@@ -62,7 +62,7 @@ export default function Comments() {
     }
   }, [commentOrder, headers, postID]);
 
-  //get post WITH auth headers
+  //get post with headers
   const getPost = useCallback(async () => {
     await axios
       .get(`/api/posts/${postID}/`, headers) // get current post
@@ -71,8 +71,14 @@ export default function Comments() {
         setCommentList([]);
         setCommentList(res.data.comments);
       })
-      .catch(() => history.push("/404"));
-  }, [postID, history, headers]);
+      .catch((res) => {
+        // if invalid token, try again without headers
+        if(res.data["detail"] === "Invalid token."){
+          setHeaders(null);
+        }
+        history.push("/404")
+      });
+  }, [postID, history, headers, setHeaders]);
 
   useEffect(() => {
     getPost();
