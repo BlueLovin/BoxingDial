@@ -2,7 +2,7 @@
 [x] pressing enter logs in on login page
 [x] like button on posts
 [x] upvote/downvote comments
-[] reply to other comments
+[x] reply to other comments
 [] user inbox
 [] fix register page
 [] delete account, account settings, more account control
