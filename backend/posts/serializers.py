@@ -48,20 +48,26 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         owner = self.context["request"].user
-
+        
         if owner.is_anonymous:
             raise serializers.DjangoValidationError("not logged in")
+
+        username = owner.username
 
         if validated_data["post"] is not None:
             post = validated_data.pop("post")
             Notification.objects.create(recipient=post.owner, text="somone posted a comment on ur post!")
-        
-
-        username = owner.username
-
-        comment = PostComment.objects.create(
+            comment = PostComment.objects.create(
+            owner=owner, username=username, post=post, **validated_data
+        )
+        else:
+            comment = PostComment.objects.create(
             owner=owner, username=username, **validated_data
         )
+
+        
+
+        
 
         # upvote comment
         comment.votes.up(owner.id)

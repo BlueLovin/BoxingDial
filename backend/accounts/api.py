@@ -125,7 +125,7 @@ class UserFeedByRecentView(generics.GenericAPIView):
         )
 
         comments = (
-            PostComment.objects.filter(owner__in=follower_user_ids, parent=None)
+            PostComment.objects.filter(owner__in=follower_user_ids, parent=None, post=not None)
             .annotate(
                 is_voted_down=Exists(
                     Vote.objects.filter(
@@ -158,7 +158,7 @@ class UserFeedByRecentView(generics.GenericAPIView):
 
         user_comments = (
             #parent=None to exclude replies to other comments
-            PostComment.objects.filter(owner__in=[request.user], parent=None)
+            PostComment.objects.filter(owner__in=[request.user], parent=None, post=not None)
             .annotate(
                 is_voted_down=Exists(
                     Vote.objects.filter(
