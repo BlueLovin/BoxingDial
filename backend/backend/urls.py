@@ -5,6 +5,7 @@ from rest_framework import routers
 from posts import views as posts_views
 from fights import views as fight_views
 from accounts import views as user_views
+from notifications import views as inbox_views
 
 router = routers.DefaultRouter()
 router.register("comments", posts_views.PostCommentsView, basename="postcomment")
@@ -21,6 +22,7 @@ urlpatterns = [
     path("api/users", user_views.UsersView.as_view()),
     path("api/users/<str:user>/following/", user_views.UserFollowingView.as_view()),
     path("api/users/<str:user>/followers/", user_views.UserFollowersView.as_view()),
+    path("api/inbox/", inbox_views.InboxView.as_view()),
     ##########
     # fights #
     ##########

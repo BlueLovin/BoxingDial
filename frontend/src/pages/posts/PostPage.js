@@ -30,9 +30,10 @@ export default function Comments() {
   const [commentOrder, setCommentOrder] = useState("date");
   const [modal, setModal] = useState(false);
 
-  const { userVal, headersVal } = useContext(UserContext);
+  const { userVal, headersVal, loggedInVal } = useContext(UserContext);
   const [user] = userVal;
-  const [setHeaders, headers] = headersVal;
+  const [loggedIn] = loggedInVal;
+  const [headers, setHeaders] = headersVal;
 
   const history = useHistory();
   const isMounted = useRef(false);
@@ -60,11 +61,11 @@ export default function Comments() {
       // DO NOTHING ON MOUNT
       isMounted.current = true;
     }
-  }, [commentOrder, headers, postID]);
+  }, [commentOrder, headers, postID, loggedIn]);
 
   //get post with headers
   const getPost = useCallback(async () => {
-    await axios
+      axios
       .get(`/api/posts/${postID}/`, headers) // get current post
       .then((res) => {
         setCurrentPost(res.data);
@@ -78,6 +79,7 @@ export default function Comments() {
         }
         history.push("/404")
       });
+
   }, [postID, history, headers, setHeaders]);
 
   useEffect(() => {
@@ -95,6 +97,11 @@ export default function Comments() {
   };
 
   const submitComment = async (item) => {
+    if(loggedIn === false){
+      alert("must be logged in to post a comment.")
+      return;
+    }
+
     await axios // create
       .post("/api/comments/", item, headers)
       .then((res) => {

@@ -1,8 +1,10 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from accounts.serializers import UserWithFollowageSerializer
 from fights.serializers.common import SmallFightSerializer, TinyFightSerializer
 from .models import Post, PostComment, PostLike
+from notifications.models import Notification
 
 
 class TinyPostSerializer(serializers.ModelSerializer):
@@ -49,6 +51,11 @@ class CommentSerializer(serializers.ModelSerializer):
 
         if owner.is_anonymous:
             raise serializers.DjangoValidationError("not logged in")
+
+        if validated_data["post"] is not None:
+            post = validated_data.pop("post")
+            Notification.objects.create(recipient=post.owner, text="somone posted a comment on ur post!")
+        
 
         username = owner.username
 

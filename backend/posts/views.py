@@ -4,6 +4,8 @@ from accounts.models import UserFollowing
 from django.db.models.expressions import Exists, OuterRef
 from rest_framework import serializers, viewsets, generics, views, status
 from rest_framework.permissions import IsAuthenticated
+
+from notifications.models import Notification
 from .models import Post, PostComment, PostLike
 from .serializers import (
     CreatePostSerializer,
@@ -30,14 +32,12 @@ class PostsView(generics.ListAPIView):
             comment_count=Count("comments", distinct=True),
         )
 
-
 class CreatePostView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CreatePostSerializer
 
     def get_queryset(self):
         return Post.objects.all()
-
 
 # post's comments /api/posts/6/comments
 class SinglePostCommentsView(generics.ListAPIView):
@@ -74,7 +74,6 @@ class SinglePostCommentsView(generics.ListAPIView):
             )
             .order_by(order)
         )
-
 
 # single post - /api/posts/{postID}
 class PostView(generics.RetrieveDestroyAPIView):
@@ -130,7 +129,6 @@ class PostView(generics.RetrieveDestroyAPIView):
                 .annotate(comment_count=Count("comments", distinct=True),)
             )
 
-
 # single post - /api/posts/{postID}/likes
 class PostLikesView(generics.ListAPIView):
     serializer_class = PostLikeSerializer
@@ -166,7 +164,6 @@ class PostLikesView(generics.ListAPIView):
             .order_by("-liked_on")
         )
 
-
 # 5 most popular posts, popularity determined by number of comments
 class PopularPostsView(generics.ListAPIView):
     serializer_class = SmallPostSerializer
@@ -176,7 +173,6 @@ class PopularPostsView(generics.ListAPIView):
             like_count=Count("post_likes", distinct=True),
             comment_count=Count("comments", distinct=True),
         ).order_by("-comment_count", "-like_count")[:5]
-
 
 # all comments /api/comments
 class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
@@ -193,7 +189,6 @@ class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
         ).get(pk=pk)
         serializer = CommentSerializer(comment)
         return Response(serializer.data)
-
 
 # all comments /api/comments/{comment_ID}/reply
 class CommentReplyView(views.APIView):
@@ -223,6 +218,8 @@ class CommentReplyView(views.APIView):
                 content=request.data["content"],
             )
 
+            Notification.objects.create(recipient=parent_comment.owner, text="someone replied to ur comment!")
+
             # upvote comment
             comment.votes.up(owner.id)
 
@@ -235,7 +232,6 @@ class CommentReplyView(views.APIView):
             return Response({"result": result,}, status=status.HTTP_200_OK,)
         else:
             return Response({"result": "can not reply to reply"}, status=status.HTTP_400_BAD_REQUEST)
-
 
 class PostLikeApiView(views.APIView):
     def post(self, request, post, format=None):
@@ -257,7 +253,6 @@ class PostLikeApiView(views.APIView):
             result = "liked"
 
         return Response({"result": result,}, status=status.HTTP_200_OK,)
-
 
 class PostCommentViewSet(viewsets.ModelViewSet, VoteMixin):
     queryset = PostComment.objects.all()
