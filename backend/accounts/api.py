@@ -66,16 +66,22 @@ class UserAPI(generics.RetrieveAPIView):
     def get_object(self):
         user = self.request.user
         return user
+
     def get(self, request, format=None):
         user = self.request.user
-        unread_messages = Value(Notification.objects.filter(recipient=user, is_read=False).count(), output_field=IntegerField())
-        
+        unread_messages = Value(
+            Notification.objects.filter(recipient=user, is_read=False).count(),
+            output_field=IntegerField(),
+        )
+
         # annotate user with unread messages count
-        user = User.objects.filter(id=user.id).annotate(unread_messages_count=unread_messages).first()
+        user = (
+            User.objects.filter(id=user.id)
+            .annotate(unread_messages_count=unread_messages)
+            .first()
+        )
 
         return Response(UserWithFollowersSerializer(user).data)
-
-
 
 
 class AddFollowerView(generics.GenericAPIView):
@@ -138,7 +144,9 @@ class UserFeedByRecentView(generics.GenericAPIView):
         )
 
         comments = (
-            PostComment.objects.filter(owner__in=follower_user_ids, parent=None, post=not None)
+            PostComment.objects.filter(
+                owner__in=follower_user_ids, parent=None, post=not None
+            )
             .annotate(
                 is_voted_down=Exists(
                     Vote.objects.filter(
@@ -170,8 +178,10 @@ class UserFeedByRecentView(generics.GenericAPIView):
         )
 
         user_comments = (
-            #parent=None to exclude replies to other comments
-            PostComment.objects.filter(owner__in=[request.user], parent=None, post=not None)
+            # parent=None to exclude replies to other comments
+            PostComment.objects.filter(
+                owner__in=[request.user], parent=None, post=not None
+            )
             .annotate(
                 is_voted_down=Exists(
                     Vote.objects.filter(

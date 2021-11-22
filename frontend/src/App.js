@@ -14,6 +14,7 @@ import { UserContext } from "./UserContext";
 import Register from "./components/accounts/Register";
 import NavigationBar from "./components/navbar/NavBar";
 import { NotFound } from "./NotFound404";
+import Inbox from "./pages/profiles/Inbox";
 
 export default function App() {
   const [user, setUser] = useState(); // set to undefined initially
@@ -104,6 +105,10 @@ export default function App() {
 
             <Route path="/user/:username" exact>
               <UserProfile />
+            </Route>
+
+            <Route path="/inbox" exact>
+              <Inbox />
             </Route>
 
             <Route path="/register" exact>

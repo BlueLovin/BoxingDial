@@ -19,7 +19,7 @@ class InboxView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
 
-        return user.notifications
+        return user.notifications.order_by("-date")
 
 
 class MarkNotificationAsReadView(generics.UpdateAPIView):
