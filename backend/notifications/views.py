@@ -13,6 +13,8 @@ from .serializers import NotificationSerializer
 from .models import Notification
 from backend.permissions import IsOwnerOrReadOnly
 
+not_logged_in_exception = exceptions.ValidationError("Not logged in.")
+
 # user inbox - /api/users/{username}
 class InboxView(generics.ListAPIView):
     serializer_class = NotificationSerializer
@@ -31,7 +33,7 @@ class MarkNotificationAsReadView(generics.UpdateAPIView):
         user = self.request.user
 
         if user.is_anonymous:
-            raise exceptions.ValidationError
+            raise not_logged_in_exception
 
         # get notification object
         notification_object = Notification.objects.get(id=notification)
@@ -42,6 +44,26 @@ class MarkNotificationAsReadView(generics.UpdateAPIView):
             notification_object.save()
         else:
             return Response(None, HTTP_403_FORBIDDEN)
+
+        serializer = NotificationSerializer(notification_object).data
+
+        return Response(serializer, HTTP_200_OK)
+
+
+# mark all notifications as read in user's inbox
+class MarkAllAsReadView(generics.UpdateAPIView):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsOwnerOrReadOnly]
+
+    def post(self, request, format=None):
+        user = self.request.user
+
+        if user.is_anonymous:
+            raise not_logged_in_exception
+
+        for notification in user.notifications.all():
+            notification.is_read = True
+            notification.save()
 
         return Response({}, HTTP_200_OK)
 
@@ -54,7 +76,7 @@ class DeleteNotificationView(generics.DestroyAPIView):
         user = self.request.user
 
         if user.is_anonymous:
-            raise exceptions.ValidationError
+            raise not_logged_in_exception
 
         # get notification object
         notification_object = Notification.objects.get(id=notification)
@@ -65,6 +87,21 @@ class DeleteNotificationView(generics.DestroyAPIView):
         else:
             return Response(None, HTTP_403_FORBIDDEN)
 
-        serializer = NotificationSerializer(notification_object).data
+        return Response({}, HTTP_200_OK)
 
-        return Response(serializer, HTTP_200_OK)
+
+# clear inbox, delete all user notifications
+class DeleteAllNotificationsView(generics.DestroyAPIView):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsOwnerOrReadOnly]
+
+    def post(self, request, format=None):
+        user = self.request.user
+
+        if user.is_anonymous:
+            raise not_logged_in_exception
+
+        for notification in user.notifications.all():
+            notification.delete()
+
+        return Response({}, HTTP_200_OK)

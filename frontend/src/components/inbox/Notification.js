@@ -39,10 +39,12 @@ export default function Notification(props) {
 
   return (
     <Container>
-      <div className="list-group-item bg-light justify-content-center preserve-line-breaks">
+      <div className="list-group-item bg-light justify-content-center preserve-line-breaks ">
+        <div className={is_read ? null : "bg-warning"}> 
         <button className="btn btn-link" onClick={() => goToPost()}>
           {text}
         </button>
+        </div>
         <div className="list-group-item p-auto m-auto d-flex justify-content-between align-items-center">
           <div>{`${new Date(date).toLocaleDateString()} ${new Date(
             date
