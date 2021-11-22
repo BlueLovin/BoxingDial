@@ -54,6 +54,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
         username = owner.username
 
+        # if a comment on a post, specify post
         if validated_data["post"] is not None:
             post = validated_data.pop("post")
             Notification.objects.create(recipient=post.owner, text="somone posted a comment on ur post!")

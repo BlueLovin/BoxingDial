@@ -32,12 +32,14 @@ class PostsView(generics.ListAPIView):
             comment_count=Count("comments", distinct=True),
         )
 
+
 class CreatePostView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CreatePostSerializer
 
     def get_queryset(self):
         return Post.objects.all()
+
 
 # post's comments /api/posts/6/comments
 class SinglePostCommentsView(generics.ListAPIView):
@@ -63,7 +65,9 @@ class SinglePostCommentsView(generics.ListAPIView):
             .annotate(
                 is_voted_down=Exists(
                     Vote.objects.filter(
-                        user_id=user_id, action=DOWN, object_id=OuterRef("pk"),
+                        user_id=user_id,
+                        action=DOWN,
+                        object_id=OuterRef("pk"),
                     )
                 ),
                 is_voted_up=Exists(
@@ -74,6 +78,7 @@ class SinglePostCommentsView(generics.ListAPIView):
             )
             .order_by(order)
         )
+
 
 # single post - /api/posts/{postID}
 class PostView(generics.RetrieveDestroyAPIView):
@@ -88,7 +93,9 @@ class PostView(generics.RetrieveDestroyAPIView):
         prefetch_query = PostComment.objects.annotate(
             is_voted_down=Exists(
                 Vote.objects.filter(
-                    user_id=user_id, action=DOWN, object_id=OuterRef("pk"),
+                    user_id=user_id,
+                    action=DOWN,
+                    object_id=OuterRef("pk"),
                 )
             ),
             is_voted_up=Exists(
@@ -106,7 +113,9 @@ class PostView(generics.RetrieveDestroyAPIView):
                     Prefetch(
                         "comments",
                         queryset=prefetch_query.prefetch_related(
-                            Prefetch("replies", queryset=prefetch_query.order_by('-date'))
+                            Prefetch(
+                                "replies", queryset=prefetch_query.order_by("-date")
+                            )
                         ).order_by("-date"),
                     ),
                 )
@@ -126,8 +135,11 @@ class PostView(generics.RetrieveDestroyAPIView):
                 .prefetch_related(
                     Prefetch("comments", queryset=PostComment.objects.order_by("-id")),
                 )
-                .annotate(comment_count=Count("comments", distinct=True),)
+                .annotate(
+                    comment_count=Count("comments", distinct=True),
+                )
             )
+
 
 # single post - /api/posts/{postID}/likes
 class PostLikesView(generics.ListAPIView):
@@ -164,6 +176,7 @@ class PostLikesView(generics.ListAPIView):
             .order_by("-liked_on")
         )
 
+
 # 5 most popular posts, popularity determined by number of comments
 class PopularPostsView(generics.ListAPIView):
     serializer_class = SmallPostSerializer
@@ -173,6 +186,7 @@ class PopularPostsView(generics.ListAPIView):
             like_count=Count("post_likes", distinct=True),
             comment_count=Count("comments", distinct=True),
         ).order_by("-comment_count", "-like_count")[:5]
+
 
 # all comments /api/comments
 class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
@@ -190,10 +204,22 @@ class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
         serializer = CommentSerializer(comment)
         return Response(serializer.data)
 
+
 # all comments /api/comments/{comment_ID}/reply
 class CommentReplyView(views.APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ReplySerializer
+
+    def create_reply_notification(self, new_comment, parent_comment):
+        new_comment_username = new_comment.username
+        truncated_parent_content = parent_comment.content[:15] + "..."
+        truncated_new_content = new_comment.content[:15] + "..."
+
+        notification_string = f'{new_comment_username} replied "{truncated_new_content}" to your comment: "{truncated_parent_content}"'
+        
+        Notification.objects.create(
+            recipient=parent_comment.owner, text=notification_string
+        )
 
     def post(self, request, parent, format=None):
         parent_pk = parent
@@ -211,27 +237,36 @@ class CommentReplyView(views.APIView):
 
             username = owner.username
 
-            comment = PostComment.objects.create(
+            new_comment = PostComment.objects.create(
                 owner=owner,
                 username=username,
                 parent=parent_comment,
                 content=request.data["content"],
             )
 
-            Notification.objects.create(recipient=parent_comment.owner, text="someone replied to ur comment!")
+            # create notification for parent comment owner
+            self.create_reply_notification(new_comment, parent_comment)
 
             # upvote comment
-            comment.votes.up(owner.id)
+            new_comment.votes.up(owner.id)
 
             # annotate response
-            comment.vote_score = 1
-            comment.is_voted_up = True
+            new_comment.vote_score = 1
+            new_comment.is_voted_up = True
 
-            result = ReplySerializer(comment).data
+            result = ReplySerializer(new_comment).data
 
-            return Response({"result": result,}, status=status.HTTP_200_OK,)
+            return Response(
+                {
+                    "result": result,
+                },
+                status=status.HTTP_200_OK,
+            )
         else:
-            return Response({"result": "can not reply to reply"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"result": "can not reply to reply"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
 
 class PostLikeApiView(views.APIView):
     def post(self, request, post, format=None):
@@ -240,7 +275,9 @@ class PostLikeApiView(views.APIView):
 
         # if not logged in
         if not user.is_authenticated:
-            return Response({"result": "not logged in"},)
+            return Response(
+                {"result": "not logged in"},
+            )
 
         post = Post.objects.get(id=post)
 
@@ -252,7 +289,13 @@ class PostLikeApiView(views.APIView):
             PostLike.objects.create(user=user, post=post)
             result = "liked"
 
-        return Response({"result": result,}, status=status.HTTP_200_OK,)
+        return Response(
+            {
+                "result": result,
+            },
+            status=status.HTTP_200_OK,
+        )
+
 
 class PostCommentViewSet(viewsets.ModelViewSet, VoteMixin):
     queryset = PostComment.objects.all()
