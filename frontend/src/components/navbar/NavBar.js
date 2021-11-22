@@ -18,8 +18,10 @@ import {
   faHome,
   faPenFancy,
   faFistRaised,
+  faBell
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ShowInboxBell from "./ShowInboxBell";
 
 export default function NavigationBar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -56,6 +58,7 @@ export default function NavigationBar() {
             </DropdownMenu>
           </UncontrolledDropdown>
         </Nav>
+        <ShowInboxBell/>
         <NavbarText>
           <ShowUser />
         </NavbarText>

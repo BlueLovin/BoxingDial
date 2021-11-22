@@ -1,11 +1,12 @@
-from django.db.models.expressions import Exists, OuterRef
+from django.db.models.expressions import Exists, OuterRef, Value
+from django.db.models.fields import IntegerField
 from posts.serializers import FeedCommentSerializer, SmallPostSerializer
 from django.db.models.aggregates import Count
 from django.db.models.query import Prefetch
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, serializers
 from rest_framework.response import Response
 from knox.models import AuthToken
-from itertools import chain
+from itertools import chain, count
 from django.contrib.auth.models import User
 from .models import UserFollowing
 from posts.models import Post, PostComment, PostLike
@@ -16,6 +17,7 @@ from .serializers import (
     LoginSerializer,
     UserWithFollowersSerializer,
 )
+from notifications.models import Notification
 from vote.models import Vote, DOWN, UP
 
 
@@ -62,7 +64,18 @@ class UserAPI(generics.RetrieveAPIView):
     serializer_class = UserWithFollowersSerializer
 
     def get_object(self):
-        return self.request.user
+        user = self.request.user
+        return user
+    def get(self, request, format=None):
+        user = self.request.user
+        unread_messages = Value(Notification.objects.filter(recipient=user, is_read=False).count(), output_field=IntegerField())
+        
+        # annotate user with unread messages count
+        user = User.objects.filter(id=user.id).annotate(unread_messages_count=unread_messages).first()
+
+        return Response(UserWithFollowersSerializer(user).data)
+
+
 
 
 class AddFollowerView(generics.GenericAPIView):

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from rest_framework.fields import IntegerField
 from .models import UserFollowing
 from django.contrib.auth import authenticate
 
@@ -48,11 +49,12 @@ class FollowersSerializer(serializers.ModelSerializer):
 class UserWithFollowersSerializer(serializers.ModelSerializer):
     following = UserFollowingSerializer(many=True)
     followers = FollowersSerializer(many=True)
+    unread_messages_count = serializers.IntegerField(default=0)
 
     class Meta:
         unique_together = ["followers, following"]
         model = User
-        fields = ("id", "username", "followers", "following")
+        fields = ("id", "username", "followers", "following", "unread_messages_count")
 
 
 # Register Serializer
