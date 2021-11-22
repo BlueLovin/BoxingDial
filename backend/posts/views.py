@@ -210,17 +210,29 @@ class CommentReplyView(views.APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ReplySerializer
 
+    # create notification object for parent user
     def create_reply_notification(self, new_comment, parent_comment):
         new_comment_username = new_comment.username
-        truncated_parent_content = parent_comment.content[:15] + "..."
-        truncated_new_content = new_comment.content[:15] + "..."
 
-        notification_string = f'{new_comment_username} replied "{truncated_new_content}" to your comment: "{truncated_parent_content}"'
-        
-        Notification.objects.create(
-            recipient=parent_comment.owner, text=notification_string
+        # show first 15 chars if longer than 15 chars, and append ellipses
+        truncated_parent_content = (
+            parent_comment.content[:15] + "..."
+            if len(parent_comment.content) > 15
+            else parent_comment.content
+        )
+        truncated_new_content = (
+            new_comment.content[:15] + "..."
+            if len(new_comment.content) > 15
+            else new_comment.content
         )
 
+        notification_text = f'{new_comment_username} replied "{truncated_new_content}" to your comment: "{truncated_parent_content}"'
+
+        Notification.objects.create(
+            recipient=parent_comment.owner, text=notification_text
+        )
+
+    # create reply
     def post(self, request, parent, format=None):
         parent_pk = parent
         owner = request.user

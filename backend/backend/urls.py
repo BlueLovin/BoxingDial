@@ -22,7 +22,14 @@ urlpatterns = [
     path("api/users", user_views.UsersView.as_view()),
     path("api/users/<str:user>/following/", user_views.UserFollowingView.as_view()),
     path("api/users/<str:user>/followers/", user_views.UserFollowersView.as_view()),
+    #########
+    # inbox #
+    #########
     path("api/inbox/", inbox_views.InboxView.as_view()),
+    path(
+        "api/inbox/<int:notification>/read",
+        inbox_views.MarkNotificationAsReadView.as_view(),
+    ),
     ##########
     # fights #
     ##########

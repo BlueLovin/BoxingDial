@@ -46,9 +46,23 @@ class CommentSerializer(serializers.ModelSerializer):
 
         requires_context = True
 
+    def create_notification(self, new_comment, parent_post):
+        recipient = parent_post.owner
+        new_comment_username = new_comment.username
+        recipient_username = recipient.username
+
+        # user does not send notification to theirself
+        if(recipient_username != new_comment_username):
+            truncated_new_comment = new_comment.content[:25] + "..."
+            truncated_parent_post = parent_post.content[:25] + "..."
+
+            notification_text = f'{new_comment_username} commented "{truncated_new_comment}" on your post: {truncated_parent_post}'
+
+            Notification.objects.create(recipient=recipient, text=notification_text)
+
     def create(self, validated_data):
         owner = self.context["request"].user
-        
+
         if owner.is_anonymous:
             raise serializers.DjangoValidationError("not logged in")
 
@@ -57,18 +71,16 @@ class CommentSerializer(serializers.ModelSerializer):
         # if a comment on a post, specify post
         if validated_data["post"] is not None:
             post = validated_data.pop("post")
-            Notification.objects.create(recipient=post.owner, text="somone posted a comment on ur post!")
+
             comment = PostComment.objects.create(
-            owner=owner, username=username, post=post, **validated_data
-        )
+                owner=owner, username=username, post=post, **validated_data
+            )
+            self.create_notification(comment, post)
+
         else:
             comment = PostComment.objects.create(
-            owner=owner, username=username, **validated_data
-        )
-
-        
-
-        
+                owner=owner, username=username, **validated_data
+            )
 
         # upvote comment
         comment.votes.up(owner.id)
