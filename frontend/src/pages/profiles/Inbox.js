@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
+import Notification from "../../components/inbox/Notification";
 import { UserContext } from "../../UserContext";
 
 export default function Inbox(){
@@ -23,13 +24,14 @@ export default function Inbox(){
     }
   }, [loggedIn, headers]);
 
+  
+
 
   const showNotifications = () => {
     console.table(notificationList)
     return notificationList.map((notification) => (
-      <div className="text-center">
-        {JSON.stringify(notification)}
-        <hr/>
+      <div>
+        <Notification notification={notification}/>
       </div>
     ));
   }

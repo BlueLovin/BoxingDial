@@ -11,6 +11,7 @@ from rest_framework.status import (
 from accounts.serializers import UserSerializer
 from .serializers import NotificationSerializer
 from .models import Notification
+from backend.permissions import IsOwnerOrReadOnly
 
 # user inbox - /api/users/{username}
 class InboxView(generics.ListAPIView):
@@ -25,6 +26,28 @@ class InboxView(generics.ListAPIView):
 class MarkNotificationAsReadView(generics.UpdateAPIView):
     serializer_class = NotificationSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, notification, format=None):
+        user = self.request.user
+
+        if user.is_anonymous:
+            raise exceptions.ValidationError
+
+        # get notification object
+        notification_object = Notification.objects.get(id=notification)
+
+        # if notification belongs to client user
+        if notification_object.recipient == user:
+            notification_object.delete()
+        else:
+            return Response(None, HTTP_403_FORBIDDEN)
+
+        return Response({}, HTTP_200_OK)
+
+
+class DeleteNotificationView(generics.DestroyAPIView):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsOwnerOrReadOnly]
 
     def post(self, request, notification, format=None):
         user = self.request.user
