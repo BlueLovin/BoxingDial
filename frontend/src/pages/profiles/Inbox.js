@@ -4,42 +4,40 @@ import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
 import Notification from "../../components/inbox/Notification";
 import { UserContext } from "../../UserContext";
 
-export default function Inbox(){
-  const {loggedInVal, headersVal} = useContext(UserContext);
+export default function Inbox() {
+  const { loggedInVal, headersVal } = useContext(UserContext);
   const [loggedIn] = loggedInVal;
   const [headers] = headersVal;
 
   const [notificationList, setNotificationList] = useState();
-  
+
   useEffect(() => {
-    if(loggedIn){
-      axios.get("/api/inbox", headers)
-      .then((res) => {
+    if (loggedIn) {
+      axios.get("/api/inbox", headers).then((res) => {
         setNotificationList(res.data);
         console.log(res.data);
       });
-    }
-    else{
-      return <Redirect to='/404' />
+    } else {
+      return <Redirect to="/404" />;
     }
   }, [loggedIn, headers]);
 
-  
-
-
   const showNotifications = () => {
-    console.table(notificationList)
+    console.table(notificationList);
+    if (notificationList.length < 1) {
+      return <div className="text-center">Nothing to see here...</div>;
+    }
     return notificationList.map((notification) => (
       <div>
-        <Notification notification={notification}/>
+        <Notification notification={notification} />
       </div>
     ));
-  }
+  };
 
-  return(
-      <>
-        <h3 className="text-center">Inbox</h3>
-        {loggedIn && notificationList ? showNotifications() : null}
-      </>
+  return (
+    <>
+      <h3 className="text-center">Inbox</h3>
+      {loggedIn && notificationList ? showNotifications() : null}
+    </>
   );
 }

@@ -38,7 +38,8 @@ class MarkNotificationAsReadView(generics.UpdateAPIView):
 
         # if notification belongs to client user
         if notification_object.recipient == user:
-            notification_object.delete()
+            notification_object.is_read = True
+            notification_object.save()
         else:
             return Response(None, HTTP_403_FORBIDDEN)
 
@@ -60,8 +61,7 @@ class DeleteNotificationView(generics.DestroyAPIView):
 
         # if notification belongs to client user
         if notification_object.recipient == user:
-            notification_object.is_read = True
-            notification_object.save()
+            notification_object.delete()
         else:
             return Response(None, HTTP_403_FORBIDDEN)
 

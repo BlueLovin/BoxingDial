@@ -32,7 +32,7 @@ urlpatterns = [
     ),
     path(
         "api/inbox/<int:notification>/delete",
-        inbox_views.MarkNotificationAsReadView.as_view(),
+        inbox_views.DeleteNotificationView.as_view(),
     ),
     ##########
     # fights #
