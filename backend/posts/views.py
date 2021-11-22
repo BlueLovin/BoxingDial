@@ -229,7 +229,9 @@ class CommentReplyView(views.APIView):
         notification_text = f'{new_comment_username} replied "{truncated_new_content}" to your comment: "{truncated_parent_content}"'
 
         Notification.objects.create(
-            recipient=parent_comment.owner, text=notification_text
+            recipient=parent_comment.owner,
+            text=notification_text,
+            post_id=parent_comment.post.id,
         )
 
     # create reply

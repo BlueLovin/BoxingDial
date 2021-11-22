@@ -52,13 +52,15 @@ class CommentSerializer(serializers.ModelSerializer):
         recipient_username = recipient.username
 
         # user does not send notification to theirself
-        if(recipient_username != new_comment_username):
+        if recipient_username != new_comment_username:
             truncated_new_comment = new_comment.content[:25] + "..."
             truncated_parent_post = parent_post.content[:25] + "..."
 
             notification_text = f'{new_comment_username} commented "{truncated_new_comment}" on your post: {truncated_parent_post}'
 
-            Notification.objects.create(recipient=recipient, text=notification_text)
+            Notification.objects.create(
+                recipient=recipient, text=notification_text, post_id=parent_post.id
+            )
 
     def create(self, validated_data):
         owner = self.context["request"].user
