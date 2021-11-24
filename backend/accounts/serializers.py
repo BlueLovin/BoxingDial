@@ -1,8 +1,11 @@
-from rest_framework import serializers
+from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
+from rest_framework import exceptions, serializers
 from django.contrib.auth.models import User
 from rest_framework.fields import IntegerField
+from rest_framework.response import Response
 from .models import UserFollowing
 from django.contrib.auth import authenticate
+import django.contrib.auth.password_validation as validators
 
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
@@ -65,17 +68,32 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
+        username = validated_data["username"]
+        email = validated_data["email"]
+        password = validated_data["password"]
+        #validators.validate_password(password)
+
+        errors = dict() 
+        try:
+            # validate the password and catch the exception
+            validators.validate_password(password=password)
+
+        # the exception raised here is different than serializers.ValidationError
+        except exceptions.ValidationError as e:
+            errors['password'] = list(e.messages)
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
         user = User.objects.create_user(
-            validated_data["username"],
-            validated_data["email"],
-            validated_data["password"],
+            username,
+            email,
+            password,
         )
         return user
 
 
 # Login Serializer
-
-
 class LoginSerializer(serializers.Serializer):
     class Meta:
         model = User

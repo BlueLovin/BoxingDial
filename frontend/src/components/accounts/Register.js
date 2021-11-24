@@ -10,6 +10,7 @@ export default function Register() {
     username: "",
     email: "",
     password: "",
+    confirmation_password: ""
   });
   const { userVal, tokenVal, loggedInVal } = useContext(UserContext);
   const [error, setError] = useState(false);
@@ -40,6 +41,15 @@ export default function Register() {
   };
 
   const submitUser = async (item) => {
+    setError(false);
+    if(item.confirmation_password !== item.password){
+      console.log(item.password);
+      console.log(item.confirmation_password);
+      setError(true);
+      setErrorMessages([]);
+      setErrorMessages((oldArray) => [...oldArray, "Passwords do not match"]);
+      return;
+    }
     await axios
       .post("/api/token-auth/register", item)
       .then((res) => {
@@ -52,13 +62,13 @@ export default function Register() {
         setErrorMessages([]);
         let data = err.response.data;
         if (data.username) {
-          setErrorMessages((oldArray) => [...oldArray, data.username[0]]);
+          setErrorMessages((oldArray) => [...oldArray, "username: " + data.username[0]]);
         }
 
         if (data.password) {
           setErrorMessages((oldArray) => [
             ...oldArray,
-            "Password can not be blank",
+            "Invalid password",
           ]);
         }
 
@@ -71,13 +81,6 @@ export default function Register() {
 
         setError(true);
       });
-
-    setActiveItem({
-      // RESET TEXT BOX
-      username: "",
-      email: "",
-      password: "",
-    });
   };
 
   const renderErrors = () => {
@@ -96,6 +99,7 @@ export default function Register() {
     <div className="container login-container">
       <div className="card card-body mt-5">
         <h2 className="text-center">Register</h2>
+        <form onSubmit={e => {e.preventDefault(); submitUser(activeItem)}}>
         <div className="form-group">
           <label>Username</label>
           <input
@@ -136,17 +140,20 @@ export default function Register() {
           <input
             type="password"
             className="form-control"
-            name="confirmationPassword"
+            name="confirmation_password"
             onChange={handleChange}
+            value={activeItem.confirmation_password}
             required
           />
         </div>
         {error ? renderErrors() : null}
         <div className="form-group">
-          <Button color="success" onClick={() => submitUser(activeItem)}>
+          <Button color="success" type="submit" >
             Register
           </Button>
         </div>
+        </form>
+        
         <p>
           Already have an account?
           <Link to="/login"> Login</Link>
