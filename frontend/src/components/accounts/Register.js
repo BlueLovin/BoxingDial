@@ -10,7 +10,7 @@ export default function Register() {
     username: "",
     email: "",
     password: "",
-    confirmation_password: ""
+    confirmation_password: "",
   });
   const { userVal, tokenVal, loggedInVal } = useContext(UserContext);
   const [error, setError] = useState(false);
@@ -19,12 +19,11 @@ export default function Register() {
   const [, setToken] = tokenVal;
   const [loggedIn] = loggedInVal;
 
-
   const history = useHistory();
 
-  useEffect(()=>{
-    if(loggedIn){        
-      history.push('/');
+  useEffect(() => {
+    if (loggedIn) {
+      history.push("/");
       window.location.reload();
     }
   }, [history, loggedIn]);
@@ -42,7 +41,7 @@ export default function Register() {
 
   const submitUser = async (item) => {
     setError(false);
-    if(item.confirmation_password !== item.password){
+    if (item.confirmation_password !== item.password) {
       console.log(item.password);
       console.log(item.confirmation_password);
       setError(true);
@@ -62,14 +61,14 @@ export default function Register() {
         setErrorMessages([]);
         let data = err.response.data;
         if (data.username) {
-          setErrorMessages((oldArray) => [...oldArray, "username: " + data.username[0]]);
+          setErrorMessages((oldArray) => [
+            ...oldArray,
+            "username: " + data.username[0],
+          ]);
         }
 
         if (data.password) {
-          setErrorMessages((oldArray) => [
-            ...oldArray,
-            "Invalid password",
-          ]);
+          setErrorMessages((oldArray) => [...oldArray, "Invalid password"]);
         }
 
         if (data.email) {
@@ -77,6 +76,9 @@ export default function Register() {
             ...oldArray,
             "Invalid e-mail address",
           ]);
+        }
+        if (data.errors) {
+          setErrorMessages((oldArray) => [...oldArray.concat(data.errors)]);
         }
 
         setError(true);
@@ -87,8 +89,8 @@ export default function Register() {
     if (error && errorMessages) {
       return errorMessages.map((_error, i) => (
         <div key={i}>
-          <br />
           <h6 className="text-danger">{_error}</h6>
+          <hr />
         </div>
       ));
     }
@@ -99,61 +101,66 @@ export default function Register() {
     <div className="container login-container">
       <div className="card card-body mt-5">
         <h2 className="text-center">Register</h2>
-        <form onSubmit={e => {e.preventDefault(); submitUser(activeItem)}}>
-        <div className="form-group">
-          <label>Username</label>
-          <input
-            type="text"
-            className="form-control"
-            name="username"
-            onChange={handleChange}
-            value={activeItem.username}
-            autoFocus={true}
-            autoComplete="off"
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Email</label>
-          <input
-            type="email"
-            className="form-control"
-            name="email"
-            onChange={handleChange}
-            value={activeItem.email}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Password</label>
-          <input
-            type="password"
-            className="form-control"
-            name="password"
-            onChange={handleChange}
-            value={activeItem.password}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Confirm Password</label>
-          <input
-            type="password"
-            className="form-control"
-            name="confirmation_password"
-            onChange={handleChange}
-            value={activeItem.confirmation_password}
-            required
-          />
-        </div>
-        {error ? renderErrors() : null}
-        <div className="form-group">
-          <Button color="success" type="submit" >
-            Register
-          </Button>
-        </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            submitUser(activeItem);
+          }}
+        >
+          <div className="form-group">
+            <label>Username</label>
+            <input
+              type="text"
+              className="form-control"
+              name="username"
+              onChange={handleChange}
+              value={activeItem.username}
+              autoFocus={true}
+              autoComplete="off"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              className="form-control"
+              name="email"
+              onChange={handleChange}
+              value={activeItem.email}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              className="form-control"
+              name="password"
+              onChange={handleChange}
+              value={activeItem.password}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              className="form-control"
+              name="confirmation_password"
+              onChange={handleChange}
+              value={activeItem.confirmation_password}
+              required
+            />
+          </div>
+          {error ? renderErrors() : null}
+          <div className="form-group">
+            <Button color="success" type="submit">
+              Register
+            </Button>
+          </div>
         </form>
-        
+
         <p>
           Already have an account?
           <Link to="/login"> Login</Link>

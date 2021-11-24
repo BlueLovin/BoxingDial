@@ -1,5 +1,8 @@
+import json
 from django.db.models.expressions import Exists, OuterRef, Value
 from django.db.models.fields import IntegerField
+from django.http.response import HttpResponse, HttpResponseBadRequest, JsonResponse
+from rest_framework.exceptions import ValidationError
 from posts.serializers import FeedCommentSerializer, SmallPostSerializer
 from django.db.models.aggregates import Count
 from django.db.models.query import Prefetch
@@ -27,16 +30,27 @@ class RegisterAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        token = AuthToken.objects.create(user)
-        return Response(
-            {
-                "user": SmallUserSerializer(
-                    user, context=self.get_serializer_context()
-                ).data,
-                "token": token[1],
-            }
-        )
+
+        # try to create user
+        try:
+            user = serializer.save()
+            token = AuthToken.objects.create(user)
+            return Response(
+                {
+                    "user": SmallUserSerializer(
+                        user, context=self.get_serializer_context()
+                    ).data,
+                    "token": token[1],
+                }
+            )
+
+        # return errors if exception is thrown
+        except Exception as e:
+            errors = dict()
+            errors["errors"] = list(e.messages)
+            return HttpResponseBadRequest(
+                json.dumps(errors), content_type="application/json"
+            )
 
 
 class LoginAPI(generics.GenericAPIView):
