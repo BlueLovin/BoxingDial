@@ -41,14 +41,17 @@ export default function Register() {
 
   const submitUser = async (item) => {
     setError(false);
+
+    // password and confirmation password must match
     if (item.confirmation_password !== item.password) {
       console.log(item.password);
       console.log(item.confirmation_password);
       setError(true);
       setErrorMessages([]);
-      setErrorMessages((oldArray) => [...oldArray, "Passwords do not match"]);
+      setErrorMessages(["Passwords do not match"]);
       return;
     }
+
     await axios
       .post("/api/token-auth/register", item)
       .then((res) => {
@@ -78,7 +81,7 @@ export default function Register() {
           ]);
         }
         if (data.errors) {
-          setErrorMessages((oldArray) => [...oldArray.concat(data.errors)]);
+          setErrorMessages((oldArray) => oldArray.concat(data.errors));
         }
 
         setError(true);
