@@ -104,11 +104,14 @@ class AddFollowerView(generics.GenericAPIView):
     def post(self, request, format=None):
         user = self.request.user
         follow = User.objects.get(id=self.request.data.get("follow"))
-
+        
         if user != follow:
-            UserFollowing.objects.get_or_create(user_id=user, following_user_id=follow)[
-                0
-            ]
+            notification_text = f"{user.username} just followed you!"
+            UserFollowing.objects.get_or_create(user_id=user, following_user_id=follow)
+            Notification.objects.get_or_create(
+                recipient=follow, text=notification_text, post_id=-1
+            )
+
         else:
             return Response("User can not follow themself, wtf are you doing?")
 
@@ -125,6 +128,7 @@ class DeleteFollowerView(generics.GenericAPIView):
     def post(self, request, format=None):
         user = self.request.user
         unfollow = User.objects.get(id=self.request.data.get("unfollow"))
+
         UserFollowing.objects.get(user_id=user, following_user_id=unfollow).delete()
         return Response(
             {

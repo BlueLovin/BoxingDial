@@ -9,4 +9,4 @@ class Notification(models.Model):
     text = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
-    post_id = models.IntegerField()
+    post_id = models.IntegerField(default=None)
