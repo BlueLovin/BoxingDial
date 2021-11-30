@@ -32,9 +32,9 @@ export default function ShowUser() {
     localStorage.removeItem("token");
   };
 
-  const renderUsername = () => {
-    if (loggedIn) {
-      return (
+  if (loggedIn) {
+    return (
+      <div className="text-center">
         <span>
           {"Welcome, "}
           <a href={`/user/${user.username}`}>{user.username}</a>
@@ -45,15 +45,13 @@ export default function ShowUser() {
             {" Logout "}
           </Button>
         </span>
-      );
-    } else {
-      return (
-        <div>
-          <a href="/login/">Login</a>
-        </div>
-      );
-    }
-  };
-
-  return <div className="text-center">{renderUsername()}</div>;
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <a href="/login/">Login</a>
+      </div>
+    );
+  }
 }

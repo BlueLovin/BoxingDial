@@ -4,7 +4,7 @@
 [x] upvote/downvote comments
 [x] reply to other comments
 [x] user inbox
-[] fix register page
+[x] fix register page
 [] delete account, account settings, more account control
 [] add bio/picture and other info to user profiles
 [] block/mute/report other users

@@ -9,20 +9,19 @@ export default function ShowInboxBell() {
   const [user] = userVal;
   const [loggedIn] = loggedInVal;
 
-  const renderBell = () => {
-    if (loggedIn) {
-      return (
-        <span className="p-5">
-          <Button color={user.unread_messages_count > 0 ? "danger" : "primary"} href="/inbox">
-            <FontAwesomeIcon icon={faBell} onClick={null} />
-            {" " + user.unread_messages_count}
-          </Button>
-        </span>
-      );
-    } else {
-      return null;
-    }
-  };
-
-  return <div>{renderBell()}</div>;
+  if (loggedIn) {
+    return (
+      <span className="p-3">
+        <Button
+          color={user.unread_messages_count > 0 ? "danger" : "primary"}
+          href="/inbox"
+        >
+          <FontAwesomeIcon icon={faBell} onClick={null} />
+          {" " + user.unread_messages_count}
+        </Button>
+      </span>
+    );
+  } else {
+    return null;
+  }
 }
