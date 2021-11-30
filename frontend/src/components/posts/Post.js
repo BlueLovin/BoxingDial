@@ -94,9 +94,9 @@ export default function Post(props){
                       : `${likeCount} like`}
                   </Link>
                 </p>
-                <p>ass</p>
-                <p>ass</p>
-                <p>ass</p>
+                <p>placeholder</p>
+                <p>share</p>
+                <p>copy</p>
               </div>
             </>
           ) : (

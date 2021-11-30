@@ -1,17 +1,16 @@
 import json
 from django.db.models.expressions import Exists, OuterRef, Value
 from django.db.models.fields import IntegerField
-from django.http.response import HttpResponse, HttpResponseBadRequest, JsonResponse
-from rest_framework.exceptions import ValidationError
+from django.http.response import HttpResponseBadRequest
 from posts.serializers import FeedCommentSerializer, SmallPostSerializer
 from django.db.models.aggregates import Count
 from django.db.models.query import Prefetch
-from rest_framework import generics, permissions, serializers
+from rest_framework import generics, permissions
 from rest_framework.response import Response
 from knox.models import AuthToken
-from itertools import chain, count
+from itertools import chain
 from django.contrib.auth.models import User
-from .models import UserFollowing
+from .models import UserFollowing, UserProfile
 from posts.models import Post, PostComment, PostLike
 from .serializers import (
     SmallUserSerializer,
@@ -34,6 +33,7 @@ class RegisterAPI(generics.GenericAPIView):
         # try to create user
         try:
             user = serializer.save()
+            UserProfile.objects.create(user=user)
             token = AuthToken.objects.create(user)
             return Response(
                 {
@@ -104,12 +104,14 @@ class AddFollowerView(generics.GenericAPIView):
     def post(self, request, format=None):
         user = self.request.user
         follow = User.objects.get(id=self.request.data.get("follow"))
+
         if user != follow:
             UserFollowing.objects.get_or_create(user_id=user, following_user_id=follow)[
                 0
             ]
         else:
-            return Response("User can not follow themself, u dumb shit")
+            return Response("User can not follow themself, wtf are you doing?")
+
         return Response(
             {
                 "response": "followed",

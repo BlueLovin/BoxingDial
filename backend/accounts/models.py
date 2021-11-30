@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    bio = models.CharField(max_length=500, blank=True, null=True, default='', editable=True)
+    #avatar = models.ImageField()
+
 
 class UserFollowing(models.Model):
     user_id = models.ForeignKey(
