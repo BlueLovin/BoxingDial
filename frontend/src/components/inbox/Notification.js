@@ -5,7 +5,7 @@ import { UserContext } from "../../UserContext";
 import { useHistory } from "react-router";
 
 export default function Notification(props) {
-  const { text, date, is_read, post_id } = props.notification;
+  const { text, date, is_read, post_id, sender } = props.notification;
   const this_notification = props.notification;
 
   const { loggedInVal, headersVal } = useContext(UserContext);
@@ -20,9 +20,15 @@ export default function Notification(props) {
     }
   };
 
-  const goToPost = async () => {
+  const goToPostOrUser = async () => {
     await markAsRead();
-    history.push(`/post/${post_id}`);
+    // post_id is -1 if there is no post attached
+    // takes you to the sender's profile instead
+    if (post_id == -1) {
+      history.push(`/user/${sender}`);
+    } else {
+      history.push(`/post/${post_id}`);
+    }
     window.location.reload();
   };
 
@@ -40,10 +46,10 @@ export default function Notification(props) {
   return (
     <Container>
       <div className="list-group-item bg-light justify-content-center preserve-line-breaks ">
-        <div className={is_read ? null : "bg-warning"}> 
-        <button className="btn btn-link" onClick={() => goToPost()}>
-          {text}
-        </button>
+        <div className={is_read ? null : "bg-warning"}>
+          <button className="btn btn-link" onClick={() => goToPostOrUser()}>
+            {text}
+          </button>
         </div>
         <div className="list-group-item p-auto m-auto d-flex justify-content-between align-items-center">
           <div>{`${new Date(date).toLocaleDateString()} ${new Date(

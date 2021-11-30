@@ -230,8 +230,10 @@ class CommentReplyView(views.APIView):
 
         Notification.objects.create(
             recipient=parent_comment.owner,
+            sender=new_comment.user,
             text=notification_text,
             post_id=parent_comment.post.id,
+
         )
 
     # create reply

@@ -59,7 +59,7 @@ class CommentSerializer(serializers.ModelSerializer):
             notification_text = f'{new_comment_username} commented "{truncated_new_comment}" on your post: {truncated_parent_post}'
 
             Notification.objects.create(
-                recipient=recipient, text=notification_text, post_id=parent_post.id
+                recipient=recipient, sender=new_comment.username, text=notification_text, post_id=parent_post.id
             )
 
     def create(self, validated_data):
