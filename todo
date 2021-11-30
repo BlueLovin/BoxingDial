@@ -5,13 +5,13 @@
 [x] reply to other comments
 [x] user inbox
 [x] fix register page
-[] delete account, account settings, more account control
-[] add bio/picture and other info to user profiles
-[] block/mute/report other users
-[] add explore page
-[] notifications
-[] emailing / email verification
-[] captcha on register page
-[] rate limiting
-[] better design/navbar
-[] tiktok style videos?
+[x] notifications
+[]  add bio/picture and other info to user profiles
+[]  delete account, account settings, more account control
+[]  block/mute/report other users
+[]  add explore page
+[]  emailing / email verification
+[]  captcha on register page
+[]  rate limiting
+[]  better design/navbar
+[]  tiktok style videos?
