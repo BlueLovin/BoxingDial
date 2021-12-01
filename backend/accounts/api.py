@@ -32,8 +32,13 @@ class RegisterAPI(generics.GenericAPIView):
 
         # try to create user
         try:
+            # create user 
             user = serializer.save()
-            UserProfile.objects.create(user=user)
+
+            # initialize user profile
+            UserProfile.objects.create(user=user, screen_name=user.dsadsa)
+
+            # create token and login user
             token = AuthToken.objects.create(user)
             return Response(
                 {
@@ -46,6 +51,9 @@ class RegisterAPI(generics.GenericAPIView):
 
         # return errors if exception is thrown
         except Exception as e:
+            if user: # if user was created, rollback changes.
+                user.delete()
+
             errors = dict()
             errors["errors"] = list(e.messages)
             return HttpResponseBadRequest(

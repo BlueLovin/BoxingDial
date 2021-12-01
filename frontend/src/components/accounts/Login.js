@@ -53,8 +53,7 @@ export default function Login() {
       .catch((res) => setError(true));
 
     setActiveItem({
-      // RESET TEXT BOX
-      username: "",
+      // reset password box
       password: "",
     });
   };

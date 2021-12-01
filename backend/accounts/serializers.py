@@ -1,16 +1,26 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import UserFollowing
+from .models import UserFollowing, UserProfile
 from django.contrib.auth import authenticate
 import django.contrib.auth.password_validation as validators
+
+
+# UserProfile Serializer
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ["screen_name", "bio"]
 
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
     posts_count = serializers.IntegerField()
+    profile = ProfileSerializer(many=False)
 
     class Meta:
         model = User
-        fields = ["id", "username", "posts_count"]
+        fields = ["id", "username", "posts_count", "profile"]
+
+
 
 
 # User Serializer

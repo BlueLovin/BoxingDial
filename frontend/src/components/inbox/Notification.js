@@ -24,7 +24,7 @@ export default function Notification(props) {
     await markAsRead();
     // post_id is -1 if there is no post attached
     // takes you to the sender's profile instead
-    if (post_id == -1) {
+    if (post_id === -1) {
       history.push(`/user/${sender}`);
     } else {
       history.push(`/post/${post_id}`);

@@ -184,7 +184,7 @@ export default function Comments() {
       );
     } else {
       return (
-        <div className="list-group-item text-center align-items-center p-5">
+        <div className="container list-group-item text-center align-items-center p-5">
           <h4>
             Please <Link to={`/login/`}>login</Link> to post a comment
           </h4>

@@ -70,20 +70,22 @@ export default function Register() {
           ]);
         }
 
-        if (data.password) {
+        else if (data.password) {
           setErrorMessages((oldArray) => [...oldArray, "Invalid password"]);
         }
 
-        if (data.email) {
+        else if (data.email) {
           setErrorMessages((oldArray) => [
             ...oldArray,
             "Invalid e-mail address",
           ]);
         }
-        if (data.errors) {
+        else if (data.errors) {
           setErrorMessages((oldArray) => oldArray.concat(data.errors));
         }
-
+        else{
+          setErrorMessages(["Unknown error has occured."])
+        }
         setError(true);
       });
   };

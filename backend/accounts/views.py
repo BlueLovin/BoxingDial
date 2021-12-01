@@ -43,6 +43,9 @@ class UserView(generics.GenericAPIView):
             following = this_user.followers.filter(user_id=request.user).exists()
 
             follows_you = request.user.followers.filter(user_id=this_user).exists()
+
+            profile = this_user.profile
+
             return Response(
                 {
                     "id": this_user.id,
@@ -50,6 +53,7 @@ class UserView(generics.GenericAPIView):
                     "posts_count": this_user.posts.count(),
                     "is_following": following,
                     "follows_you": follows_you,
+                    "profile": this_user.profilefff
                 }
             )
         except Exception:
