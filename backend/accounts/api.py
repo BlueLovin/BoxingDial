@@ -32,11 +32,11 @@ class RegisterAPI(generics.GenericAPIView):
 
         # try to create user
         try:
-            # create user 
+            # create user
             user = serializer.save()
 
             # initialize user profile
-            UserProfile.objects.create(user=user, screen_name=user.dsadsa)
+            UserProfile.objects.create(user=user, screen_name=user.username)
 
             # create token and login user
             token = AuthToken.objects.create(user)
@@ -48,14 +48,18 @@ class RegisterAPI(generics.GenericAPIView):
                     "token": token[1],
                 }
             )
+        except AttributeError as e:
+            if user:  # if user was created, rollback changes.
+                user.delete()
+
+            return HttpResponseBadRequest()
 
         # return errors if exception is thrown
         except Exception as e:
-            if user: # if user was created, rollback changes.
-                user.delete()
 
             errors = dict()
             errors["errors"] = list(e.messages)
+
             return HttpResponseBadRequest(
                 json.dumps(errors), content_type="application/json"
             )
@@ -112,7 +116,7 @@ class AddFollowerView(generics.GenericAPIView):
     def post(self, request, format=None):
         user = self.request.user
         follow = User.objects.get(id=self.request.data.get("follow"))
-        
+
         if user != follow:
             notification_text = f"{user.username} just followed you!"
             UserFollowing.objects.get_or_create(user_id=user, following_user_id=follow)

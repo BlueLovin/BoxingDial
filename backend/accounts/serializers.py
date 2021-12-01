@@ -11,6 +11,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ["screen_name", "bio"]
 
+
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
     posts_count = serializers.IntegerField()
@@ -19,8 +20,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "username", "posts_count", "profile"]
-
-
 
 
 # User Serializer
