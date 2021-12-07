@@ -59,7 +59,7 @@ export default function UserProfile() {
     return postsList.map((post, i) => (
       <div key={i}>
         <br />
-        <Post post={post} updateStateFunction={fetchUserPosts} />
+        <Post post={post} removePostFromParentList={fetchUserPosts} />
       </div>
     ));
   };

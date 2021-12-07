@@ -59,7 +59,10 @@ class CommentSerializer(serializers.ModelSerializer):
             notification_text = f'{new_comment_username} commented "{truncated_new_comment}" on your post: {truncated_parent_post}'
 
             Notification.objects.create(
-                recipient=recipient, sender=new_comment.username, text=notification_text, post_id=parent_post.id
+                recipient=recipient,
+                sender=new_comment.username,
+                text=notification_text,
+                post_id=parent_post.id,
             )
 
     def create(self, validated_data):
@@ -154,22 +157,6 @@ class CreatePostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ("id", "date", "fight", "content")
-
-    def create(self, validated_data):
-        owner = self.context["request"].user
-
-        if owner.is_anonymous:
-            raise IsAuthenticated(detail=None, code=None)
-
-        comment_data = []
-        username = owner.username
-        post = Post.objects.create(owner=owner, username=username, **validated_data)
-
-        for comments in comment_data:
-            PostComment.objects.create(
-                Post=post, **comments, owner=owner, username=username
-            )
-        return post
 
 
 class SmallPostSerializer(serializers.ModelSerializer):

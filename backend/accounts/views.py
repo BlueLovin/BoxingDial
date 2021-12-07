@@ -7,11 +7,13 @@ from vote.models import DOWN, UP, Vote
 
 from accounts.serializers import (
     FollowersSerializer,
+    ProfileSerializer,
     UserFollowingSerializer,
     UserSerializer,
 )
 from posts.models import Post, PostComment, PostLike
 from posts.serializers import CommentSerializer, SmallPostSerializer
+import json
 
 # all users - /api/users
 class UsersView(generics.ListAPIView):
@@ -26,25 +28,22 @@ class UserView(generics.GenericAPIView):
     serializer_class = UserSerializer
 
     def get_queryset(self):
+
         return User.objects.filter(username=self.kwargs["user"]).annotate(
             posts_count=Count("posts")
         )
 
-    def get_object(self):
-        return User.objects.annotate(posts_count=Count("posts")).get(
-            username=self.kwargs["user"]
-        )
-
     def get(self, request, user, format=None):
-        this_user = self.get_object()
+
+        this_user = User.objects.annotate(posts_count=Count("posts")).get(username=user)
         if this_user == request.user:
             return Response(UserSerializer(this_user).data)
         try:
-            following = this_user.followers.filter(user_id=request.user).exists()
 
-            follows_you = request.user.followers.filter(user_id=this_user).exists()
+            following = this_user.followers.filter(user_id=request.user.id).exists()
 
-            profile = this_user.profile
+            follows_you = request.user.followers.filter(user_id=this_user.id).exists()
+            profile = ProfileSerializer(this_user.profile).data
 
             return Response(
                 {
@@ -53,7 +52,7 @@ class UserView(generics.GenericAPIView):
                     "posts_count": this_user.posts.count(),
                     "is_following": following,
                     "follows_you": follows_you,
-                    "profile": this_user.profilefff
+                    "profile": profile,
                 }
             )
         except Exception:

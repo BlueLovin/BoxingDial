@@ -194,8 +194,8 @@ export default function Comments() {
   };
 
   const renderComments = () => {
-    return commentList.map((comment, i) => (
-      <Comment comment={comment} updateStateFunction={getPost} key={i} />
+    return commentList.map((comment) => (
+      <Comment comment={comment} updateStateFunction={getPost} key={comment.id} />
     ));
   };
 

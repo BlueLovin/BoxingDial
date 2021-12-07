@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 
 export default function Post(props){
-  const { fullPostPage = false, updateStateFunction = null, toggleModal = null, } = props;
+  const { fullPostPage = false, removePostFromParentList = null, toggleModal = null, } = props;
   const post = props.post;
   const [likeCount, setLikeCount] = useState(post.like_count);
   const { userVal, headersVal } = useContext(UserContext);
@@ -18,8 +18,8 @@ export default function Post(props){
   const history = useHistory();
   const deletePost = (_post) => {
     axios.delete(`/api/posts/${_post.id}/`, headers).then(() => {
-      if (updateStateFunction != null) {
-        updateStateFunction();
+      if (removePostFromParentList != null) {
+        removePostFromParentList();
       } else {
         history.goBack();
       }

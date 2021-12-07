@@ -101,7 +101,7 @@ export default function Comment(props) {
   };
 
   return (
-    <Container key={comment.id}>
+    <Container>
       <div className="list-group-item bg-light justify-content-center preserve-line-breaks">
         <p>{comment.content}</p>
         <div className="list-group-item p-auto m-auto d-flex justify-content-between align-items-center">

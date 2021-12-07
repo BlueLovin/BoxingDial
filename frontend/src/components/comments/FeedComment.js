@@ -1,10 +1,11 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import { Container } from "reactstrap";
 import Comment from "./Comment";
 
-export default function FeedComment(props) {
+export const FeedComment = React.memo((props) => {
   const comment = props.comment;
-  if(comment.post === null){
+  if(comment.post === null || comment.post === undefined){
     return null;
   }
   return (
@@ -23,4 +24,4 @@ export default function FeedComment(props) {
       <Comment comment={comment} />
     </Container>
   );
-}
+})

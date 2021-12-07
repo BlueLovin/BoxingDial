@@ -1,9 +1,10 @@
 from vote.managers import UP
 from vote.models import DOWN, Vote
 from accounts.models import UserFollowing
-from django.db.models.expressions import Exists, OuterRef
+from django.db.models.expressions import Exists, OuterRef, Value
 from rest_framework import serializers, viewsets, generics, views, status
 from rest_framework.permissions import IsAuthenticated
+from fights.models import Fight
 
 from notifications.models import Notification
 from .models import Post, PostComment, PostLike
@@ -37,8 +38,33 @@ class CreatePostView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CreatePostSerializer
 
-    def get_queryset(self):
-        return Post.objects.all()
+    def post(self, request, *args, **kwargs):
+        owner = request.user
+
+        if owner.is_anonymous:
+            raise IsAuthenticated(detail=None, code=None)
+
+        content = request.data["content"]
+        username = owner.username
+        fight_id = request.data["fight"]
+        fight_obj = Fight.objects.get(id=fight_id)
+
+        new_post = Post.objects.create(
+            owner=owner, username=username, content=content, fight=fight_obj
+        )
+        new_post.comments.set([])
+
+        annotated_query = (
+            Post.objects.filter(id=new_post.id)
+            .annotate(
+                comment_count=Value(0),
+                liked=Value(False),
+                like_count=Value(0),
+            )
+            .first()
+        )
+
+        return Response(SmallPostSerializer(annotated_query).data)
 
 
 # post's comments /api/posts/6/comments
@@ -233,7 +259,6 @@ class CommentReplyView(views.APIView):
             sender=new_comment.user,
             text=notification_text,
             post_id=parent_comment.post.id,
-
         )
 
     # create reply

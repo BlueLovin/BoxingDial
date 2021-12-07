@@ -17,6 +17,7 @@ export default function FightPage() {
   const [headers] = headersVal;
   const [modal, setModal] = useState(false);
   const [fightData, setFightData] = useState();
+  const [postList, setPostList] = useState();
   const [loading, setLoading] = useState(true);
   const [activeItem, setActiveItem] = useState({
     fight: null,
@@ -28,17 +29,16 @@ export default function FightPage() {
     let data = {};
     //fetch fight data
     if (loggedIn) {
-      await axios
-        .get(`/api/fights/${fightID}/`, headers)
-        .then((res) => {
-          data = res.data;
-        });
+      await axios.get(`/api/fights/${fightID}/`, headers).then((res) => {
+        data = res.data;
+      });
     } else {
       await axios.get(`/api/fights/${fightID}/`).then((res) => {
         data = res.data;
       });
     }
     setFightData(data); // set local fight object
+    setPostList(data.posts);
     setLoading(false);
   }, [fightID, loggedIn, headers]);
 
@@ -46,10 +46,18 @@ export default function FightPage() {
     fetchFightData();
   }, [fetchFightData]);
 
+  const removePostFromFeed = (post) => {
+    setPostList((list) => list.filter((p) => post !== p));
+  };
+
   const renderPosts = () => {
-    return fightData.posts.map((post, i) => (
-      <div key={i}>
-        <Post post={post} updateStateFunction={fetchFightData} /> <br />
+    return postList.map((post) => (
+      <div key={post.id}>
+        <Post
+          post={post}
+          removePostFromParentList={() => removePostFromFeed(post)}
+        />{" "}
+        <br />
       </div>
     ));
   };
@@ -61,7 +69,7 @@ export default function FightPage() {
 
     await axios
       .post("/api/post/create/", item, headers)
-      .then(() => fetchFightData());
+      .then((res) => setPostList((p) => [res.data, ...p]));
   };
   const createItem = () => {
     const item = {

@@ -2,7 +2,7 @@ import { UserContext } from "../../UserContext";
 import axios from "axios";
 import { useContext, useEffect, useState, useCallback } from "react";
 import Post from "../posts/Post";
-import FeedComment from "../comments/FeedComment";
+import {FeedComment} from "../comments/FeedComment";
 import Modal from "../modals/PostModal";
 import { Button, Card, Container } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -35,17 +35,19 @@ export default function UserFeed() {
   const submitPost = async (item) => {
     await axios
       .post("/api/post/create/", item, headers)
-      .then(() => {
+      .then((res) => {
         toggleModal();
-        window.location.reload(false);
+        console.log(res.data);
+        setFeed((f) => [res.data, ...f]);
+        
       })
-      .catch(() => alert("Error creating your post. Please try again."));
+      //.catch(() => alert("Error creating your post. Please try again."));
   };
   const createItem = () => {
     const item = {
       fight: null,
       content: "",
-      comments: []
+      comments: [],
     };
     setActiveItem(item);
     toggleModal();
@@ -60,21 +62,22 @@ export default function UserFeed() {
       </div>
     );
   };
+  const removePostFromView = (item) => {
+    setFeed(feed.filter((i) => item !== i));
+  };
 
   const renderPosts = () => {
     return feed.map((item, i) => (
-      <div key={i}>
+      <div key={item.id}>
         {item.comment_count != null ? (
           // if the item contains a "comment_count" field, it is a post
-          <Post
-            post={item}
-            updateStateFunction={() => window.location.reload(false)}
-          />
+          <Post key={item.id} post={item} removePostFromParentList={() => removePostFromView(item)} />
         ) : (
           // and if it doesn't... it is definitely a comment
           <FeedComment
+            key={item.id}
             comment={item}
-            updateStateFunction={() => window.location.reload(false)}
+            updateStateFunction={() => removePostFromView(item)}
           />
         )}
         <hr />
