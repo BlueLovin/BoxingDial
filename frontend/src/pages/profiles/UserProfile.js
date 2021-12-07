@@ -11,25 +11,23 @@ export default function UserProfile() {
   const params = useParams();
   const username = params.username;
   const [postsList, setPostsList] = useState([]);
-  const [profileFollowingList, setFollowingList] = useState(null);
-  const [profileFollowersList, setFollowersList] = useState(null);
+  const [profileFollowingList, setFollowingList] = useState([]);
+  const [profileFollowersList, setFollowersList] = useState([]);
 
   const [profile, setProfile] = useState({});
-  const [loading, setLoading] = useState(true);
+
   const [activeTab, setActiveTab] = useState("1");
+
   const { headersVal } = useContext(UserContext);
   const [headers] = headersVal;
 
   const fetchUserPosts = useCallback(async () => {
-    setLoading(true);
     await axios.get(`/api/users/${username}/posts/`, headers).then((res) => {
       setPostsList(res.data);
     });
-    setLoading(false);
   }, [username, headers]);
 
   useEffect(() => {
-    setLoading(true);
     const fetchProfile = async () => {
       //fetch profile with token
       //if token fails, fetch without token
@@ -49,15 +47,14 @@ export default function UserProfile() {
       await axios.get(`/api/users/${username}/followers/`).then((res) => {
         setFollowersList(res.data);
       });
-      setLoading(false);
     };
     fetchUserPosts();
     fetchProfile();
   }, [fetchUserPosts, username, headers]);
 
   const renderProfilePosts = () => {
-    return postsList.map((post, i) => (
-      <div key={i}>
+    return postsList.map((post) => (
+      <div key={post.id}>
         <br />
         <Post post={post} removePostFromParentList={fetchUserPosts} />
       </div>
@@ -65,9 +62,9 @@ export default function UserProfile() {
   };
 
   const renderProfileFollowers = () => {
-    if (profileFollowersList !== null) {
-      return profileFollowersList.map((follower, i) => (
-        <div key={i}>
+    if (profileFollowersList) {
+      return profileFollowersList.map((follower) => (
+        <div key={follower.id}>
           <br />
           <p>{follower.user_id.username}</p>
         </div>
@@ -77,8 +74,8 @@ export default function UserProfile() {
   };
   const renderProfileFollowing = () => {
     if (profileFollowingList) {
-      return profileFollowingList.map((following_user, i) => (
-        <div key={i}>
+      return profileFollowingList.map((following_user) => (
+        <div key={following_user.following_user_id}>
           <br />
           <p>{following_user.following_user_id.username}</p>
         </div>
@@ -89,7 +86,7 @@ export default function UserProfile() {
 
   return (
     <>
-      {loading || !profile ? (
+      {!profile ? (
         "loading"
       ) : (
         <>
