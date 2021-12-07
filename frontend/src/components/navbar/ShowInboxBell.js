@@ -9,7 +9,7 @@ export default function ShowInboxBell() {
   const [user] = userVal;
   const [loggedIn] = loggedInVal;
 
-  if (loggedIn) {
+  if (loggedIn && user) {
     return (
       <span className="p-3">
         <Button

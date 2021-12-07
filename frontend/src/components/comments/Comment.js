@@ -49,7 +49,7 @@ export default function Comment(props) {
   const renderReplyBox = () => {
     if (showReplyBox) {
       return (
-        <span class="p-4 ">
+        <span className="p-4 ">
           <h4 className="text-center">share your thoughts</h4>
           <FormGroup>
             <Input
@@ -101,7 +101,7 @@ export default function Comment(props) {
   };
 
   return (
-    <Container>
+    <Container key={comment.id}>
       <div className="list-group-item bg-light justify-content-center preserve-line-breaks">
         <p>{comment.content}</p>
         <div className="list-group-item p-auto m-auto d-flex justify-content-between align-items-center">

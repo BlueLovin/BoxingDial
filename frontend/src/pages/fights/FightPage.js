@@ -4,7 +4,7 @@ import { useParams, Link } from "react-router-dom/cjs/react-router-dom.min";
 import { UserContext } from "../../UserContext";
 import Post from "../../components/posts/Post";
 import Fight from "../../components/fights/Fight";
-import Modal from "../../components/modals/PostModal";
+import PostModal from "../../components/modals/PostModal";
 import { Button } from "reactstrap";
 
 export default function FightPage() {
@@ -111,7 +111,7 @@ export default function FightPage() {
             {renderPosts()}
           </div>
           {modal ? (
-            <Modal
+            <PostModal
               activeItem={activeItem}
               toggle={toggle}
               onSave={submitPost}

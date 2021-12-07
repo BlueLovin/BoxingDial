@@ -5,7 +5,7 @@ export default function SmallUser(props) {
   let { user } = props;
   return (
     <div className="small-user">
-      <div class="image-cropper">
+      <div className="image-cropper">
         <img className="avatar" src="/default_images/lion.jpg" alt="avatar" />
       </div>
       <div className="small-user-name">

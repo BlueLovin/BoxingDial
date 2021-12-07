@@ -163,7 +163,7 @@ export default function Comments() {
   const renderCommentInput = () => {
     if (user) {
       return (
-        <div class="col-sm-12 my-auto">
+        <div className="col-sm-12 my-auto">
           <h4 className="text-center">share your thoughts</h4>
           <FormGroup>
             <Input
@@ -214,7 +214,7 @@ export default function Comments() {
                 : "loading"}
             </div>
             <br />
-            <div class="row h-100">{renderCommentInput()}</div>
+            <div className="row h-100">{renderCommentInput()}</div>
           </Container>
           {renderOrderBy()}
           <br />

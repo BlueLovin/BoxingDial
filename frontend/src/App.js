@@ -1,20 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import axios from "axios";
-import Home from "./pages/home/HomePage";
-import Comments from "./pages/posts/PostPage";
-import PopularPosts from "./components/posts/PopularPosts";
-import Login from "./components/accounts/Login";
-import UserProfile from "./pages/profiles/UserProfile";
-import ShowUser from "./components/navbar/ShowUser";
-import FightPage from "./pages/fights/FightPage";
-import PopularFights from "./components/fights/PopularFights";
-import RecentFights from "./components/fights/RecentFights";
 import { UserContext } from "./UserContext";
-import Register from "./components/accounts/Register";
 import NavigationBar from "./components/navbar/NavBar";
-import { NotFound } from "./NotFound404";
-import Inbox from "./pages/profiles/Inbox";
+import Routes from "./Routes";
 
 export default function App() {
   const [user, setUser] = useState(); // set to undefined initially
@@ -90,53 +79,9 @@ export default function App() {
         >
           <NavigationBar />
 
-          <Switch>
-            <Route path="/" exact>
-              <Home />
-            </Route>
+          {/* SWITCH AND ROUTES HERE */}
+          <Routes />
 
-            <Route path="/post/:id" exact>
-              <Comments />
-            </Route>
-
-            <Route path="/posts/popular" exact>
-              <PopularPosts />
-            </Route>
-
-            <Route path="/user/:username" exact>
-              <UserProfile />
-            </Route>
-
-            <Route path="/inbox" exact>
-              <Inbox />
-            </Route>
-
-            <Route path="/register" exact>
-              <Register />
-            </Route>
-
-            <Route path="/login" exact>
-              <Login />
-            </Route>
-
-            <Route path="/user" exact>
-              <ShowUser />
-            </Route>
-
-            <Route path="/fight/:fightID" exact>
-              <FightPage />
-            </Route>
-
-            <Route path="/fights/popular" exact>
-              <PopularFights />
-            </Route>
-
-            <Route path="/fights/recent" exact>
-              <RecentFights />
-            </Route>
-
-            <Route component={NotFound} />
-          </Switch>
         </UserContext.Provider>
       </BrowserRouter>
     );

@@ -32,7 +32,7 @@ export default function ShowUser() {
     localStorage.removeItem("token");
   };
 
-  if (loggedIn) {
+  if (loggedIn && user) {
     return (
       <div className="text-center">
         <span>

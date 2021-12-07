@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Modal, ModalHeader, ModalBody } from "reactstrap";
 import TextareaAutosize from "react-textarea-autosize";
 
-export default function PostModal(props) {
+const PostModal = React.memo((props) => {
   let { toggle, onSave } = props;
   const [activeItem, setActiveItem] = useState(props.activeItem);
   const handleChange = (e) => {
@@ -33,4 +33,6 @@ export default function PostModal(props) {
       </ModalBody>
     </Modal>
   );
-}
+})
+
+export default PostModal;

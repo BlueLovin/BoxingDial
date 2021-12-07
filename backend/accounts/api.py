@@ -49,20 +49,20 @@ class RegisterAPI(generics.GenericAPIView):
                 }
             )
         except AttributeError as e:
-            if user:  # if user was created, rollback changes.
-                user.delete()
-
             return HttpResponseBadRequest()
 
         # return errors if exception is thrown
         except Exception as e:
-
             errors = dict()
             errors["errors"] = list(e.messages)
 
             return HttpResponseBadRequest(
                 json.dumps(errors), content_type="application/json"
             )
+
+        finally:
+            if user:  # if user was created, rollback changes.
+                user.delete()
 
 
 class LoginAPI(generics.GenericAPIView):
