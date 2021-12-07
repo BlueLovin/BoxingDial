@@ -8,7 +8,7 @@ import VotingButtons from "./UpvoteButtons";
 export default function Comment(props) {
   //props
   const { contextButton = false } = props;
-  const { updateStateFunction = null } = props;
+  const { removeCommentFromParentList = null } = props;
   const comment = props.comment;
   //context
   const { userVal, headersVal } = useContext(UserContext);
@@ -20,8 +20,8 @@ export default function Comment(props) {
 
   const deleteComment = () => {
     axios.delete(`/api/comments/${comment.id}/`, headers).then(() => {
-      if (updateStateFunction) {
-        updateStateFunction();
+      if (removeCommentFromParentList) {
+        removeCommentFromParentList();
       }
     });
   };
@@ -79,8 +79,8 @@ export default function Comment(props) {
       axios
         .post(`/api/comments/${comment.id}/reply`, activeItem, headers)
         .then(() => {
-          if (updateStateFunction !== null) {
-            updateStateFunction();
+          if (removeCommentFromParentList !== null) {
+            removeCommentFromParentList();
           }
         });
     } else {

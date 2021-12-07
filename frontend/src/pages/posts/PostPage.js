@@ -195,7 +195,7 @@ export default function Comments() {
 
   const renderComments = () => {
     return commentList.map((comment) => (
-      <Comment comment={comment} updateStateFunction={getPost} key={comment.id} />
+      <Comment comment={comment} removeCommentFromParentList={getPost} key={comment.id} />
     ));
   };
 

@@ -77,7 +77,7 @@ export default function UserFeed() {
           <FeedComment
             key={item.id}
             comment={item}
-            updateStateFunction={() => removePostFromView(item)}
+            removeCommentFromParentList={() => removePostFromView(item)}
           />
         )}
         <hr />
