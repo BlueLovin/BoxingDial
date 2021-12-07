@@ -168,7 +168,7 @@ class UserFeedByRecentView(generics.GenericAPIView):
             .annotate(
                 comment_count=Count("comments", distinct=True),
                 liked=Exists(
-                    PostLike.objects.filter(post=OuterRef("pk"), user=self.request.user)
+                    PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
                 ),
                 like_count=Count("post_likes", distinct=True),
             )
@@ -176,9 +176,8 @@ class UserFeedByRecentView(generics.GenericAPIView):
         )
 
         comments = (
-            PostComment.objects.filter(
-                owner__in=follower_user_ids, parent=None, post=not None
-            )
+            PostComment.objects.exclude(post__isnull=True)
+            .filter(owner__in=follower_user_ids, parent=None)
             .annotate(
                 is_voted_down=Exists(
                     Vote.objects.filter(
@@ -211,7 +210,8 @@ class UserFeedByRecentView(generics.GenericAPIView):
 
         user_comments = (
             # parent=None to exclude replies to other comments
-            PostComment.objects.filter(
+            PostComment.objects.exclude(post__isnull=True)
+            .filter(
                 owner__in=[request.user], parent=None, post=not None
             )
             .annotate(
