@@ -1,10 +1,11 @@
 from django.db.models.aggregates import Count
 from django.db.models.expressions import Exists, OuterRef
+from django.http.response import HttpResponseBadRequest
 from rest_framework import generics
 from django.contrib.auth.models import User
+from rest_framework.exceptions import NotAuthenticated
 from rest_framework.response import Response
 from vote.models import DOWN, UP, Vote
-
 from accounts.serializers import (
     FollowersSerializer,
     ProfileSerializer,
@@ -13,7 +14,6 @@ from accounts.serializers import (
 )
 from posts.models import Post, PostComment, PostLike
 from posts.serializers import CommentSerializer, SmallPostSerializer
-import json
 
 # all users - /api/users
 class UsersView(generics.ListAPIView):
@@ -128,3 +128,17 @@ class UserPostListView(generics.ListAPIView):
                 )
                 .order_by("-id")
             )
+
+
+# change user bio /api/user/change-bio
+class ChangeUserBioView(generics.UpdateAPIView):
+    serializer_class = UserSerializer
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        if user.is_anonymous:
+            raise NotAuthenticated
+        user.profile.bio = request.data["new_bio"]
+        user.profile.save()
+
+        return Response(ProfileSerializer(user.profile).data)

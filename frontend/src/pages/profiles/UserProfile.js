@@ -91,9 +91,16 @@ export default function UserProfile() {
       ) : (
         <>
           <h1 className="text-center">
-            {`${username}'s Profile `}
+            {`${
+              profile.profile ? profile.profile.screen_name : username
+            }'s Profile`}
             <FollowButton profile={profile} />
           </h1>
+          <p>
+            {profile.profile && profile.profile.bio.length > 0
+              ? profile.profile.bio
+              : null}
+          </p>
           <br />
 
           <br />

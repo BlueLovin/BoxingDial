@@ -22,6 +22,7 @@ urlpatterns = [
     path("api/users", user_views.UsersView.as_view()),
     path("api/users/<str:user>/following/", user_views.UserFollowingView.as_view()),
     path("api/users/<str:user>/followers/", user_views.UserFollowersView.as_view()),
+    path("api/user/change-bio", user_views.ChangeUserBioView.as_view()),
     #########
     # inbox #
     #########
@@ -42,7 +43,6 @@ urlpatterns = [
         "api/inbox/read-all",
         inbox_views.MarkAllAsReadView.as_view(),
     ),
-    
     ##########
     # fights #
     ##########

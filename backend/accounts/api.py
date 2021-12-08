@@ -48,22 +48,19 @@ class RegisterAPI(generics.GenericAPIView):
                     "token": token[1],
                 }
             )
-        except AttributeError as e:
-            return HttpResponseBadRequest()
-
         # return errors if exception is thrown
         except Exception as e:
+            if user:  # if user was created, rollback changes.
+                user.delete()
+
+            if(e == AttributeError):
+                return HttpResponseBadRequest()
             errors = dict()
             errors["errors"] = list(e.messages)
 
             return HttpResponseBadRequest(
                 json.dumps(errors), content_type="application/json"
             )
-
-        finally:
-            if user:  # if user was created, rollback changes.
-                user.delete()
-
 
 class LoginAPI(generics.GenericAPIView):
     serializer_class = LoginSerializer
@@ -211,9 +208,7 @@ class UserFeedByRecentView(generics.GenericAPIView):
         user_comments = (
             # parent=None to exclude replies to other comments
             PostComment.objects.exclude(post__isnull=True)
-            .filter(
-                owner__in=[request.user], parent=None, post=not None
-            )
+            .filter(owner__in=[request.user], parent=None, post=not None)
             .annotate(
                 is_voted_down=Exists(
                     Vote.objects.filter(
