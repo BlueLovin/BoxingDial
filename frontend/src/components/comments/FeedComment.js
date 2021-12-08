@@ -4,8 +4,8 @@ import { Container } from "reactstrap";
 import Comment from "./Comment";
 
 export const FeedComment = React.memo((props) => {
-  const {comment, removeCommentFromParentList} = props;
-  if(comment.post === null || comment.post === undefined){
+  const { comment, removeCommentFromParentList } = props;
+  if (comment.post === null || comment.post === undefined) {
     return null;
   }
   return (
@@ -21,7 +21,10 @@ export const FeedComment = React.memo((props) => {
           {comment.post.username}
         </Link>
       </p>
-      <Comment comment={comment} removeCommentFromParentList={removeCommentFromParentList}/>
+      <Comment
+        comment={comment}
+        removeCommentFromParentList={removeCommentFromParentList}
+      />
     </Container>
   );
-})
+});

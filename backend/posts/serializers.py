@@ -1,7 +1,11 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
-from accounts.serializers import UserWithFollowageSerializer
+from accounts.serializers import (
+    SmallUserSerializer,
+    SmallUserWithProfileSerializer,
+    UserWithFollowageSerializer,
+)
 from fights.serializers.common import SmallFightSerializer, TinyFightSerializer
 from .models import Post, PostComment, PostLike
 from notifications.models import Notification
@@ -28,6 +32,7 @@ class ReplySerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     replies = ReplySerializer(read_only=True, many=True)
+    owner = SmallUserWithProfileSerializer(many=False)
 
     class Meta:
         model = PostComment
@@ -104,6 +109,7 @@ class TruncatedPostSerializer(serializers.ModelSerializer):
 
 class FeedCommentSerializer(serializers.ModelSerializer):
     post = TruncatedPostSerializer(many=False)
+    owner = SmallUserWithProfileSerializer(many=False)
 
     class Meta:
         model = PostComment
@@ -134,6 +140,7 @@ class PostSerializer(serializers.ModelSerializer):
     comment_count = serializers.IntegerField()
     like_count = serializers.IntegerField()
     liked = serializers.BooleanField(default=False)
+    owner = SmallUserWithProfileSerializer(many=False)
 
     class Meta:
         model = Post
@@ -164,6 +171,7 @@ class SmallPostSerializer(serializers.ModelSerializer):
     comment_count = serializers.IntegerField()
     like_count = serializers.IntegerField()
     liked = serializers.BooleanField(default=False)
+    owner = SmallUserWithProfileSerializer(many=False)
 
     class Meta:
         model = Post

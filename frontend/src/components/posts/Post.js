@@ -6,8 +6,12 @@ import { UserContext } from "../../UserContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 
-export default function Post(props){
-  const { fullPostPage = false, removePostFromParentList = null, toggleModal = null, } = props;
+export default function Post(props) {
+  const {
+    fullPostPage = false,
+    removePostFromParentList = null,
+    toggleModal = null,
+  } = props;
   const post = props.post;
   const [likeCount, setLikeCount] = useState(post.like_count);
   const { userVal, headersVal } = useContext(UserContext);
@@ -65,9 +69,11 @@ export default function Post(props){
     <Container>
       <div className="list-group-item p-3">
         <span>
-          <Link to={`/user/${post.username}`}>{post.username}</Link>
+          {post.owner.profile.screen_name}
+          <Link to={`/user/${post.owner.username}`}>
+            <div>@{post.owner.username}</div>
+          </Link>
         </span>
-        <br />
         <br />
         <span className="font-weight-light list-group-item bg-light p-2 m-1 preserve-line-breaks">
           {post.content}

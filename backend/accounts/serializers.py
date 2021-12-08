@@ -22,6 +22,15 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "posts_count", "profile"]
 
 
+# User with profile Serializer
+class SmallUserWithProfileSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(many=False)
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "profile"]
+
+
 # User Serializer
 class UserWithFollowageSerializer(serializers.ModelSerializer):
     posts_count = serializers.IntegerField()

@@ -27,7 +27,8 @@ export default function Comment(props) {
   };
 
   const renderReplyButton = () => {
-    if (comment.replies && comment.parent === null) { // if parent comment
+    if (comment.replies && comment.parent === null) {
+      // if parent comment
       return (
         <button
           className="btn btn-primary"
@@ -106,8 +107,15 @@ export default function Comment(props) {
         <p>{comment.content}</p>
         <div className="list-group-item p-auto m-auto d-flex justify-content-between align-items-center">
           <div>
-            <span className="text-muted">by </span>
-            <Link to={`/user/${comment.username}`}>{comment.username}</Link>
+            <div className="text-muted">
+              by{" "}
+              <span className="text-dark font-weight-bold">
+                {comment.owner.profile.screen_name}
+              </span>
+            </div>
+            <Link to={`/user/${comment.owner.username}`}>
+              @{comment.username}
+            </Link>
           </div>
           {contextButton && comment.post !== null ? (
             <Link to={`/post/${comment.post}`}>
@@ -120,7 +128,7 @@ export default function Comment(props) {
           </div>
           <div>
             {renderReplyButton()}
-            {user && user.username === comment.username ? (
+            {user && user.username === comment.owner.username ? (
               <React.Fragment>
                 <button
                   className="btn-sm btn-danger"

@@ -53,7 +53,7 @@ class RegisterAPI(generics.GenericAPIView):
             if user:  # if user was created, rollback changes.
                 user.delete()
 
-            if(e == AttributeError):
+            if e == AttributeError:
                 return HttpResponseBadRequest()
             errors = dict()
             errors["errors"] = list(e.messages)
@@ -61,6 +61,7 @@ class RegisterAPI(generics.GenericAPIView):
             return HttpResponseBadRequest(
                 json.dumps(errors), content_type="application/json"
             )
+
 
 class LoginAPI(generics.GenericAPIView):
     serializer_class = LoginSerializer
