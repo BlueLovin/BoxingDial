@@ -130,7 +130,7 @@ class UserPostListView(generics.ListAPIView):
             )
 
 
-# change user bio /api/user/change-bio
+# change user profile /api/user/change-profile
 class ChangeUserProfileView(generics.UpdateAPIView):
     serializer_class = UserSerializer
 
