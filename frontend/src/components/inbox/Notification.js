@@ -1,6 +1,6 @@
 import { Button, Container } from "reactstrap";
 import axios from "axios";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { UserContext } from "../../UserContext";
 import { useHistory } from "react-router";
 
@@ -9,14 +9,16 @@ export default function Notification(props) {
   const this_notification = props.notification;
 
   const { loggedInVal, headersVal } = useContext(UserContext);
+  const [read, setRead] = useState(is_read);
   const [loggedIn] = loggedInVal;
   const [headers] = headersVal;
 
   const history = useHistory();
 
   const markAsRead = async () => {
-    if (is_read === false && loggedIn) {
+    if (read === false && loggedIn) {
       await axios.post(`/api/inbox/${this_notification.id}/read`, {}, headers);
+      setRead(true);
     }
   };
 
@@ -46,7 +48,7 @@ export default function Notification(props) {
   return (
     <Container>
       <div className="list-group-item bg-light justify-content-center preserve-line-breaks ">
-        <div className={is_read ? null : "bg-warning"}>
+        <div className={read ? null : "bg-warning"} onClick={markAsRead}>
           <button className="btn btn-link" onClick={() => goToPostOrUser()}>
             {text}
           </button>
