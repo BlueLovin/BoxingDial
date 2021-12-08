@@ -96,11 +96,14 @@ export default function UserProfile() {
             }'s Profile`}
             <FollowButton profile={profile} />
           </h1>
-          <p>
-            {profile.profile && profile.profile.bio.length > 0
-              ? profile.profile.bio
-              : null}
-          </p>
+          <div className="container justify-content-center d-flex">
+            <p className="list-group-item w-25 text-center">
+              {profile.profile && profile.profile.bio.length > 0
+                ? profile.profile.bio
+                : null}
+            </p>
+          </div>
+
           <br />
 
           <br />
