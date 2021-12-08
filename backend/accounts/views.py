@@ -131,14 +131,20 @@ class UserPostListView(generics.ListAPIView):
 
 
 # change user bio /api/user/change-bio
-class ChangeUserBioView(generics.UpdateAPIView):
+class ChangeUserProfileView(generics.UpdateAPIView):
     serializer_class = UserSerializer
 
     def post(self, request, *args, **kwargs):
         user = request.user
         if user.is_anonymous:
             raise NotAuthenticated
-        user.profile.bio = request.data["new_bio"]
+
+        if "new_bio" in request.data:
+            user.profile.bio = request.data["new_bio"]
+            
+        if "new_screen_name" in request.data:
+            user.profile.screen_name = request.data["new_screen_name"]
+            
         user.profile.save()
 
         return Response(ProfileSerializer(user.profile).data)
