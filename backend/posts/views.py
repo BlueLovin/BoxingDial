@@ -22,6 +22,8 @@ from django.db.models import Count, Prefetch
 from rest_framework.response import Response
 from vote.views import VoteMixin
 
+NOT_LOGGED_IN_EXCEPTION = serializers.DjangoValidationError("not logged in")
+
 
 # all posts /api/posts
 class PostsView(generics.ListAPIView):
@@ -46,8 +48,15 @@ class CreatePostView(generics.CreateAPIView):
 
         content = request.data["content"]
         username = owner.username
-        fight_id = request.data["fight"]
-        fight_obj = Fight.objects.get(id=fight_id)
+
+        # fight field is optional when creating a post.
+        if "fight" in request.data:
+            fight_id = request.data["fight"]
+
+            if fight_id is not None:
+                fight_obj = Fight.objects.get(id=fight_id)
+            else:
+                fight_obj = None
 
         new_post = Post.objects.create(
             owner=owner, username=username, content=content, fight=fight_obj
@@ -215,6 +224,62 @@ class PopularPostsView(generics.ListAPIView):
 
 
 # all comments /api/comments
+class CreatePostCommentView(generics.CreateAPIView):
+    permission_classes = [IsOwnerOrReadOnly]
+    serializer_class = CommentSerializer
+
+    def create_notification(self, new_comment, parent_post):
+        recipient = parent_post.owner
+        new_comment_username = new_comment.username
+        recipient_username = recipient.username
+
+        # user does not send notification to theirself
+        if recipient_username != new_comment_username:
+            truncated_new_comment = new_comment.content[:25] + "..."
+            truncated_parent_post = parent_post.content[:25] + "..."
+
+            notification_text = f'{new_comment_username} commented "{truncated_new_comment}" on your post: {truncated_parent_post}'
+
+            Notification.objects.create(
+                recipient=recipient,
+                sender=new_comment.username,
+                text=notification_text,
+                post_id=parent_post.id,
+            )
+
+    def post(self, request, format=None):
+        owner = self.request.user
+
+        if owner.is_anonymous:
+            raise NOT_LOGGED_IN_EXCEPTION
+
+        username = owner.username
+
+        # if a comment on a post, specify post
+        if "post" in request.data:
+            post_id = request.data.pop("post")
+            post = Post.objects.get(id=post_id)
+
+            comment = PostComment.objects.create(
+                owner=owner, username=username, post=post, **request.data
+            )
+            self.create_notification(comment, post)
+
+        else:
+            comment = PostComment.objects.create(
+                owner=owner, username=username, **request.data
+            )
+
+        # upvote comment
+        comment.votes.up(owner.id)
+
+        # annotate response
+        comment.is_voted_up = True
+        comment.vote_score = 1
+        return Response(CommentSerializer(comment).data)
+
+
+# all comments /api/comments
 class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
     permission_classes = [IsOwnerOrReadOnly]
     serializer_class = CommentSerializer
@@ -229,6 +294,37 @@ class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
         ).get(pk=pk)
         serializer = CommentSerializer(comment)
         return Response(serializer.data)
+
+    def post(self, request, parent, format=None):
+        print("\n\n\ndafd\n\n\n\n")
+        owner = self.request.user
+
+        if owner.is_anonymous:
+            raise NOT_LOGGED_IN_EXCEPTION
+
+        username = owner.username
+
+        # if a comment on a post, specify post
+        if request.data["post"] is not None:
+            post = request.data.pop("post")
+
+            comment = PostComment.objects.create(
+                owner=owner, username=username, post=post, **request.data
+            )
+            self.create_notification(comment, post)
+
+        else:
+            comment = PostComment.objects.create(
+                owner=owner, username=username, **request.data
+            )
+
+        # upvote comment
+        comment.votes.up(owner.id)
+
+        # annotate response
+        comment.is_voted_up = True
+        comment.vote_score = 1
+        return CommentSerializer(comment).data
 
 
 # all comments /api/comments/{comment_ID}/reply
@@ -268,11 +364,12 @@ class CommentReplyView(views.APIView):
 
         try:  # try getting the parent comment
             parent_comment = PostComment.objects.get(id=parent_pk)
+
         except PostComment.DoesNotExist:
             raise serializers.ValidationError("error getting parent comment")
 
         if owner.is_anonymous:
-            raise serializers.DjangoValidationError("not logged in")
+            raise NOT_LOGGED_IN_EXCEPTION
 
         if parent_comment.parent == None:
 
