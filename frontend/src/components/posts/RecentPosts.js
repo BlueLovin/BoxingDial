@@ -19,8 +19,8 @@ export default function RecentPosts() {
   const renderPosts = () => {
     return postList
       .slice(0, 3)
-      .map((post, i) => (
-        <div key={i}>
+      .map((post) => (
+        <div key={post.id}>
           <Post post={post} />
           <hr />
         </div>

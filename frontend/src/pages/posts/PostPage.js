@@ -1,16 +1,8 @@
-import React, {
-  useEffect,
-  useState,
-  useContext,
-  useCallback,
-  useRef,
-} from "react";
-import { useHistory, useParams, Link } from "react-router-dom";
+import React, { useEffect, useState, useContext, useCallback } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../../UserContext";
-import {
-  Container,
-} from "reactstrap";
+
 import Post from "../../components/posts/Post";
 import PostLikesModal from "../../components/modals/PostLikesModal";
 import PostPageComments from "../../components/comments/PostPageComments";
@@ -19,10 +11,9 @@ export default function Comments() {
   const params = useParams();
   const postID = params.id;
 
-
   const [modal, setModal] = useState(false);
 
-  const { headersVal, loggedInVal } = useContext(UserContext);
+  const { headersVal } = useContext(UserContext);
   const [headers, setHeaders] = headersVal;
 
   const history = useHistory();
@@ -31,12 +22,9 @@ export default function Comments() {
     content: "",
   });
 
-
   const toggleModal = () => {
     setModal(!modal);
   };
-
-
 
   //get post with headers
   const getPost = useCallback(async () => {
@@ -58,9 +46,6 @@ export default function Comments() {
     getPost();
   }, [getPost]);
 
-
-
- 
   const renderPost = (post) => {
     return (
       <>
@@ -77,7 +62,6 @@ export default function Comments() {
     );
   };
 
-
   return (
     <div>
       <br />
@@ -85,7 +69,7 @@ export default function Comments() {
         <>
           {renderPost(currentPost)}
 
-         <PostPageComments post={currentPost}/> 
+          <PostPageComments post={currentPost} />
           {modal ? (
             <PostLikesModal toggle={toggleModal} postID={postID} />
           ) : null}

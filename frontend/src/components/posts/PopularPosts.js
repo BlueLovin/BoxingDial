@@ -17,8 +17,8 @@ export default function PopularPosts() {
       .catch((err) => console.log(err));
   };
   const renderPosts = () => {
-    return postList.slice(0, 5).map((post, i) => (
-      <div key={i}>
+    return postList.slice(0, 5).map((post) => (
+      <div key={post.id}>
         <Post post={post} />
         <hr />
       </div>
