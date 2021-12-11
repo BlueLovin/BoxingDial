@@ -139,11 +139,11 @@ class ChangeUserProfileView(generics.UpdateAPIView):
         if user.is_anonymous:
             raise NotAuthenticated
 
-        if "new_bio" in request.data:
-            user.profile.bio = request.data["new_bio"]
+        if "bio" in request.data:
+            user.profile.bio = request.data["bio"]
             
-        if "new_screen_name" in request.data:
-            user.profile.screen_name = request.data["new_screen_name"]
+        if "screen_name" in request.data:
+            user.profile.screen_name = request.data["screen_name"]
             
         user.profile.save()
 

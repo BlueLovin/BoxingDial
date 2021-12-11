@@ -9,6 +9,7 @@ import { NotFound } from "./NotFound404";
 import FightPage from "./pages/fights/FightPage";
 import Home from "./pages/home/HomePage";
 import Comments from "./pages/posts/PostPage";
+import EditProfile from "./pages/profiles/EditProfile";
 import Inbox from "./pages/profiles/Inbox";
 import UserProfile from "./pages/profiles/UserProfile";
 
@@ -29,6 +30,10 @@ export default function Routes() {
 
       <Route path="/user/:username" exact>
         <UserProfile />
+      </Route>
+
+      <Route path="/edit-profile" exact>
+        <EditProfile />
       </Route>
 
       <Route path="/inbox" exact>
@@ -59,7 +64,7 @@ export default function Routes() {
         <RecentFights />
       </Route>
 
-      <Route path='*' exact={true} component={NotFound} />
+      <Route path="*" exact={true} component={NotFound} />
     </Switch>
   );
 }

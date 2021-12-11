@@ -31,12 +31,7 @@ export default function Register() {
   const handleChange = (e) => {
     let { name, value } = e.target;
 
-    const item = {
-      ...activeItem,
-      [name]: value,
-    };
-
-    setActiveItem(item);
+    setActiveItem((oldItem) => ({ ...oldItem, [name]: value }));
   };
 
   const submitUser = async (item) => {
@@ -47,7 +42,6 @@ export default function Register() {
       console.log(item.password);
       console.log(item.confirmation_password);
       setError(true);
-      setErrorMessages([]);
       setErrorMessages(["Passwords do not match"]);
       return;
     }
@@ -68,23 +62,17 @@ export default function Register() {
             ...oldArray,
             "username: " + data.username[0],
           ]);
-        }
-
-        else if (data.password) {
+        } else if (data.password) {
           setErrorMessages((oldArray) => [...oldArray, "Invalid password"]);
-        }
-
-        else if (data.email) {
+        } else if (data.email) {
           setErrorMessages((oldArray) => [
             ...oldArray,
             "Invalid e-mail address",
           ]);
-        }
-        else if (data.errors) {
+        } else if (data.errors) {
           setErrorMessages((oldArray) => oldArray.concat(data.errors));
-        }
-        else{
-          setErrorMessages(["Unknown error has occured."])
+        } else {
+          setErrorMessages(["Unknown error has occured."]);
         }
         setError(true);
       });

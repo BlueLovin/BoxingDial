@@ -15,8 +15,8 @@ export default function ProfileComments(props) {
   }, [headers, username]);
 
   const renderProfileComments = () => {
-    return commentsList.map((comment, i) => (
-      <div key={i}>
+    return commentsList.map((comment) => (
+      <div key={comment.id}>
         <br />
         <Comment comment={comment} contextButton={true} />
       </div>

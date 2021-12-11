@@ -67,7 +67,7 @@ export default function UserFeed() {
   };
 
   const renderPosts = () => {
-    return feed.map((item, i) => (
+    return feed.map((item) => (
       <div key={item.id}>
         {item.comment_count != null ? (
           // if the item contains a "comment_count" field, it is a post

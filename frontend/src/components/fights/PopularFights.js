@@ -19,8 +19,8 @@ export default function PopularFights() {
   const renderFights = () => {
     return fightList
       .slice(0, 3)
-      .map((fightData, i) => (
-        <div className="border rounded p-3" key={i}>
+      .map((fightData) => (
+        <div className="border rounded p-3" key={fightData.id}>
           <SmallFight fightData={fightData} />
         </div>
       ));

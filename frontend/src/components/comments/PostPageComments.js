@@ -37,7 +37,6 @@ export default function PostPageComments(props) {
   useEffect(() => {
     // only if rerender, never on mount
     if (isMounted.current) {
-      setCommentList([]);
       axios
         .get(`/api/posts/${post.id}/comments?order_by=${commentOrder}`, headers)
         .then((res) => setCommentList(res.data));
