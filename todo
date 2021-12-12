@@ -6,9 +6,10 @@
 [x] user inbox
 [x] fix register page
 [x] notifications
-[]  add bio/picture and other info to user profiles
+[x] add bio/screen name to user profiles
 []  delete account, account settings, more account control
 []  block/mute/report other users
+[]  add profile pictures to profiles
 []  DMs
 []  add explore page
 []  emailing / email verification
