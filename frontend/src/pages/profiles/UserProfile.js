@@ -2,10 +2,12 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Post from "../../components/posts/Post";
-import { Nav, NavItem, TabContent, TabPane, NavLink } from "reactstrap";
+import { Nav, NavItem, TabContent, TabPane, NavLink, Button } from "reactstrap";
 import { UserContext } from "../../UserContext";
 import FollowButton from "../../components/profiles/FollowButton";
 import ProfileComments from "../../components/profiles/ProfileComments";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 
 export default function UserProfile() {
   const params = useParams();
@@ -20,6 +22,8 @@ export default function UserProfile() {
 
   const { headersVal } = useContext(UserContext);
   const [headers] = headersVal;
+  const { userVal } = useContext(UserContext);
+  const [user] = userVal;
 
   const fetchUserPosts = useCallback(async () => {
     await axios.get(`/api/users/${username}/posts/`, headers).then((res) => {
@@ -102,6 +106,14 @@ export default function UserProfile() {
                 ? profile.profile.bio
                 : null}
             </p>
+          </div>
+          <div className="d-flex justify-content-center">
+            {user.username === username ? (
+              <Button href="/edit-profile">
+                <FontAwesomeIcon icon={faPencilAlt}></FontAwesomeIcon>
+                {" Edit Profile"}
+              </Button>
+            ) : null}
           </div>
 
           <br />
