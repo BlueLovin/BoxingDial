@@ -107,18 +107,17 @@ export default function Post(props) {
             </>
           ) : (
             <>
-              {/* like button */}
-              <div className="text-left m-1">
+              <div className="d-flex justify-content-between">
+                {/* like button */}
                 <button className={buttonClass} onClick={() => likePost(post)}>
                   <FontAwesomeIcon icon={faHeart} />
                   {" " + likeCount}
                 </button>
-              </div>
-              <p>
+                {/* comments link */}
                 <Link to={`/post/${post.id}`}>
                   {post.comment_count} comments
                 </Link>
-              </p>
+              </div>
             </>
           )}
 
