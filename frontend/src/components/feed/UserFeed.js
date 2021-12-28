@@ -2,7 +2,7 @@ import { UserContext } from "../../UserContext";
 import axios from "axios";
 import { useContext, useEffect, useState, useCallback } from "react";
 import Post from "../posts/Post";
-import {FeedComment} from "../comments/FeedComment";
+import { FeedComment } from "../comments/FeedComment";
 import Modal from "../modals/PostModal";
 import { Button, Card, Container } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -17,9 +17,9 @@ export default function UserFeed() {
   const [user] = userVal;
   const [activeItem, setActiveItem] = useState({});
 
-  const fetchPostsAndComments = useCallback(async () => {
+  const fetchPostsAndComments = useCallback(() => {
     if (loggedIn) {
-      await axios.get("/api/feed/recent", headers).then((res) => {
+      axios.get("/api/feed/recent", headers).then((res) => {
         setFeed(res.data);
       });
     }
@@ -32,16 +32,13 @@ export default function UserFeed() {
   const toggleModal = () => {
     setModal(!modal);
   };
-  const submitPost = async (item) => {
-    await axios
-      .post("/api/post/create/", item, headers)
-      .then((res) => {
-        toggleModal();
-        console.log(res.data);
-        setFeed((f) => [res.data, ...f]);
-        
-      })
-      //.catch(() => alert("Error creating your post. Please try again."));
+  const submitPost = (item) => {
+    axios.post("/api/post/create/", item, headers).then((res) => {
+      toggleModal();
+      console.log(res.data);
+      setFeed((f) => [res.data, ...f]);
+    });
+    //.catch(() => alert("Error creating your post. Please try again."));
   };
   const createItem = () => {
     const item = {
@@ -71,7 +68,11 @@ export default function UserFeed() {
       <div key={item.id}>
         {item.comment_count != null ? (
           // if the item contains a "comment_count" field, it is a post
-          <Post key={item.id} post={item} removePostFromParentList={() => removePostFromView(item)} />
+          <Post
+            key={item.id}
+            post={item}
+            removePostFromParentList={() => removePostFromView(item)}
+          />
         ) : (
           // and if it doesn't... it is definitely a comment
           <FeedComment

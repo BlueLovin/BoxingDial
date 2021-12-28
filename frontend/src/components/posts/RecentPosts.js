@@ -10,21 +10,19 @@ export default function RecentPosts() {
     refreshPostList();
   }, []);
 
-  const refreshPostList = async () => {
-    await axios
+  const refreshPostList = () => {
+    axios
       .get("/api/posts/")
       .then((res) => setpostList(res.data))
       .catch((err) => console.log(err));
   };
   const renderPosts = () => {
-    return postList
-      .slice(0, 3)
-      .map((post) => (
-        <div key={post.id}>
-          <Post post={post} />
-          <hr />
-        </div>
-      ));
+    return postList.slice(0, 3).map((post) => (
+      <div key={post.id}>
+        <Post post={post} />
+        <hr />
+      </div>
+    ));
   };
   return (
     <>

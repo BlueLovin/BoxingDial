@@ -24,16 +24,16 @@ export default function FightPage() {
     content: "",
   });
 
-  const fetchFightData = useCallback(async () => {
+  const fetchFightData = useCallback(() => {
     setLoading(true);
     let data = {};
     //fetch fight data
     if (loggedIn) {
-      await axios.get(`/api/fights/${fightID}/`, headers).then((res) => {
+      axios.get(`/api/fights/${fightID}/`, headers).then((res) => {
         data = res.data;
       });
     } else {
-      await axios.get(`/api/fights/${fightID}/`).then((res) => {
+      axios.get(`/api/fights/${fightID}/`).then((res) => {
         data = res.data;
       });
     }
@@ -64,10 +64,10 @@ export default function FightPage() {
   const toggle = () => {
     setModal(!modal);
   };
-  const submitPost = async (item) => {
+  const submitPost = (item) => {
     toggle();
 
-    await axios
+    axios
       .post("/api/post/create/", item, headers)
       .then((res) => setPostList((p) => [res.data, ...p]));
   };

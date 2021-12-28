@@ -7,7 +7,6 @@ export default function FollowButton(props) {
   const { profile } = props;
 
   const [isFollowing, setIsFollowing] = useState(profile.is_following);
-  const [followButtonPressed, setFollowButtonPressed] = useState(false);
 
   const { headersVal, userVal, loggedInVal } = useContext(UserContext);
   const [user] = userVal;
@@ -18,20 +17,20 @@ export default function FollowButton(props) {
     setIsFollowing(profile.is_following);
   }, [profile]);
 
-  const follow = async () => {
+  const follow = () => {
     let data = {
       follow: profile.id,
     };
-    await axios
+    axios
       .post(`/api/users/follow`, data, headers)
       .then(() => setIsFollowing(true));
   };
 
-  const unfollow = async () => {
+  const unfollow = () => {
     let data = {
       unfollow: profile.id,
     };
-    await axios
+    axios
       .post(`/api/users/unfollow`, data, headers)
       .then(() => setIsFollowing(false));
   };
@@ -43,9 +42,8 @@ export default function FollowButton(props) {
           return (
             <>
               <Button
-                onClick={async () => {
-                  await follow();
-                  setFollowButtonPressed(!followButtonPressed);
+                onClick={() => {
+                  follow();
                 }}
               >
                 Follow
@@ -56,9 +54,8 @@ export default function FollowButton(props) {
           return (
             <>
               <Button
-                onClick={async () => {
-                  await unfollow();
-                  setFollowButtonPressed(!followButtonPressed);
+                onClick={() => {
+                  unfollow();
                 }}
               >
                 Unfollow

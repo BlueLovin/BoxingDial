@@ -8,11 +8,12 @@ import { faHeart } from "@fortawesome/free-solid-svg-icons";
 
 export default function Post(props) {
   const {
+    post,
     fullPostPage = false,
     removePostFromParentList = null,
     toggleModal = null,
   } = props;
-  const post = props.post;
+
   const [likeCount, setLikeCount] = useState(post.like_count);
   const { userVal, headersVal } = useContext(UserContext);
   const [buttonClass, setButtonClass] = useState("btn-sm btn-primary");
@@ -20,6 +21,7 @@ export default function Post(props) {
   const [user] = userVal;
   const [headers] = headersVal;
   const history = useHistory();
+
   const deletePost = (_post) => {
     axios.delete(`/api/posts/${_post.id}/`, headers).then(() => {
       if (removePostFromParentList != null) {
@@ -38,12 +40,12 @@ export default function Post(props) {
     }
   }, [post]);
 
-  const likePost = async (_post) => {
+  const likePost = (_post) => {
     if (!user) {
       alert("login to be able to like posts!");
       return;
     }
-    await axios.post(`/api/posts/${_post.id}/like`, {}, headers).then((res) => {
+    axios.post(`/api/posts/${_post.id}/like`, {}, headers).then((res) => {
       const result = res.data["result"];
       // LIKE
       if (result === "liked") {
@@ -107,7 +109,7 @@ export default function Post(props) {
             </>
           ) : (
             <>
-              <div className="d-flex justify-content-between">
+              <div className="d-flex justify-content-between align-items-center">
                 {/* like button */}
                 <button className={buttonClass} onClick={() => likePost(post)}>
                   <FontAwesomeIcon icon={faHeart} />

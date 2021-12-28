@@ -13,7 +13,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getTokenAndSetHeaders = async () => {
+    const getTokenAndSetHeaders = () => {
       let tokenValue = localStorage.getItem("token");
       setToken(tokenValue);
 
@@ -30,9 +30,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const setLoggedInUser = async () => {
+    const setLoggedInUser = () => {
       if (token) {
-        await axios
+        axios
           .get("/api/token-auth/user", {
             headers: {
               Authorization: `Token ${token}`,

@@ -56,13 +56,13 @@ export default function PostPageComments(props) {
     setActiveItem(item);
   };
 
-  const submitComment = async (item) => {
+  const submitComment = (item) => {
     if (loggedIn === false) {
       alert("must be logged in to post a comment.");
       return;
     }
 
-    await axios // create
+    axios // create
       .post("/api/comments/create", item, headers)
       .then((res) => {
         setCommentList((oldList) => [res.data, ...oldList]);

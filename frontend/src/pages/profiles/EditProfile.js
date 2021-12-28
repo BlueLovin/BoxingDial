@@ -42,10 +42,11 @@ export default function EditProfile() {
     setFieldCharCounts((oldCount) => ({ ...oldCount, [name]: value.length }));
   };
 
-  const sumbitNewProfile = async (e) => {
+  const sumbitNewProfile = (e) => {
     e.preventDefault();
-    await axios.post("/api/user/change-profile", profile, headers)
-    .then(() => {history.push(`/user/${user.username}`);});
+    axios.post("/api/user/change-profile", profile, headers).then(() => {
+      history.push(`/user/${user.username}`);
+    });
   };
 
   return (

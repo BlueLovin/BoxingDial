@@ -34,7 +34,7 @@ export default function Register() {
     setActiveItem((oldItem) => ({ ...oldItem, [name]: value }));
   };
 
-  const submitUser = async (item) => {
+  const submitUser = (item) => {
     setError(false);
 
     // password and confirmation password must match
@@ -46,7 +46,7 @@ export default function Register() {
       return;
     }
 
-    await axios
+    axios
       .post("/api/token-auth/register", item)
       .then((res) => {
         setError(false);

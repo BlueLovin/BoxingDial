@@ -10,8 +10,8 @@ export default function RecentFights() {
     refreshPostList();
   }, []);
 
-  const refreshPostList = async () => {
-    await axios
+  const refreshPostList = () => {
+    axios
       .get("/api/fights/small")
       .then((res) => setFightList(res.data))
       .catch((err) => console.log(err));

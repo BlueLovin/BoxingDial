@@ -38,9 +38,9 @@ export default function Login() {
     submitUser(activeItem);
   };
 
-  const submitUser = async (item) => {
+  const submitUser = (item) => {
     // create user object
-    await axios
+    axios
       .post("/api/token-auth/login", item)
       .then((res) => {
         setToken(res.data.token);
@@ -50,7 +50,7 @@ export default function Login() {
           setError(false);
         }
       })
-      .catch((res) => setError(true));
+      .catch(() => setError(true));
 
     setActiveItem({
       // reset password box

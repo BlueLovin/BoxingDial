@@ -103,10 +103,10 @@ export default function VotingButtons(props) {
     }
   };
   //post voting data to server and set DOM state for better UX
-  const vote = async (direction) => {
+  const vote = (direction) => {
     if (loggedIn) {
       const data = serializeDirection(direction);
-      await axios.post(`/api/comments/${comment.id}/vote/`, data, headers);
+      axios.post(`/api/comments/${comment.id}/vote/`, data, headers);
       if (direction === "up") {
         setCommentScore(scoreBeforeVote + 1);
         setVoteDirection(DIRECTION.UP);

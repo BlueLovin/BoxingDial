@@ -10,8 +10,8 @@ export default function PopularPosts() {
     refreshPostList();
   }, []);
 
-  const refreshPostList = async () => {
-    await axios
+  const refreshPostList = () => {
+    axios
       .get("/api/posts/popular")
       .then((res) => setpostList(res.data))
       .catch((err) => console.log(err));

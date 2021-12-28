@@ -25,17 +25,17 @@ export default function UserProfile() {
   const { userVal } = useContext(UserContext);
   const [user] = userVal;
 
-  const fetchUserPosts = useCallback(async () => {
-    await axios.get(`/api/users/${username}/posts/`, headers).then((res) => {
+  const fetchUserPosts = useCallback(() => {
+    axios.get(`/api/users/${username}/posts/`, headers).then((res) => {
       setPostsList(res.data);
     });
   }, [username, headers]);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchProfile = () => {
       //fetch profile with token
       //if token fails, fetch without token
-      await axios
+      axios
         .get(`/api/users/${username}/`, headers)
         .then((res) => {
           setProfile(res.data);
@@ -44,11 +44,11 @@ export default function UserProfile() {
           window.location = "/404/"; //404 if user doesnt exist
         });
       // set profile followers list
-      await axios.get(`/api/users/${username}/following/`).then((res) => {
+      axios.get(`/api/users/${username}/following/`).then((res) => {
         setFollowingList(res.data);
       });
       // set profile following list
-      await axios.get(`/api/users/${username}/followers/`).then((res) => {
+      axios.get(`/api/users/${username}/followers/`).then((res) => {
         setFollowersList(res.data);
       });
     };

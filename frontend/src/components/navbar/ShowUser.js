@@ -15,7 +15,7 @@ export default function ShowUser() {
   const [headers] = headersVal;
   const history = useHistory();
 
-  const Logout = async () => {
+  const Logout = () => {
     setUser(null);
     axios
       .post("/api/token-auth/logout", {}, headers)

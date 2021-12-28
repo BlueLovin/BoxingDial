@@ -10,8 +10,8 @@ export default function PopularFights() {
     refreshPostList();
   }, []);
 
-  const refreshPostList = async () => {
-    await axios
+  const refreshPostList = () => {
+    axios
       .get("/api/fights/popular")
       .then((res) => setFightList(res.data))
       .catch((err) => console.log(err));
