@@ -3,7 +3,7 @@ import axios from "axios";
 import { useContext, useEffect, useState, useCallback } from "react";
 import Post from "../posts/Post";
 import { FeedComment } from "../comments/FeedComment";
-import Modal from "../modals/PostModal";
+import PostModal from "../modals/PostModal";
 import { Button, Card, Container } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
@@ -64,26 +64,30 @@ export default function UserFeed() {
   };
 
   const renderPosts = () => {
-    return feed.map((item) => (
-      <div key={item.id}>
-        {item.comment_count != null ? (
-          // if the item contains a "comment_count" field, it is a post
-          <Post
-            key={item.id}
-            post={item}
-            removePostFromParentList={() => removePostFromView(item)}
-          />
-        ) : (
-          // and if it doesn't... it is definitely a comment
-          <FeedComment
-            key={item.id}
-            comment={item}
-            removeCommentFromParentList={() => removePostFromView(item)}
-          />
-        )}
-        <hr />
-      </div>
-    ));
+    if (feed && feed.length > 0) {
+      return feed.map((item) => (
+        <div key={item.id}>
+          {item.comment_count != null ? (
+            // if the item contains a "comment_count" field, it is a post
+            <Post
+              key={item.id}
+              post={item}
+              removePostFromParentList={() => removePostFromView(item)}
+            />
+          ) : (
+            // and if it doesn't... it is definitely a comment
+            <FeedComment
+              key={item.id}
+              comment={item}
+              removeCommentFromParentList={() => removePostFromView(item)}
+            />
+          )}
+          <hr />
+        </div>
+      ));
+    } else {
+      return "nothing to see here... make a post!";
+    }
   };
 
   return (
@@ -97,16 +101,12 @@ export default function UserFeed() {
               Welcome to your feed! Follow somebody to see their posts here.
             </p>
           ) : null}
-          <div>
-            {feed && feed.length > 0
-              ? renderPosts()
-              : "nothing to see here... make a post!"}
-          </div>
+          <div>{renderPosts()}</div>
         </Card>
       </Container>
 
       {modal ? (
-        <Modal
+        <PostModal
           activeItem={activeItem}
           toggle={toggleModal}
           onSave={submitPost}

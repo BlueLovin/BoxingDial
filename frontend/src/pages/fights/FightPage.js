@@ -8,16 +8,19 @@ import PostModal from "../../components/modals/PostModal";
 import { Button } from "reactstrap";
 
 export default function FightPage() {
+  // props
   const params = useParams();
   const fightID = params.fightID;
 
-  const { loggedInVal, userVal, headersVal } = useContext(UserContext);
+  // context
+  const { userVal, headersVal } = useContext(UserContext);
   const [user] = userVal;
-  const [loggedIn] = loggedInVal;
   const [headers] = headersVal;
+
+  // state
   const [modal, setModal] = useState(false);
-  const [fightData, setFightData] = useState();
-  const [postList, setPostList] = useState();
+  const [fightData, setFightData] = useState({});
+  const [postList, setPostList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeItem, setActiveItem] = useState({
     fight: null,
@@ -26,21 +29,15 @@ export default function FightPage() {
 
   const fetchFightData = useCallback(() => {
     setLoading(true);
-    let data = {};
-    //fetch fight data
-    if (loggedIn) {
-      axios.get(`/api/fights/${fightID}/`, headers).then((res) => {
-        data = res.data;
-      });
-    } else {
-      axios.get(`/api/fights/${fightID}/`).then((res) => {
-        data = res.data;
-      });
-    }
-    setFightData(data); // set local fight object
-    setPostList(data.posts);
+    axios.get(`/api/fights/${fightID}/`, headers).then((res) => {
+      const data = res.data;
+      setFightData(data);
+      setPostList(data.posts);
+      setLoading(false);
+    });
+
     setLoading(false);
-  }, [fightID, loggedIn, headers]);
+  }, [fightID, headers]);
 
   useEffect(() => {
     fetchFightData();
@@ -61,16 +58,18 @@ export default function FightPage() {
       </div>
     ));
   };
+
   const toggle = () => {
     setModal(!modal);
   };
+
   const submitPost = (item) => {
     toggle();
-
     axios
       .post("/api/post/create/", item, headers)
       .then((res) => setPostList((p) => [res.data, ...p]));
   };
+
   const createItem = () => {
     const item = {
       fight: fightData.id,

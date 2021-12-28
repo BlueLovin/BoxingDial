@@ -2,6 +2,7 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { Button, FormGroup, Input } from "reactstrap";
+import DeleteAccount from "../../components/profiles/DeleteAccount";
 import { UserContext } from "../../UserContext";
 
 export default function EditProfile() {
@@ -81,6 +82,7 @@ export default function EditProfile() {
           </Button>
         </form>
       </div>
+     <DeleteAccount/> 
     </div>
   );
 }

@@ -108,7 +108,7 @@ export default function UserProfile() {
             </p>
           </div>
           <div className="d-flex justify-content-center">
-            {user.username === username ? (
+            {user && user.username === username ? (
               <Button href="/edit-profile">
                 <FontAwesomeIcon icon={faPencilAlt}></FontAwesomeIcon>
                 {" Edit Profile"}

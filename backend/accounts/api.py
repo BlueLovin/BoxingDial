@@ -1,17 +1,14 @@
 import json
-from django.db.models.expressions import Exists, OuterRef, Value
+from django.contrib.auth import authenticate
+from django.db.models.expressions import Value
 from django.db.models.fields import IntegerField
 from django.http.response import HttpResponseBadRequest
-from posts.serializers import FeedCommentSerializer, SmallPostSerializer
-from django.db.models.aggregates import Count
 from django.db.models.query import Prefetch
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from knox.models import AuthToken
-from itertools import chain
 from django.contrib.auth.models import User
 from .models import UserFollowing, UserProfile
-from posts.models import Post, PostComment, PostLike
 from .serializers import (
     SmallUserSerializer,
     UserFollowingSerializer,
@@ -20,13 +17,16 @@ from .serializers import (
     UserWithFollowersSerializer,
 )
 from notifications.models import Notification
-from vote.models import Vote, DOWN, UP
 
 
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
+
+        # make the username lowercase
+        request.data["username"] = request.data["username"].lower()
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -48,6 +48,8 @@ class RegisterAPI(generics.GenericAPIView):
                     "token": token[1],
                 }
             )
+        except AttributeError:
+            return HttpResponseBadRequest()
         # return errors if exception is thrown
         except Exception as e:
             if user:  # if user was created, rollback changes.
@@ -76,10 +78,52 @@ class LoginAPI(generics.GenericAPIView):
                 "user": SmallUserSerializer(
                     user, context=self.get_serializer_context()
                 ).data,
-                "token": token[1],  # must be subscripted
+                "token": token[1],
             }
         )
 
+# DELETE the current user
+# {
+#     "password": "fuckyoubitch",
+# }
+class DeleteUserView(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete_all_user_objects(self, user):
+        for post in user.posts.all():
+            for comment in post.comments.all():
+                comment.delete()
+            post.delete()
+
+        for comment in user.comments.all():
+            comment.delete()
+
+        for following_object in user.following.all():
+            following_object.delete()
+
+        for like in user.user_likes.all():
+            like.delete()
+
+        user.profile.delete()
+        
+
+    def delete(self, request, format=None):
+        if("password" not in request.data):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        #authenticate user
+        user = request.user
+        auth_data = {"username": user.username, "password": request.data["password"]}
+        user = authenticate(**auth_data)
+
+        if not user or not user.is_active:
+            return Response({"error": "incorrect password"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # delete user
+        self.delete_all_user_objects(user)
+        user.delete()
+
+        return Response(status=status.HTTP_200_OK) 
 
 class UserAPI(generics.RetrieveAPIView):
     permission_classes = [
@@ -136,8 +180,8 @@ class DeleteFollowerView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, format=None):
-        user = self.request.user
-        unfollow = User.objects.get(id=self.request.data.get("unfollow"))
+        user = request.user
+        unfollow = User.objects.get(id=request.data.get("unfollow"))
 
         UserFollowing.objects.get(user_id=user, following_user_id=unfollow).delete()
         return Response(
@@ -147,104 +191,10 @@ class DeleteFollowerView(generics.GenericAPIView):
         )
 
 
-class UserFeedByRecentView(generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request, format=None):
-        user_id = request.user.id
-
-        # get following user IDs
-        follower_user_ids = (
-            UserFollowing.objects.filter(user_id=request.user)
-            .values_list("following_user_id_id", flat=True)
-            .distinct()
-        )
-
-        # get posts and comments from following users
-        posts = (
-            Post.objects.filter(owner__in=follower_user_ids)
-            .annotate(
-                comment_count=Count("comments", distinct=True),
-                liked=Exists(
-                    PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
-                ),
-                like_count=Count("post_likes", distinct=True),
-            )
-            .order_by("-id")
-        )
-
-        comments = (
-            PostComment.objects.exclude(post__isnull=True)
-            .filter(owner__in=follower_user_ids, parent=None)
-            .annotate(
-                is_voted_down=Exists(
-                    Vote.objects.filter(
-                        user_id=user_id,
-                        action=DOWN,
-                        object_id=OuterRef("pk"),
-                    )
-                ),
-                is_voted_up=Exists(
-                    Vote.objects.filter(
-                        user_id=user_id, action=UP, object_id=OuterRef("pk")
-                    )
-                ),
-            )
-            .order_by("-id")
-        )
-
-        # get posts and comments from logged in user
-        user_posts = (
-            Post.objects.filter(owner__in=[request.user])
-            .annotate(
-                like_count=Count("post_likes", distinct=True),
-                liked=Exists(
-                    PostLike.objects.filter(post=OuterRef("pk"), user=self.request.user)
-                ),
-                comment_count=Count("comments", distinct=True),
-            )
-            .order_by("-id")
-        )
-
-        user_comments = (
-            # parent=None to exclude replies to other comments
-            PostComment.objects.exclude(post__isnull=True)
-            .filter(owner__in=[request.user], parent=None, post=not None)
-            .annotate(
-                is_voted_down=Exists(
-                    Vote.objects.filter(
-                        user_id=user_id,
-                        action=DOWN,
-                        object_id=OuterRef("pk"),
-                    )
-                ),
-                is_voted_up=Exists(
-                    Vote.objects.filter(
-                        user_id=user_id, action=UP, object_id=OuterRef("pk")
-                    )
-                ),
-            )
-            .order_by("-id")
-        )
-
-        # combine post list and comment list
-        combined = list(
-            chain(
-                SmallPostSerializer(posts, many=True).data,
-                SmallPostSerializer(user_posts, many=True).data,
-                FeedCommentSerializer(comments, many=True).data,
-                FeedCommentSerializer(user_comments, many=True).data,
-            )
-        )
-
-        # sort combined list by date
-        newlist = sorted(combined, key=lambda k: k["date"], reverse=True)
-
-        return Response(newlist)
-
-
 class UserFollowingView(generics.ListAPIView):
     queryset = UserFollowing.objects.prefetch_related(
         Prefetch("following_user_id")
     ).all()
     serializer_class = UserFollowingSerializer
+
+
