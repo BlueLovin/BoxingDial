@@ -8,16 +8,17 @@ import PostLikesModal from "../../components/modals/PostLikesModal";
 import PostPageComments from "../../components/comments/PostPageComments";
 
 export default function Comments() {
+  //props
   const params = useParams();
   const postID = params.id;
 
-  const [modal, setModal] = useState(false);
-
+  //context
   const { headersVal } = useContext(UserContext);
-  const [headers, setHeaders] = headersVal;
-
   const history = useHistory();
 
+  //state
+  const [modal, setModal] = useState(false);
+  const [headers, setHeaders] = headersVal;
   const [currentPost, setCurrentPost] = useState({
     content: "",
   });

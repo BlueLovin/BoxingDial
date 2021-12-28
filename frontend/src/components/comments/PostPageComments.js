@@ -25,8 +25,8 @@ export default function PostPageComments(props) {
   const [headers] = headersVal;
 
   // state
-  const [commentList, setCommentList] = useState(post.comments);
-  const [commentCount, setCommentCount] = useState(post.comment_count);
+  const [commentList, setCommentList] = useState([]);
+  const [commentCount, setCommentCount] = useState(0);
   const [commentOrder, setCommentOrder] = useState("date");
   const [activeItem, setActiveItem] = useState({
     post: post.id,
@@ -45,6 +45,10 @@ export default function PostPageComments(props) {
       isMounted.current = true;
     }
   }, [commentOrder, headers, post.id, loggedIn]);
+
+  useEffect(() => {
+    setCommentCount(post.comment_count);
+  }, [post]);
 
   var handleChange = (e) => {
     let { name, value } = e.target;
