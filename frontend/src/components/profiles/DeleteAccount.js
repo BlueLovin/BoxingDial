@@ -38,7 +38,7 @@ export default function DeleteAccount() {
 
   const verifyUserDecision = () => {
     const confirmed = window.confirm(
-      "Are you ABSOLUTELY sure you want to" +
+      "Are you ABSOLUTELY sure you want to " +
         "delete your account, along with all of your posts/comments?"
     );
 
