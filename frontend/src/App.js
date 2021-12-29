@@ -81,7 +81,6 @@ export default function App() {
 
           {/* SWITCH AND ROUTES HERE */}
           <Routes />
-
         </UserContext.Provider>
       </BrowserRouter>
     );

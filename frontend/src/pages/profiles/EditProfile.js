@@ -82,7 +82,7 @@ export default function EditProfile() {
           </Button>
         </form>
       </div>
-     <DeleteAccount/> 
+      <DeleteAccount />
     </div>
   );
 }

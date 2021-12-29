@@ -57,7 +57,7 @@ export default function NavigationBar() {
             </DropdownMenu>
           </UncontrolledDropdown>
         </Nav>
-        <ShowInboxBell/>
+        <ShowInboxBell />
         <NavbarText>
           <ShowUser />
         </NavbarText>
