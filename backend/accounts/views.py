@@ -1,8 +1,14 @@
+from ast import Return
+from http import HTTPStatus
+from os import stat
+from telnetlib import STATUS
+from django import http
 from django.db.models.aggregates import Count
 from django.db.models.expressions import Exists, OuterRef
-from django.http.response import HttpResponseBadRequest
+from django.http.response import HttpResponse, HttpResponseBadRequest
 from rest_framework import generics
 from django.contrib.auth.models import User
+from rest_framework import exceptions
 from rest_framework.exceptions import NotAuthenticated
 from rest_framework.response import Response
 from vote.models import DOWN, UP, Vote
@@ -148,3 +154,23 @@ class ChangeUserProfileView(generics.UpdateAPIView):
         user.profile.save()
 
         return Response(ProfileSerializer(user.profile).data)
+
+
+class BlockUserView(generics.UpdateAPIView):
+    serializer_class = UserSerializer
+
+    def put(self, request, id, *args, **kwargs):
+        user_to_block = User.objects.get(id=id).profile
+        this_user = request.user
+        this_user_profile = this_user.profile
+
+        if(this_user.is_authenticated == False):
+            raise exceptions.ValidationError()
+        
+        if(user_to_block not in this_user_profile.blocked_users.all() and this_user_profile != user_to_block):
+            this_user_profile.blocked_users.add(user_to_block)
+
+        elif(this_user_profile == user_to_block):
+            return Response("Can not block yourself.", status=HTTPStatus.BAD_REQUEST)    
+
+        return HttpResponse(200)

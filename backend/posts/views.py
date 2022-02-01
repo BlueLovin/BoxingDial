@@ -1,3 +1,4 @@
+from urllib import response
 from vote.managers import UP
 from vote.models import DOWN, Vote
 from accounts.models import UserFollowing
@@ -96,7 +97,8 @@ class SinglePostCommentsView(generics.ListAPIView):
         # get comments related to post passed in through URL,
         # annotate is_voted_down and is_voted_up
         return (
-            PostComment.objects.filter(post=post_id)
+            PostComment.objects.exclude_blocked_users(self.request)
+            .filter(post=post_id)
             .annotate(
                 is_voted_down=Exists(
                     Vote.objects.filter(
@@ -125,7 +127,9 @@ class PostView(generics.RetrieveDestroyAPIView):
         user_id = self.request.user.id
 
         # query to see if the logged in user has upvoted or downvoted the current comment
-        prefetch_query = PostComment.objects.annotate(
+        prefetch_query = PostComment.objects.exclude_blocked_users(
+            self.request
+        ).annotate(
             is_voted_down=Exists(
                 Vote.objects.filter(
                     user_id=user_id,
@@ -223,7 +227,7 @@ class PopularPostsView(generics.ListAPIView):
         ).order_by("-comment_count", "-like_count")[:5]
 
 
-# all comments /api/comments
+# create comment /api/comments/create
 class CreatePostCommentView(generics.CreateAPIView):
     permission_classes = [IsOwnerOrReadOnly]
     serializer_class = CommentSerializer
@@ -327,7 +331,7 @@ class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
         return CommentSerializer(comment).data
 
 
-# all comments /api/comments/{comment_ID}/reply
+# reply to comment /api/comments/{comment_ID}/reply
 class CommentReplyView(views.APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ReplySerializer

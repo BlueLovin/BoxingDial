@@ -75,12 +75,14 @@ class FightsView(generics.ListAPIView):
 # 5 most popular fights, popularity determined by number of posts
 class PopularFightsView(generics.ListAPIView):
     serializer_class = FightSerializer
-    queryset = (
+    
+    def get_queryset(self):
+        return (
         Fight.objects.all()
         .prefetch_related(
             Prefetch(
                 "posts",
-                Post.objects.annotate(
+                Post.objects.filter_blocked_users(self.request).annotate(
                     comment_count=Count("comments", distinct=True),
                     like_count=Count("post_likes", distinct=True),
                 ),

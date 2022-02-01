@@ -1,11 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
+from accounts.models import UserManager
 from fights.models import Fight
 from vote.models import VoteModel
 
 
 class PostComment(VoteModel, models.Model):
-    post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="comments", blank=True, null=True)
+    post = models.ForeignKey(
+        "Post", on_delete=models.CASCADE, related_name="comments", blank=True, null=True
+    )
 
     content = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
@@ -13,9 +16,13 @@ class PostComment(VoteModel, models.Model):
         User, on_delete=models.CASCADE, related_name="comments", null=True
     )
 
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+    parent = models.ForeignKey(
+        "self", null=True, blank=True, related_name="replies", on_delete=models.CASCADE
+    )
 
     username = models.TextField(blank=True)
+
+    objects = UserManager()
 
     def __str__(self):
         return self.content
@@ -42,6 +49,8 @@ class Post(models.Model):
     username = models.TextField()
     likes = models.ManyToManyField(User, related_name="user", through=PostLike)
     date = models.DateTimeField(auto_now_add=True)
+
+    objects = UserManager()
 
     @property
     def truncated_content(self):
