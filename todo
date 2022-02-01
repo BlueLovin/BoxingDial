@@ -9,6 +9,7 @@
 [x] add bio/screen name to user profiles
 [x]  delete account, account settings, more account control
 []  block/mute/report other users
+[]  decouple comments and post views
 []  add profile pictures to profiles
 []  DMs
 []  add explore page
