@@ -37,7 +37,8 @@ class FightView(generics.RetrieveAPIView):
                 .prefetch_related(
                     Prefetch(
                         "posts",
-                        Post.objects.annotate(
+                        Post.objects.exclude_all_blocked_users(self.request)
+                        .annotate(
                             like_count=Count("post_likes", distinct=True),
                             comment_count=Count("comments", distinct=True),
                             liked=Exists(
@@ -45,7 +46,8 @@ class FightView(generics.RetrieveAPIView):
                                     post=OuterRef("pk"), user=self.request.user
                                 )
                             ),
-                        ).order_by("-id"),
+                        )
+                        .order_by("-id"),
                     )
                 )
                 .annotate(posts_count=Count("posts", distinct=True))
@@ -75,22 +77,22 @@ class FightsView(generics.ListAPIView):
 # 5 most popular fights, popularity determined by number of posts
 class PopularFightsView(generics.ListAPIView):
     serializer_class = FightSerializer
-    
+
     def get_queryset(self):
         return (
-        Fight.objects.all()
-        .prefetch_related(
-            Prefetch(
-                "posts",
-                Post.objects.filter_blocked_users(self.request).annotate(
-                    comment_count=Count("comments", distinct=True),
-                    like_count=Count("post_likes", distinct=True),
-                ),
+            Fight.objects.all()
+            .prefetch_related(
+                Prefetch(
+                    "posts",
+                    Post.objects.annotate(
+                        comment_count=Count("comments", distinct=True),
+                        like_count=Count("post_likes", distinct=True),
+                    ),
+                )
             )
+            .annotate(posts_count=Count("posts", distinct=True))
+            .order_by("-posts_count")[:5]
         )
-        .annotate(posts_count=Count("posts", distinct=True))
-        .order_by("-posts_count")[:5]
-    )
 
 
 # all fights without posts field

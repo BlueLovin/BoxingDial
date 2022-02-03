@@ -51,7 +51,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
         requires_context = True
 
-    
+
 class TruncatedPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post

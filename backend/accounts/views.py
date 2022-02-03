@@ -1,11 +1,7 @@
-from ast import Return
 from http import HTTPStatus
-from os import stat
-from telnetlib import STATUS
-from django import http
 from django.db.models.aggregates import Count
 from django.db.models.expressions import Exists, OuterRef
-from django.http.response import HttpResponse, HttpResponseBadRequest
+from django.http.response import HttpResponse
 from rest_framework import generics
 from django.contrib.auth.models import User
 from rest_framework import exceptions
@@ -18,8 +14,11 @@ from accounts.serializers import (
     UserFollowingSerializer,
     UserSerializer,
 )
+from accounts.managers import UserManager
+from backend.responses import BoxingDialResponses
 from posts.models import Post, PostComment, PostLike
 from posts.serializers import CommentSerializer, SmallPostSerializer
+
 
 # all users - /api/users
 class UsersView(generics.ListAPIView):
@@ -39,32 +38,40 @@ class UserView(generics.GenericAPIView):
             posts_count=Count("posts")
         )
 
-    def get(self, request, user, format=None):
+    def get(self, request, username, format=None):
 
-        this_user = User.objects.annotate(posts_count=Count("posts")).get(username=user)
+        this_user = User.objects.annotate(posts_count=Count("posts")).get(
+            username=username
+        )
+        this_user_profile = this_user.profile
+
         if this_user == request.user:
             return Response(UserSerializer(this_user).data)
-        try:
 
-            following = this_user.followers.filter(user_id=request.user.id).exists()
+        if UserManager.user_blocks_you(None, request, this_user_profile):
+            return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
+        elif UserManager.is_user_blocked(None, request, this_user_profile):
+            return BoxingDialResponses.BLOCKED_USER_RESPONSE
 
-            follows_you = request.user.followers.filter(user_id=this_user.id).exists()
-            profile = ProfileSerializer(this_user.profile).data
+        following = this_user.followers.filter(user_id=request.user.id).exists()
 
-            return Response(
-                {
-                    "id": this_user.id,
-                    "username": this_user.username,
-                    "posts_count": this_user.posts.count(),
-                    "is_following": following,
-                    "follows_you": follows_you,
-                    "profile": profile,
-                }
-            )
-        except Exception:
-            return Response(UserSerializer(this_user).data)
+        follows_you = request.user.followers.filter(user_id=this_user.id).exists()
+
+        profile_data = ProfileSerializer(this_user_profile).data
+
+        return Response(
+            {
+                "id": this_user.id,
+                "username": this_user.username,
+                "posts_count": this_user.posts.count(),
+                "is_following": following,
+                "follows_you": follows_you,
+                "profile": profile_data,
+            }
+        )
 
 
+# get a user's following accounts - /api/users/<str:user>/following/
 class UserFollowingView(generics.ListAPIView):
     serializer_class = UserFollowingSerializer
 
@@ -72,6 +79,7 @@ class UserFollowingView(generics.ListAPIView):
         return User.objects.get(username=self.kwargs["user"]).following
 
 
+# get a user's followers - /api/users/<str:user>/followers/
 class UserFollowersView(generics.ListAPIView):
     serializer_class = FollowersSerializer
 
@@ -83,25 +91,40 @@ class UserFollowersView(generics.ListAPIView):
 class UserCommentListView(generics.ListAPIView):
     serializer_class = CommentSerializer
 
-    def get_queryset(self):
-        user_id = self.request.user.id
-        return (
-            PostComment.objects.filter(username=self.kwargs["user"])
-            .annotate(
-                is_voted_down=Exists(
-                    Vote.objects.filter(
-                        user_id=user_id,
-                        action=DOWN,
-                        object_id=OuterRef("pk"),
-                    )
-                ),
-                is_voted_up=Exists(
-                    Vote.objects.filter(
-                        user_id=user_id, action=UP, object_id=OuterRef("pk")
-                    )
-                ),
-            )
-            .order_by("-id")
+    def get(self, request, user):
+        client_user_id = request.user.id
+
+        username = user
+
+        this_user_profile = User.objects.get(username=username).profile
+
+        if request.user.is_authenticated:
+            if UserManager.user_blocks_you(None, request, this_user_profile):
+                return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
+            elif UserManager.is_user_blocked(None, request, this_user_profile):
+                return BoxingDialResponses.BLOCKED_USER_RESPONSE
+
+        return Response(
+            CommentSerializer(
+                PostComment.objects.filter(username=username)
+                .annotate(
+                    is_voted_down=Exists(
+                        Vote.objects.filter(
+                            user_id=client_user_id,
+                            action=DOWN,
+                            object_id=OuterRef("pk"),
+                        )
+                    ),
+                    is_voted_up=Exists(
+                        Vote.objects.filter(
+                            user_id=client_user_id, action=UP, object_id=OuterRef("pk")
+                        )
+                    ),
+                )
+                .order_by("-id"),
+                many=True,
+            ).data,
+            status=200,
         )
 
 
@@ -109,30 +132,43 @@ class UserCommentListView(generics.ListAPIView):
 class UserPostListView(generics.ListAPIView):
     serializer_class = SmallPostSerializer
 
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_authenticated:
-            return (
-                Post.objects.filter(username=self.kwargs["user"])
-                .annotate(
-                    like_count=Count("post_likes", distinct=True),
-                    comment_count=Count("comments", distinct=True),
-                    liked=Exists(
-                        PostLike.objects.filter(
-                            post=OuterRef("pk"), user=self.request.user
-                        )
-                    ),
-                )
-                .order_by("-id")
+    def get(self, request, username):
+        client_user = request.user
+        this_user_profile = User.objects.get(username=username).profile
+
+        if client_user.is_authenticated:
+            if UserManager.user_blocks_you(None, request, this_user_profile):
+                return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
+
+            return Response(
+                SmallPostSerializer(
+                    Post.objects.filter(username=username)
+                    .annotate(
+                        like_count=Count("post_likes", distinct=True),
+                        comment_count=Count("comments", distinct=True),
+                        liked=Exists(
+                            PostLike.objects.filter(
+                                post=OuterRef("pk"), user=request.user
+                            )
+                        ),
+                    )
+                    .order_by("-id"),
+                    many=True,
+                ).data,
+                status=200,
             )
         else:
-            return (
-                Post.objects.filter(username=self.kwargs["user"])
-                .annotate(
-                    like_count=Count("post_likes", distinct=True),
-                    comment_count=Count("comments", distinct=True),
-                )
-                .order_by("-id")
+            return Response(
+                SmallPostSerializer(
+                    Post.objects.filter(username=username)
+                    .annotate(
+                        like_count=Count("post_likes", distinct=True),
+                        comment_count=Count("comments", distinct=True),
+                    )
+                    .order_by("-id"),
+                    many=True,
+                ).data,
+                status=200,
             )
 
 
@@ -147,15 +183,16 @@ class ChangeUserProfileView(generics.UpdateAPIView):
 
         if "bio" in request.data:
             user.profile.bio = request.data["bio"]
-            
+
         if "screen_name" in request.data:
             user.profile.screen_name = request.data["screen_name"]
-            
+
         user.profile.save()
 
         return Response(ProfileSerializer(user.profile).data)
 
 
+# block a user - /api/user/block/<int:id>/
 class BlockUserView(generics.UpdateAPIView):
     serializer_class = UserSerializer
 
@@ -164,13 +201,16 @@ class BlockUserView(generics.UpdateAPIView):
         this_user = request.user
         this_user_profile = this_user.profile
 
-        if(this_user.is_authenticated == False):
+        if this_user.is_authenticated == False:
             raise exceptions.ValidationError()
-        
-        if(user_to_block not in this_user_profile.blocked_users.all() and this_user_profile != user_to_block):
+
+        if (
+            user_to_block not in this_user_profile.blocked_users.all()
+            and this_user_profile != user_to_block
+        ):
             this_user_profile.blocked_users.add(user_to_block)
 
-        elif(this_user_profile == user_to_block):
-            return Response("Can not block yourself.", status=HTTPStatus.BAD_REQUEST)    
+        elif this_user_profile == user_to_block:
+            return Response("Can not block yourself.", status=HTTPStatus.BAD_REQUEST)
 
         return HttpResponse(200)

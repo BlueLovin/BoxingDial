@@ -20,8 +20,8 @@ urlpatterns = [
     path("api/user/delete", auth_views.DeleteUserView.as_view(), name="delete"),
     path("api/feed/recent", UserFeedByRecentView.as_view(), name="feed"),
     # ACCOUNT ROUTES
-    path("api/users/<str:user>/posts/", account_views.UserPostListView.as_view()),
-    path("api/users/<str:user>/", account_views.UserView.as_view()),
+    path("api/users/<str:username>/posts/", account_views.UserPostListView.as_view()),
+    path("api/users/<str:username>/", account_views.UserView.as_view()),
     path("api/users/<str:user>/comments/", account_views.UserCommentListView.as_view()),
     path("api/users", account_views.UsersView.as_view()),
     path("api/users/<str:user>/following/", account_views.UserFollowingView.as_view()),

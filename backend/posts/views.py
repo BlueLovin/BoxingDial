@@ -5,6 +5,8 @@ from accounts.models import UserFollowing
 from django.db.models.expressions import Exists, OuterRef, Value
 from rest_framework import serializers, viewsets, generics, views, status
 from rest_framework.permissions import IsAuthenticated
+from accounts.managers import UserManager
+from backend.responses import BoxingDialResponses
 from fights.models import Fight
 
 from notifications.models import Notification
@@ -122,14 +124,12 @@ class PostView(generics.RetrieveDestroyAPIView):
     permission_classes = [IsOwnerOrReadOnly]
     serializer_class = PostSerializer
     # get current post, and order the comments by their ID descending. or recent, in other words
-    def get_queryset(self):
-        logged_in = self.request.user.is_authenticated
-        user_id = self.request.user.id
+    def get(self, request, id):
+        logged_in = request.user.is_authenticated
+        user_id = request.user.id
 
         # query to see if the logged in user has upvoted or downvoted the current comment
-        prefetch_query = PostComment.objects.exclude_blocked_users(
-            self.request
-        ).annotate(
+        prefetch_query = PostComment.objects.exclude_blocked_users(request).annotate(
             is_voted_down=Exists(
                 Vote.objects.filter(
                     user_id=user_id,
@@ -145,38 +145,53 @@ class PostView(generics.RetrieveDestroyAPIView):
         )
 
         if logged_in:
-            return (
-                Post.objects.filter(id=self.kwargs["pk"])
-                .annotate(like_count=Count("likes", distinct=True))
-                .prefetch_related(
-                    Prefetch(
-                        "comments",
-                        queryset=prefetch_query.prefetch_related(
-                            Prefetch(
-                                "replies", queryset=prefetch_query.order_by("-date")
-                            )
-                        ).order_by("-date"),
-                    ),
-                )
-                .annotate(
-                    comment_count=Count("comments", distinct=True),
-                    liked=Exists(  # see if a PostLike object exists matching the client user and post.
-                        PostLike.objects.filter(
-                            post=self.kwargs["pk"], user=self.request.user
-                        )
-                    ),
-                )
+            post_query = Post.objects.filter(id=id)
+            post_owner_profile = post_query.first().owner.profile
+
+            if UserManager.user_blocks_you(None, request, post_owner_profile):
+                return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
+            elif UserManager.is_user_blocked(None, request, post_owner_profile):
+                return BoxingDialResponses.BLOCKED_USER_RESPONSE
+
+            return Response(
+                PostSerializer(
+                    Post.objects.filter(id=id)
+                    .annotate(like_count=Count("likes", distinct=True))
+                    .prefetch_related(
+                        Prefetch(
+                            "comments",
+                            queryset=prefetch_query.prefetch_related(
+                                Prefetch(
+                                    "replies", queryset=prefetch_query.order_by("-date")
+                                )
+                            ).order_by("-date"),
+                        ),
+                    )
+                    .annotate(
+                        comment_count=Count("comments", distinct=True),
+                        liked=Exists(  # see if a PostLike object exists matching the client user and post.
+                            PostLike.objects.filter(post=id, user=request.user)
+                        ),
+                    )
+                    .first()
+                ).data,
+                status=200,
             )
         else:
-            return (
-                Post.objects.filter(id=self.kwargs["pk"])
-                .annotate(like_count=Count("likes", distinct=True))
-                .prefetch_related(
-                    Prefetch("comments", queryset=PostComment.objects.order_by("-id")),
-                )
-                .annotate(
-                    comment_count=Count("comments", distinct=True),
-                )
+            return Response(
+                PostSerializer(
+                    Post.objects.filter(id=id)
+                    .annotate(like_count=Count("likes", distinct=True))
+                    .prefetch_related(
+                        Prefetch(
+                            "comments", queryset=PostComment.objects.order_by("-id")
+                        ),
+                    )
+                    .annotate(
+                        comment_count=Count("comments", distinct=True),
+                    )
+                    .first()
+                ).data
             )
 
 
@@ -237,6 +252,9 @@ class CreatePostCommentView(generics.CreateAPIView):
         new_comment_username = new_comment.username
         recipient_username = recipient.username
 
+        if UserManager.user_blocks_you(None, self.request, recipient.profile):
+            return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
+
         # user does not send notification to theirself
         if recipient_username != new_comment_username:
             truncated_new_comment = new_comment.content[:25] + "..."
@@ -263,6 +281,9 @@ class CreatePostCommentView(generics.CreateAPIView):
         if "post" in request.data:
             post_id = request.data.pop("post")
             post = Post.objects.get(id=post_id)
+
+            if UserManager.user_blocks_you(None, self.request, post.owner.profile):
+                return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
 
             comment = PostComment.objects.create(
                 owner=owner, username=username, post=post, **request.data

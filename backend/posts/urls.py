@@ -8,7 +8,7 @@ router.register("comments", post_views.PostCommentsView, basename="postcomment")
 
 urlpatterns = [
     path("api/posts/", post_views.PostsView.as_view()),
-    url(r"api/posts/(?P<pk>[0-9]+)/$", post_views.PostView.as_view()),
+    url(r"api/posts/(?P<id>[0-9]+)/$", post_views.PostView.as_view()),
     path("api/posts/<int:pk>/comments", post_views.SinglePostCommentsView.as_view()),
     path("api/posts/<int:pk>/likes", post_views.PostLikesView.as_view()),
     path("api/post/create/", post_views.CreatePostView.as_view()),

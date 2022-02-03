@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from accounts.models import UserManager
+from accounts.managers import UserManager
 from fights.models import Fight
 from vote.models import VoteModel
 
@@ -23,9 +23,6 @@ class PostComment(VoteModel, models.Model):
     username = models.TextField(blank=True)
 
     objects = UserManager()
-
-    def __str__(self):
-        return self.content
 
 
 class PostLike(models.Model):

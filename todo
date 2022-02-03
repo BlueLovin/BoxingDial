@@ -7,8 +7,12 @@
 [x] fix register page
 [x] notifications
 [x] add bio/screen name to user profiles
-[x]  delete account, account settings, more account control
-[]  block/mute/report other users
+[x] delete account, account settings, more account control
+[*]  block/mute/report other users
+    - [x] prevent viewing a blocked user's profile/posts/comments and vice versa 
+    - []  update frontend to handle user blocking
+    - []  notifications can not be sent to someone who blocks you
+    - []  prevent any objects being created related to a user that blocks you 
 []  decouple comments and post views
 []  add profile pictures to profiles
 []  DMs
