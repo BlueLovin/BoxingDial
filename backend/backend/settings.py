@@ -32,8 +32,8 @@ INSTALLED_APPS = [
     "posts",
     "accounts",
     "notifications",
-    "vote",
     "knox",
+    "vote",
 ]
 
 MIDDLEWARE = [
