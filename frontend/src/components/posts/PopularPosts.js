@@ -1,10 +1,13 @@
 import axios from "axios";
 import { Container } from "reactstrap";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Post from "./Post";
+import { UserContext } from "../../UserContext";
 
 export default function PopularPosts() {
   const [postList, setpostList] = useState([]);
+  const { headersVal } = useContext(UserContext);
+  const [headers] = headersVal;
 
   useEffect(() => {
     refreshPostList();
@@ -12,7 +15,7 @@ export default function PopularPosts() {
 
   const refreshPostList = () => {
     axios
-      .get("/api/posts/popular")
+      .get("/api/posts/popular", headers)
       .then((res) => setpostList(res.data))
       .catch((err) => console.log(err));
   };

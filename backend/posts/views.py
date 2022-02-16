@@ -1,4 +1,5 @@
-from urllib import response
+from http.client import HTTPResponse
+from django.http import HttpResponse
 from vote.managers import UP
 from vote.models import DOWN, Vote
 from accounts.models import UserFollowing
@@ -33,9 +34,13 @@ class PostsView(generics.ListAPIView):
     serializer_class = SmallPostSerializer
 
     def get_queryset(self):
-        return Post.objects.all().annotate(
-            like_count=Count("post_likes", distinct=True),
-            comment_count=Count("comments", distinct=True),
+        return (
+            Post.objects.exclude_blocked_users(self.request)
+            .all()
+            .annotate(
+                like_count=Count("post_likes", distinct=True),
+                comment_count=Count("comments", distinct=True),
+            )
         )
 
 
@@ -129,7 +134,7 @@ class PostView(generics.RetrieveDestroyAPIView):
         user_id = request.user.id
 
         # query to see if the logged in user has upvoted or downvoted the current comment
-        prefetch_query = PostComment.objects.exclude_blocked_users(request).annotate(
+        prefetch_query = PostComment.objects.annotate(
             is_voted_down=Exists(
                 Vote.objects.filter(
                     user_id=user_id,
@@ -180,7 +185,8 @@ class PostView(generics.RetrieveDestroyAPIView):
         else:
             return Response(
                 PostSerializer(
-                    Post.objects.filter(id=id)
+                    Post.objects.exclude_blocked_users(request)
+                    .filter(id=id)
                     .annotate(like_count=Count("likes", distinct=True))
                     .prefetch_related(
                         Prefetch(
@@ -231,15 +237,22 @@ class PostLikesView(generics.ListAPIView):
         )
 
 
-# 5 most popular posts, popularity determined by number of comments
+# 5 most popular posts, popularity determined by number of comments and likes
 class PopularPostsView(generics.ListAPIView):
     serializer_class = SmallPostSerializer
 
-    def get_queryset(self):
-        return Post.objects.annotate(
-            like_count=Count("post_likes", distinct=True),
-            comment_count=Count("comments", distinct=True),
-        ).order_by("-comment_count", "-like_count")[:5]
+    def get(self, request, *args, **kwargs):
+        return Response(
+            SmallPostSerializer(
+                Post.objects.exclude_blocked_users(request)
+                .annotate(
+                    like_count=Count("post_likes", distinct=True),
+                    comment_count=Count("comments", distinct=True),
+                )
+                .order_by("-comment_count", "-like_count")[:5],
+                many=True,
+            ).data
+        )
 
 
 # create comment /api/comments/create
@@ -277,23 +290,28 @@ class CreatePostCommentView(generics.CreateAPIView):
 
         username = owner.username
 
-        # if a comment on a post, specify post
-        if "post" in request.data:
-            post_id = request.data.pop("post")
-            post = Post.objects.get(id=post_id)
+        # MUST be a comment on a post, no exceptions
+        if "post" not in request.data or "content" not in request.data:
+            return Response(status=400)
 
-            if UserManager.user_blocks_you(None, self.request, post.owner.profile):
-                return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
+        content = request.data["content"]
 
-            comment = PostComment.objects.create(
-                owner=owner, username=username, post=post, **request.data
+        # must contain at least 3 non whitespace characters
+        if len(content.replace(" ", "")) < 3:
+            return Response(
+                {"error": "content must contain at least 3 characters."}, status=400
             )
-            self.create_notification(comment, post)
 
-        else:
-            comment = PostComment.objects.create(
-                owner=owner, username=username, **request.data
-            )
+        post_id = request.data.pop("post")
+        post = Post.objects.get(id=post_id)
+
+        if UserManager.user_blocks_you(None, self.request, post.owner.profile):
+            return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
+
+        comment = PostComment.objects.create(
+            owner=owner, username=username, post=post, **request.data
+        )
+        self.create_notification(comment, post)
 
         # upvote comment
         comment.votes.up(owner.id)
@@ -311,12 +329,18 @@ class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
     queryset = PostComment.objects.all()
 
     def retrieve(self, request, pk):
-        comment = PostComment.objects.annotate(
-            is_voted_down=Exists(
-                Vote.objects.filter(user_id=request.user.id, action=DOWN)
-            ),
-            is_voted_up=Exists(Vote.objects.filter(user_id=request.user.id, action=UP)),
-        ).get(pk=pk)
+        comment = (
+            PostComment.objects.exclude_blocked_users(request)
+            .annotate(
+                is_voted_down=Exists(
+                    Vote.objects.filter(user_id=request.user.id, action=DOWN)
+                ),
+                is_voted_up=Exists(
+                    Vote.objects.filter(user_id=request.user.id, action=UP)
+                ),
+            )
+            .get(pk=pk)
+        )
         serializer = CommentSerializer(comment)
         return Response(serializer.data)
 
@@ -332,6 +356,13 @@ class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
         # if a comment on a post, specify post
         if request.data["post"] is not None:
             post = request.data.pop("post")
+
+            # prevent user from commenting on post if the owner blocks them
+            post_owner_blocks_you = UserManager.user_blocks_you(
+                None, request, post.owner.profile
+            )
+            if post_owner_blocks_you:
+                return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
 
             comment = PostComment.objects.create(
                 owner=owner, username=username, post=post, **request.data

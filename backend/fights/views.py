@@ -37,7 +37,7 @@ class FightView(generics.RetrieveAPIView):
                 .prefetch_related(
                     Prefetch(
                         "posts",
-                        Post.objects.exclude_all_blocked_users(self.request)
+                        Post.objects.exclude_blocked_users(self.request)
                         .annotate(
                             like_count=Count("post_likes", distinct=True),
                             comment_count=Count("comments", distinct=True),
@@ -84,7 +84,7 @@ class PopularFightsView(generics.ListAPIView):
             .prefetch_related(
                 Prefetch(
                     "posts",
-                    Post.objects.annotate(
+                    Post.objects.exclude_blocked_users(self.request).annotate(
                         comment_count=Count("comments", distinct=True),
                         like_count=Count("post_likes", distinct=True),
                     ),

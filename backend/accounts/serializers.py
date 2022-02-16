@@ -9,14 +9,13 @@ import django.contrib.auth.password_validation as validators
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ["screen_name", "bio", "blocked_users"]
+        fields = ["screen_name", "bio"]
 
 
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
     posts_count = serializers.IntegerField()
     profile = ProfileSerializer(many=False)
-
 
     class Meta:
         model = User
@@ -74,7 +73,14 @@ class UserWithFollowersSerializer(serializers.ModelSerializer):
     class Meta:
         unique_together = ["followers, following"]
         model = User
-        fields = ("id", "username", "profile", "followers", "following", "unread_messages_count")
+        fields = (
+            "id",
+            "username",
+            "profile",
+            "followers",
+            "following",
+            "unread_messages_count",
+        )
 
 
 # Register Serializer
