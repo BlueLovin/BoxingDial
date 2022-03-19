@@ -39,23 +39,29 @@ class UserView(generics.GenericAPIView):
         )
 
     def get(self, request, username, format=None):
-
         this_user = User.objects.annotate(posts_count=Count("posts")).get(
             username=username
         )
+
+        logged_in = request.user.is_authenticated
+
         this_user_profile = this_user.profile
 
         if this_user == request.user:
             return Response(UserSerializer(this_user).data)
 
-        if UserManager.user_blocks_you(None, request, this_user_profile):
-            return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
-        elif UserManager.is_user_blocked(None, request, this_user_profile):
-            return BoxingDialResponses.BLOCKED_USER_RESPONSE
+        following = False
+        follows_you = False
 
-        following = this_user.followers.filter(user_id=request.user.id).exists()
+        if logged_in:
+            if UserManager.user_blocks_you(None, request, this_user_profile):
+                return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
+            elif UserManager.is_user_blocked(None, request, this_user_profile):
+                return BoxingDialResponses.BLOCKED_USER_RESPONSE
 
-        follows_you = request.user.followers.filter(user_id=this_user.id).exists()
+            following = this_user.followers.filter(user_id=request.user.id).exists()
+
+            follows_you = request.user.followers.filter(user_id=this_user.id).exists()
 
         profile_data = ProfileSerializer(this_user_profile).data
 
