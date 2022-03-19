@@ -71,7 +71,7 @@ export default function Post(props) {
     <Container>
       <div className="list-group-item p-3">
         <span>
-          {post.owner.profile ? post.owner.profile.screen_name : null }
+          {post.owner.profile ? post.owner.profile.screen_name : null}
           <Link to={`/user/${post.owner.username}`}>
             <div>@{post.owner.username}</div>
           </Link>

@@ -8,6 +8,7 @@ import FollowButton from "../../components/profiles/FollowButton";
 import ProfileComments from "../../components/profiles/ProfileComments";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import BlockButton from "../../components/profiles/BlockButton";
 
 export default function UserProfile() {
   const params = useParams();
@@ -99,6 +100,7 @@ export default function UserProfile() {
               profile.profile ? profile.profile.screen_name : username
             }'s Profile`}
             <FollowButton profile={profile} />
+            <BlockButton profile={profile} />
           </h1>
           <div className="container justify-content-center d-flex">
             <p className="list-group-item w-25 text-center">

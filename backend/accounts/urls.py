@@ -28,4 +28,5 @@ urlpatterns = [
     path("api/users/<str:user>/followers/", account_views.UserFollowersView.as_view()),
     path("api/user/change-profile", account_views.ChangeUserProfileView.as_view()),
     path("api/user/block/<int:id>/", account_views.BlockUserView.as_view()),
+    path("api/user/unblock/<int:id>/", account_views.UnblockUserView.as_view()),
 ]

@@ -50,14 +50,12 @@ class UserView(generics.GenericAPIView):
 
         # check viewing permissions
         this_user_profile = this_user.profile
-        if UserManager.user_blocks_you(None, request, this_user_profile):
-            return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
-        elif UserManager.is_user_blocked(None, request, this_user_profile):
-            return BoxingDialResponses.BLOCKED_USER_RESPONSE
 
         # check to see if user follows you or if you follow the user
         following = this_user.followers.filter(user_id=request.user.id).exists()
         follows_you = request.user.followers.filter(user_id=this_user.id).exists()
+        blocks_you = UserManager.user_blocks_you(None, request, this_user.profile)
+        blocked = UserManager.is_user_blocked(None, request, this_user.profile)
 
         profile_data = ProfileSerializer(this_user_profile).data
         return Response(
@@ -68,6 +66,8 @@ class UserView(generics.GenericAPIView):
                 "is_following": following,
                 "follows_you": follows_you,
                 "profile": profile_data,
+                "blocks_you": blocks_you,
+                "blocked": blocked,
             }
         )
 
@@ -215,3 +215,26 @@ class BlockUserView(generics.UpdateAPIView):
             return Response("Can not block yourself.", status=HTTPStatus.BAD_REQUEST)
 
         return HttpResponse(200)
+# unblock a user - /api/user/unblock/<int:id>/
+class UnblockUserView(generics.UpdateAPIView):
+    serializer_class = UserSerializer
+
+    def put(self, request, id, *args, **kwargs):
+        user_to_unblock = User.objects.get(id=id).profile
+        this_user = request.user
+        this_user_profile = this_user.profile
+
+        if this_user.is_authenticated == False:
+            raise exceptions.ValidationError()
+
+        if (
+            user_to_unblock in this_user_profile.blocked_users.all()
+            and this_user_profile != user_to_unblock
+        ):
+            this_user_profile.blocked_users.remove(user_to_unblock)
+
+        elif this_user_profile == user_to_unblock:
+            return Response("Can not unblock yourself.", status=HTTPStatus.BAD_REQUEST)
+
+        return HttpResponse(200)
+
