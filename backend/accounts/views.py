@@ -33,21 +33,19 @@ class UserView(generics.GenericAPIView):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-
         return User.objects.filter(username=self.kwargs["user"]).annotate(
             posts_count=Count("posts")
         )
 
-
     def get(self, request, username, format=None):
         logged_in = request.user.is_authenticated
 
-        # this_user is the user that the client user is viewing 
+        # this_user is the user that the client user is viewing
         this_user = User.objects.annotate(posts_count=Count("posts")).get(
             username=username
         )
 
-        if this_user == request.user or logged_in:
+        if this_user == request.user or logged_in == False:
             return Response(UserSerializer(this_user).data)
 
         # check viewing permissions

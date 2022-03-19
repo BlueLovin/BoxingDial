@@ -28,7 +28,6 @@ from vote.views import VoteMixin
 
 NOT_LOGGED_IN_EXCEPTION = serializers.DjangoValidationError("not logged in")
 
-
 # all posts /api/posts
 class PostsView(generics.ListAPIView):
     serializer_class = SmallPostSerializer
@@ -242,14 +241,18 @@ class PopularPostsView(generics.ListAPIView):
     serializer_class = SmallPostSerializer
 
     def get(self, request, *args, **kwargs):
+        query = Post.objects
+
+        # if client user is logged in, exclude blocked users
+        if request.user.is_authenticated:
+            query = query.exclude_blocked_users(request)
+
         return Response(
             SmallPostSerializer(
-                Post.objects.exclude_blocked_users(request)
-                .annotate(
+                query.annotate(
                     like_count=Count("post_likes", distinct=True),
                     comment_count=Count("comments", distinct=True),
-                )
-                .order_by("-comment_count", "-like_count")[:5],
+                ).order_by("-comment_count", "-like_count")[:5],
                 many=True,
             ).data
         )
