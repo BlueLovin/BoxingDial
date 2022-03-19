@@ -38,33 +38,30 @@ class UserView(generics.GenericAPIView):
             posts_count=Count("posts")
         )
 
+
     def get(self, request, username, format=None):
+        logged_in = request.user.is_authenticated
+
+        # this_user is the user that the client user is viewing 
         this_user = User.objects.annotate(posts_count=Count("posts")).get(
             username=username
         )
 
-        logged_in = request.user.is_authenticated
-
-        this_user_profile = this_user.profile
-
-        if this_user == request.user:
+        if this_user == request.user or logged_in:
             return Response(UserSerializer(this_user).data)
 
-        following = False
-        follows_you = False
+        # check viewing permissions
+        this_user_profile = this_user.profile
+        if UserManager.user_blocks_you(None, request, this_user_profile):
+            return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
+        elif UserManager.is_user_blocked(None, request, this_user_profile):
+            return BoxingDialResponses.BLOCKED_USER_RESPONSE
 
-        if logged_in:
-            if UserManager.user_blocks_you(None, request, this_user_profile):
-                return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
-            elif UserManager.is_user_blocked(None, request, this_user_profile):
-                return BoxingDialResponses.BLOCKED_USER_RESPONSE
-
-            following = this_user.followers.filter(user_id=request.user.id).exists()
-
-            follows_you = request.user.followers.filter(user_id=this_user.id).exists()
+        # check to see if user follows you or if you follow the user
+        following = this_user.followers.filter(user_id=request.user.id).exists()
+        follows_you = request.user.followers.filter(user_id=this_user.id).exists()
 
         profile_data = ProfileSerializer(this_user_profile).data
-
         return Response(
             {
                 "id": this_user.id,
