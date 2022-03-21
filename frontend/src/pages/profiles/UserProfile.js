@@ -96,11 +96,17 @@ export default function UserProfile() {
       ) : (
         <>
           <h1 className="text-center">
+            {/* show screen name if they have one */}
             {`${
               profile.profile ? profile.profile.screen_name : username
             }'s Profile`}
-            <FollowButton profile={profile} />
-            <BlockButton profile={profile} />
+
+            {/* show follow button if user is not blocked */}
+            {!profile.blocked ? (
+              <FollowButton profile={profile} />
+            ) : null}
+
+          <BlockButton profile={profile} />
           </h1>
           <div className="container justify-content-center d-flex">
             <p className="list-group-item w-25 text-center">
