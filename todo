@@ -10,8 +10,8 @@
 [x] delete account, account settings, more account control
 [*] block/mute/report other users
     - [x] prevent viewing a blocked user's profile/posts/comments and vice versa 
-    - [x]  be able to unblock
-    - [*]  update frontend to handle user blocking
+    - [x] be able to unblock
+    - [*] update frontend to handle user blocking
         - [x] add block button
         - []  can not follow user that you block and vice versa
         - []  dont show any posts or data other than profile if you block that user
