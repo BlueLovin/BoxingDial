@@ -162,9 +162,21 @@ class UserAPI(generics.RetrieveAPIView):
 class AddFollowerView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    # request should look like this:
+    # {
+    #     "follow": {userID}
+    # }
     def post(self, request, format=None):
         user = request.user
-        follow = User.objects.get(id=self.request.data.get("follow"))
+
+        # get the user that you wish to follow from the request
+        try:
+            follow = User.objects.get(id=self.request.data.get("follow"))
+        except ObjectDoesNotExist:
+            return Response(
+                "User does not exist",
+                HTTPStatus.BAD_REQUEST,
+            )
 
         # if you block a user, you can not follow them.
         if UserManager.is_user_blocked(None, request, follow.profile):
@@ -173,6 +185,14 @@ class AddFollowerView(generics.GenericAPIView):
                 HTTPStatus.BAD_REQUEST,
             )
 
+        # if the user blocks you, YOU can not follow them
+        if UserManager.user_blocks_you(None, request, follow.profile):
+            return Response(
+                "This user has blocked you.",
+                HTTPStatus.BAD_REQUEST,
+            )
+
+        # can not follow yourself
         if user == follow:
             return Response(
                 "User can not follow themself, wtf are you doing?",
@@ -198,6 +218,10 @@ class AddFollowerView(generics.GenericAPIView):
 class DeleteFollowerView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    # request should look like this:
+    # {
+    #     "unfollow": {userID}
+    # }
     def post(self, request, format=None):
         user = request.user
 
@@ -206,7 +230,10 @@ class DeleteFollowerView(generics.GenericAPIView):
             UserFollowing.objects.get(user_id=user, following_user_id=unfollow).delete()
 
         except ObjectDoesNotExist:
-            return Response("You are not following this user", HTTPStatus.BAD_REQUEST)
+            return Response(
+                "You are not following this user, or the user does not exist",
+                HTTPStatus.BAD_REQUEST,
+            )
 
         return Response(
             {
