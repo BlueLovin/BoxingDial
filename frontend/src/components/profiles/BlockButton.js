@@ -25,7 +25,7 @@ export default function BlockButton(props) {
 
   const unblock = () => {
     axios
-      .post(`/api/user/unblock/${profile.id}/`, {}, headers)
+      .put(`/api/user/unblock/${profile.id}/`, {}, headers)
       .then(() => setIsBlocked(false));
   };
 
@@ -35,13 +35,17 @@ export default function BlockButton(props) {
         if (isBlocked === false) {
           return (
             <>
-              <Button color="danger" onClick={() => block()}>Block</Button>
+              <Button color="danger" onClick={() => block()}>
+                Block
+              </Button>
             </>
           );
         } else if (isBlocked != null) {
           return (
             <>
-              <Button color="danger" onClick={() => unblock()}>Unblock</Button>
+              <Button color="danger" onClick={() => unblock()}>
+                Unblock
+              </Button>
             </>
           );
         }

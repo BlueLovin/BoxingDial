@@ -215,6 +215,8 @@ class BlockUserView(generics.UpdateAPIView):
             return Response("Can not block yourself.", status=HTTPStatus.BAD_REQUEST)
 
         return HttpResponse(200)
+
+
 # unblock a user - /api/user/unblock/<int:id>/
 class UnblockUserView(generics.UpdateAPIView):
     serializer_class = UserSerializer
@@ -237,4 +239,3 @@ class UnblockUserView(generics.UpdateAPIView):
             return Response("Can not unblock yourself.", status=HTTPStatus.BAD_REQUEST)
 
         return HttpResponse(200)
-

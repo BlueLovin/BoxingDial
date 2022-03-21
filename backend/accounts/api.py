@@ -1,3 +1,4 @@
+from http import HTTPStatus
 import json
 from django.contrib.auth import authenticate
 from django.db.models.expressions import Value
@@ -8,6 +9,9 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from knox.models import AuthToken
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+
+from accounts.managers import UserManager
 from .models import UserFollowing, UserProfile
 from .serializers import (
     SmallUserSerializer,
@@ -82,6 +86,7 @@ class LoginAPI(generics.GenericAPIView):
             }
         )
 
+
 # DELETE the current user
 # {
 #     "password": "fuckyoubitch",
@@ -105,25 +110,27 @@ class DeleteUserView(generics.DestroyAPIView):
             like.delete()
 
         user.profile.delete()
-        
 
     def delete(self, request, format=None):
-        if("password" not in request.data):
+        if "password" not in request.data:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        #authenticate user
+        # authenticate user
         user = request.user
         auth_data = {"username": user.username, "password": request.data["password"]}
         user = authenticate(**auth_data)
 
         if not user or not user.is_active:
-            return Response({"error": "incorrect password"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"error": "incorrect password"}, status=status.HTTP_401_UNAUTHORIZED
+            )
 
         # delete user
         self.delete_all_user_objects(user)
         user.delete()
 
-        return Response(status=status.HTTP_200_OK) 
+        return Response(status=status.HTTP_200_OK)
+
 
 class UserAPI(generics.RetrieveAPIView):
     permission_classes = [
@@ -156,18 +163,30 @@ class AddFollowerView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, format=None):
-        user = self.request.user
+        user = request.user
         follow = User.objects.get(id=self.request.data.get("follow"))
 
-        if user != follow:
-            notification_text = f"{user.username} just followed you!"
-            UserFollowing.objects.get_or_create(user_id=user, following_user_id=follow)
-            Notification.objects.get_or_create(
-                recipient=follow, text=notification_text, post_id=-1, sender=user
+        # if you block a user, you can not follow them.
+        if UserManager.is_user_blocked(None, request, follow.profile):
+            return Response(
+                "You cannot follow a user that you have blocked.",
+                HTTPStatus.BAD_REQUEST,
             )
 
-        else:
-            return Response("User can not follow themself, wtf are you doing?")
+        if user == follow:
+            return Response(
+                "User can not follow themself, wtf are you doing?",
+                HTTPStatus.BAD_REQUEST,
+            )
+
+        # create follow object
+        UserFollowing.objects.get_or_create(user_id=user, following_user_id=follow)
+
+        # send notification to user who received the follow
+        notification_text = f"{user.username} just followed you!"
+        Notification.objects.get_or_create(
+            recipient=follow, text=notification_text, post_id=-1, sender=user
+        )
 
         return Response(
             {
@@ -181,9 +200,14 @@ class DeleteFollowerView(generics.GenericAPIView):
 
     def post(self, request, format=None):
         user = request.user
-        unfollow = User.objects.get(id=request.data.get("unfollow"))
 
-        UserFollowing.objects.get(user_id=user, following_user_id=unfollow).delete()
+        try:
+            unfollow = User.objects.get(id=request.data.get("unfollow"))
+            UserFollowing.objects.get(user_id=user, following_user_id=unfollow).delete()
+
+        except ObjectDoesNotExist:
+            return Response("You are not following this user", HTTPStatus.BAD_REQUEST)
+
         return Response(
             {
                 "response": "unfollowed",
@@ -196,5 +220,3 @@ class UserFollowingView(generics.ListAPIView):
         Prefetch("following_user_id")
     ).all()
     serializer_class = UserFollowingSerializer
-
-
