@@ -127,8 +127,12 @@ class SinglePostCommentsView(generics.ListAPIView):
 class PostView(generics.RetrieveDestroyAPIView):
     permission_classes = [IsOwnerOrReadOnly]
     serializer_class = PostSerializer
+
+    def get_queryset(self):
+        return Post.objects.all()
+
     # get current post, and order the comments by their ID descending. or recent, in other words
-    def get(self, request, id):
+    def get(self, request, pk):
         logged_in = request.user.is_authenticated
         user_id = request.user.id
 
@@ -159,7 +163,7 @@ class PostView(generics.RetrieveDestroyAPIView):
 
             return Response(
                 PostSerializer(
-                    Post.objects.filter(id=id)
+                    Post.objects.filter(id=pk)
                     .annotate(like_count=Count("likes", distinct=True))
                     .prefetch_related(
                         Prefetch(

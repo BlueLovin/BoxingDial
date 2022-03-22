@@ -5,24 +5,31 @@ import Post from "./Post";
 import { UserContext } from "../../UserContext";
 
 export default function PopularPosts() {
-  const [postList, setpostList] = useState([]);
+  const [postList, setPostList] = useState([]);
   const { headersVal } = useContext(UserContext);
   const [headers] = headersVal;
 
   useEffect(() => {
+    const refreshPostList = () => {
+      axios
+        .get("/api/posts/popular", headers)
+        .then((res) => setPostList(res.data))
+        .catch((err) => console.log(err));
+    };
     refreshPostList();
-  }, []);
+  }, [headers]);
 
-  const refreshPostList = () => {
-    axios
-      .get("/api/posts/popular", headers)
-      .then((res) => setpostList(res.data))
-      .catch((err) => console.log(err));
+  const removePostFromView = (post) => {
+    setPostList(postList.filter((i) => post !== i));
   };
+
   const renderPosts = () => {
     return postList.slice(0, 5).map((post) => (
       <div key={post.id}>
-        <Post post={post} />
+        <Post
+          post={post}
+          removePostFromParentList={() => removePostFromView(post)}
+        />
         <hr />
       </div>
     ));

@@ -3,19 +3,16 @@ import { useContext, useEffect, useState } from "react";
 import { Button } from "reactstrap";
 import { UserContext } from "../../UserContext";
 
+// pass down the already-set "isBlocked" state. this is not calculated on mount here.
 export default function BlockButton(props) {
   const { profile } = props;
 
-  const [isBlocked, setIsBlocked] = useState(profile.is_following);
+  const { isBlocked, setIsBlocked } = props;
 
   const { headersVal, userVal, loggedInVal } = useContext(UserContext);
   const [user] = userVal;
   const [headers] = headersVal;
   const [loggedIn] = loggedInVal;
-
-  useEffect(() => {
-    setIsBlocked(profile.blocked);
-  }, [profile]);
 
   const block = () => {
     axios
@@ -29,7 +26,7 @@ export default function BlockButton(props) {
       .then(() => setIsBlocked(false));
   };
 
-  const renderFollowButton = () => {
+  const renderBlockButton = () => {
     if (loggedIn) {
       if (user.username !== profile.username) {
         if (isBlocked === false) {
@@ -55,5 +52,5 @@ export default function BlockButton(props) {
     }
   };
 
-  return <>{renderFollowButton()}</>;
+  return <>{renderBlockButton()}</>;
 }

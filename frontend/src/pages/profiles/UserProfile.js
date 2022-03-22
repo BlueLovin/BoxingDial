@@ -13,6 +13,7 @@ import BlockButton from "../../components/profiles/BlockButton";
 export default function UserProfile() {
   const params = useParams();
   const username = params.username;
+  const [isBlocked, setIsBlocked] = useState(false);
   const [postsList, setPostsList] = useState([]);
   const [profileFollowingList, setFollowingList] = useState([]);
   const [profileFollowersList, setFollowersList] = useState([]);
@@ -26,11 +27,29 @@ export default function UserProfile() {
   const { userVal } = useContext(UserContext);
   const [user] = userVal;
 
-  const fetchUserPosts = useCallback(() => {
-    axios.get(`/api/users/${username}/posts/`, headers).then((res) => {
-      setPostsList(res.data);
-    });
-  }, [username, headers]);
+  // get user posts if you are not blocking this profile
+  useEffect(() => {
+    setIsBlocked(profile.blocked);
+  }, [profile, headers, username]);
+
+  useEffect(() => {
+    const fetchUserPosts = () => {
+      const notBlocked =
+        (profile.blocks_you === false || profile.blocks_you === undefined) &&
+        (profile.blocked === false || profile.blocked === undefined);
+
+      if (profile !== undefined && notBlocked) {
+        axios.get(`/api/users/${username}/posts/`, headers).then((res) => {
+          setPostsList(res.data);
+        });
+      } else {
+        setPostsList([]);
+      }
+    };
+    if (profile.id !== undefined) {
+      fetchUserPosts();
+    }
+  }, [isBlocked, headers, profile, username]);
 
   useEffect(() => {
     const fetchProfile = () => {
@@ -40,6 +59,7 @@ export default function UserProfile() {
         .get(`/api/users/${username}/`, headers)
         .then((res) => {
           setProfile(res.data);
+          setIsBlocked(res.data.blocked);
         })
         .catch(() => {
           window.location = "/404/"; //404 if user doesnt exist
@@ -53,15 +73,21 @@ export default function UserProfile() {
         setFollowersList(res.data);
       });
     };
-    fetchUserPosts();
     fetchProfile();
-  }, [fetchUserPosts, username, headers]);
+  }, [username, headers]);
+
+  const removePostFromView = (post) => {
+    setPostsList(postsList.filter((i) => post !== i));
+  };
 
   const renderProfilePosts = () => {
     return postsList.map((post) => (
       <div key={post.id}>
         <br />
-        <Post post={post} removePostFromParentList={fetchUserPosts} />
+        <Post
+          post={post}
+          removePostFromParentList={() => removePostFromView(post)}
+        />
       </div>
     ));
   };
@@ -102,11 +128,13 @@ export default function UserProfile() {
             }'s Profile`}
 
             {/* show follow button if user is not blocked */}
-            {!profile.blocked ? (
-              <FollowButton profile={profile} />
-            ) : null}
+            {!isBlocked ? <FollowButton profile={profile} /> : null}
 
-          <BlockButton profile={profile} />
+            <BlockButton
+              isBlocked={isBlocked}
+              setIsBlocked={setIsBlocked}
+              profile={profile}
+            />
           </h1>
           <div className="container justify-content-center d-flex">
             <p className="list-group-item w-25 text-center">
