@@ -153,7 +153,7 @@ class PostView(generics.RetrieveDestroyAPIView):
         )
 
         if logged_in:
-            post_query = Post.objects.filter(id=id)
+            post_query = Post.objects.filter(id=pk)
             post_owner_profile = post_query.first().owner.profile
 
             if UserManager.user_blocks_you(None, request, post_owner_profile):
@@ -178,7 +178,7 @@ class PostView(generics.RetrieveDestroyAPIView):
                     .annotate(
                         comment_count=Count("comments", distinct=True),
                         liked=Exists(  # see if a PostLike object exists matching the client user and post.
-                            PostLike.objects.filter(post=id, user=request.user)
+                            PostLike.objects.filter(post=pk, user=request.user)
                         ),
                     )
                     .first()
@@ -189,7 +189,7 @@ class PostView(generics.RetrieveDestroyAPIView):
             return Response(
                 PostSerializer(
                     Post.objects.exclude_blocked_users(request)
-                    .filter(id=id)
+                    .filter(id=pk)
                     .annotate(like_count=Count("likes", distinct=True))
                     .prefetch_related(
                         Prefetch(
