@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from knox.models import AuthToken
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import DataError
 
 from accounts.managers import UserManager
 from .models import UserFollowing, UserProfile
@@ -52,15 +53,21 @@ class RegisterAPI(generics.GenericAPIView):
                     "token": token[1],
                 }
             )
-        except AttributeError:
-            return HttpResponseBadRequest()
+
         # return errors if exception is thrown
         except Exception as e:
             if user:  # if user was created, rollback changes.
                 user.delete()
 
-            if e == AttributeError:
+            if type(e) == AttributeError:
                 return HttpResponseBadRequest()
+
+            if type(e) == DataError:
+                return Response(
+                    {"username": ["Username can only be 15 characters long"]},
+                    status=400,
+                )
+
             errors = dict()
             errors["errors"] = list(e.messages)
 
@@ -88,6 +95,7 @@ class LoginAPI(generics.GenericAPIView):
 
 
 # DELETE the current user
+# request:
 # {
 #     "password": "fuckyoubitch",
 # }
