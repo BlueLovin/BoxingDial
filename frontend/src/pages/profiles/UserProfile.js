@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useCallback } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Post from "../../components/posts/Post";
@@ -131,8 +131,7 @@ export default function UserProfile() {
             {!isBlocked ? <FollowButton profile={profile} /> : null}
 
             <BlockButton
-              isBlocked={isBlocked}
-              setIsBlocked={setIsBlocked}
+              isBlockedState={[isBlocked, setIsBlocked]}
               profile={profile}
             />
           </h1>

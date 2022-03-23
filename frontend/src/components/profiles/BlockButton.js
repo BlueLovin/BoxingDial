@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { Button } from "reactstrap";
 import { UserContext } from "../../UserContext";
 
@@ -7,7 +7,7 @@ import { UserContext } from "../../UserContext";
 export default function BlockButton(props) {
   const { profile } = props;
 
-  const { isBlocked, setIsBlocked } = props;
+  const [isBlocked, setIsBlocked] = props.isBlockedState;
 
   const { headersVal, userVal, loggedInVal } = useContext(UserContext);
   const [user] = userVal;
