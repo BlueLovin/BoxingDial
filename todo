@@ -13,8 +13,8 @@
     - [x] be able to unblock
     - [*] update frontend to handle user blocking
         - [x] add block button
-        - [x]  can not follow user that you block and vice versa
-        - []  dont show any posts or data other than profile if you block that user
+        - [x] can not follow user that you block and vice versa
+        - [x]  dont show any posts or data other than profile if you block that user
         - []  return a "user doesnt exist" frontend if the user blocks you
     - []  notifications can not be sent to someone who blocks you
     - []  prevent any objects being created related to a user that blocks you 
