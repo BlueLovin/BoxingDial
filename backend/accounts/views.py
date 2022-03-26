@@ -15,6 +15,7 @@ from accounts.serializers import (
     UserSerializer,
 )
 from accounts.managers import UserManager
+from accounts.models import UserFollowing
 from backend.responses import BoxingDialResponses
 from posts.models import Post, PostComment, PostLike
 from posts.serializers import CommentSerializer, SmallPostSerializer
@@ -213,6 +214,15 @@ class BlockUserView(generics.UpdateAPIView):
 
         elif this_user_profile == user_to_block:
             return Response("Can not block yourself.", status=HTTPStatus.BAD_REQUEST)
+
+        # unfollow user/make them unfollow you
+        following_objects = UserFollowing.objects.filter(
+            user_id=this_user, following_user_id=user_to_block.user
+        ) | UserFollowing.objects.filter(
+            user_id=user_to_block.user, following_user_id=this_user
+        )
+
+        following_objects.delete()
 
         return HttpResponse(200)
 
