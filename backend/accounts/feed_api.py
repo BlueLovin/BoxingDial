@@ -22,7 +22,7 @@ class UserFeedByRecentView(generics.GenericAPIView):
             .distinct()
         )
 
-        # get posts and comments from following users
+        # get posts from following users
         posts = (
             Post.objects.filter(owner__in=following_user_ids)
             .annotate(
@@ -36,7 +36,9 @@ class UserFeedByRecentView(generics.GenericAPIView):
         )
 
         comments = (
-            PostComment.objects.exclude(post__isnull=True)
+            PostComment.objects.exclude_blocked_users(request)
+            .exclude(post__isnull=True)
+            # you are following owner of comment, and the comment is not a reply
             .filter(owner__in=following_user_ids, parent=None)
             .annotate(
                 is_voted_down=Exists(
