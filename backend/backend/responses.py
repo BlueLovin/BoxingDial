@@ -10,3 +10,6 @@ class BoxingDialResponses:
         {"error": "This user doesn't seem to exist. or maybe they blocked u lmfaoo"},
         status=400,
     )
+    CONTENT_TOO_SHORT_RESPONSE = Response(
+        {"error": "content must contain a minimum of 5 characters"}, status=400
+    )

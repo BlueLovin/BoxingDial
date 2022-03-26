@@ -33,12 +33,14 @@ export default function UserFeed() {
     setModal(!modal);
   };
   const submitPost = (item) => {
-    axios.post("/api/post/create/", item, headers).then((res) => {
-      toggleModal();
-      console.log(res.data);
-      setFeed((f) => [res.data, ...f]);
-    });
-    //.catch(() => alert("Error creating your post. Please try again."));
+    axios
+      .post("/api/post/create/", item, headers)
+      .then((res) => {
+        toggleModal();
+        console.log(res.data);
+        setFeed((f) => [res.data, ...f]);
+      })
+      .catch((err) => alert(err.response.data.error));
   };
   const createItem = () => {
     const item = {

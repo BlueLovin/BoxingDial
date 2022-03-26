@@ -49,11 +49,14 @@ class CreatePostView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         owner = request.user
+        content = request.data["content"]
+
+        if len(content) < 5:
+            return BoxingDialResponses.CONTENT_TOO_SHORT_RESPONSE
 
         if owner.is_anonymous:
             raise IsAuthenticated(detail=None, code=None)
 
-        content = request.data["content"]
         username = owner.username
 
         # fight field is optional when creating a post.
@@ -424,6 +427,10 @@ class CommentReplyView(views.APIView):
     def post(self, request, parent, format=None):
         parent_pk = parent
         owner = request.user
+        content = request.data["content"]
+
+        if len(content) < 5:
+            return BoxingDialResponses.CONTENT_TOO_SHORT_RESPONSE
 
         try:  # try getting the parent comment
             parent_comment = PostComment.objects.get(id=parent_pk)
@@ -442,7 +449,7 @@ class CommentReplyView(views.APIView):
                 owner=owner,
                 username=username,
                 parent=parent_comment,
-                content=request.data["content"],
+                content=content,
             )
 
             # create notification for parent comment owner
