@@ -18,10 +18,12 @@ class TinyPostSerializer(serializers.ModelSerializer):
 
 
 class ReplySerializer(serializers.ModelSerializer):
+    owner = SmallUserWithProfileSerializer(many=False)
     class Meta:
         model = PostComment
         fields = (
             "id",
+            "owner",
             "content",
             "username",
             "vote_score",
