@@ -355,7 +355,6 @@ class PostCommentsView(viewsets.ModelViewSet, VoteMixin):
         return Response(serializer.data)
 
     def post(self, request, parent, format=None):
-        print("\n\n\ndafd\n\n\n\n")
         owner = self.request.user
 
         if owner.is_anonymous:
@@ -442,42 +441,49 @@ class CommentReplyView(views.APIView):
         except PostComment.DoesNotExist:
             raise serializers.ValidationError("error getting parent comment")
 
+        # don't allow user to reply to user that is blocked
+        blocked = UserManager.user_blocks_you(
+            None, request, parent.owner.profile
+        ) or UserManager.is_user_blocked(None, request, parent.owner.profile)
+        if blocked:
+            return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
+
+
         if owner.is_anonymous:
             raise NOT_LOGGED_IN_EXCEPTION
 
-        if parent_comment.parent == None:
-
-            username = owner.username
-
-            new_comment = PostComment.objects.create(
-                owner=owner,
-                username=username,
-                parent=parent_comment,
-                content=content,
-            )
-
-            # create notification for parent comment owner
-            self.create_reply_notification(new_comment, parent_comment)
-
-            # upvote comment
-            new_comment.votes.up(owner.id)
-
-            # annotate response
-            new_comment.vote_score = 1
-            new_comment.is_voted_up = True
-
-            result = ReplySerializer(new_comment).data
-
-            return Response(
-                {
-                    "result": result,
-                },
-                status=status.HTTP_200_OK,
-            )
-        else:
+        if parent_comment.parent != None:
             return Response(
                 {"result": "can not reply to reply"}, status=status.HTTP_400_BAD_REQUEST
             )
+
+        username = owner.username
+
+        new_comment = PostComment.objects.create(
+            owner=owner,
+            username=username,
+            parent=parent_comment,
+            content=content,
+        )
+
+        # create notification for parent comment owner
+        self.create_reply_notification(new_comment, parent_comment)
+
+        # upvote comment
+        new_comment.votes.up(owner.id)
+
+        # annotate response
+        new_comment.vote_score = 1
+        new_comment.is_voted_up = True
+
+        result = ReplySerializer(new_comment).data
+
+        return Response(
+            {
+                "result": result,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class PostLikeApiView(views.APIView):
