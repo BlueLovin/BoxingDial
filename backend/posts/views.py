@@ -402,6 +402,10 @@ class CommentReplyView(views.APIView):
     def create_reply_notification(self, new_comment, parent_comment):
         new_comment_username = new_comment.username
 
+        # don't send a notification if replying to yourself
+        if new_comment_username == parent_comment.username:
+            return
+
         # show first 15 chars if longer than 15 chars, and append ellipses
         truncated_parent_content = (
             parent_comment.content[:15] + "..."
