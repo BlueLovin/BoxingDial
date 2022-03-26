@@ -47,6 +47,8 @@ class UserManager(models.Manager):
                 .exclude(
                     post__owner__profile__blocked_users__id__icontains=this_user.profile.id
                 )
+                # exclude comments on a post where the owner of the post blocks you
+                .exclude(post__owner__profile__id__in=blocked_user_ids)
             )
 
         return (
