@@ -13,3 +13,6 @@ class BoxingDialResponses:
     CONTENT_TOO_SHORT_RESPONSE = Response(
         {"error": "content must contain a minimum of 5 characters"}, status=400
     )
+    NOT_LOGGED_IN_RESPONSE = Response(
+        {"error": "not logged in"}, status=400
+    ) 

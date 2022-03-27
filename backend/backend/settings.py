@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "fights",
     "posts",
+    "post_comments",
     "accounts",
     "notifications",
     "knox",
