@@ -8,7 +8,7 @@
 [x] notifications
 [x] add bio/screen name to user profiles
 [x] delete account, account settings, more account control
-[*] block/mute/report other users
+[x] block/mute/report other users
     - [x] prevent viewing a blocked user's profile/posts/comments and vice versa 
     - [x] be able to unblock
     - [*] update frontend to handle user blocking
@@ -16,9 +16,9 @@
         - [x] can not follow user that you block and vice versa
         - [x] dont show any posts or data other than profile if you block that user
         - [x] return a "user doesnt exist" frontend if the user blocks you
-    - []  notifications can not be sent to someone who blocks you
-    - []  prevent any objects being created related to a user that blocks you 
+    - [x]  notifications can not be sent to someone who blocks you
 []  decouple comments and post views
+[]  integrate CDN service
 []  add profile pictures to profiles
 []  DMs
 []  add explore page

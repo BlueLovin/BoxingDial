@@ -24,7 +24,8 @@ class UserFeedByRecentView(generics.GenericAPIView):
 
         # get posts from following users
         posts = (
-            Post.objects.filter(owner__in=following_user_ids)
+            Post.objects.exclude_blocked_users(request)
+            .filter(owner__in=following_user_ids)
             .annotate(
                 comment_count=Count("comments", distinct=True),
                 liked=Exists(
