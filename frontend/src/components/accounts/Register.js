@@ -39,8 +39,6 @@ export default function Register() {
 
     // password and confirmation password must match
     if (item.confirmation_password !== item.password) {
-      console.log(item.password);
-      console.log(item.confirmation_password);
       setError(true);
       setErrorMessages(["Passwords do not match"]);
       return;

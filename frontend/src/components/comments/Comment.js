@@ -8,7 +8,11 @@ import VotingButtons from "./UpvoteButtons";
 export default function Comment(props) {
   //props
   const { contextButton = false } = props;
-  const { removeCommentFromParentList = null } = props;
+  const {
+    removeCommentFromParentList = null,
+    addNewReply = null,
+    removeReply = null,
+  } = props;
   const comment = props.comment;
   //context
   const { userVal, headersVal } = useContext(UserContext);
@@ -26,6 +30,41 @@ export default function Comment(props) {
     });
   };
 
+  const handleChange = (e) => {
+    let { value } = e.target;
+
+    const item = { content: value };
+    setActiveItem(item);
+  };
+
+  const postReply = () => {
+    //if five or more characters
+    if (activeItem.content.length >= 5) {
+      axios
+        .post(`/api/comments/${comment.id}/reply`, activeItem, headers)
+        .then((res) => {
+          addNewReply(comment, res.data.result);
+          setActiveItem({ content: "" });
+          setShowReplyBox(false);
+        });
+    } else {
+      alert("comments must be longer than 5 characters");
+    }
+  };
+
+  const renderReplies = () => {
+    if (comment.replies) {
+      return comment.replies.map((reply) => (
+        <>
+          <hr />
+          <Comment
+            comment={reply}
+            removeCommentFromParentList={() => removeReply(comment, reply)}
+          />
+        </>
+      ));
+    }
+  };
   const renderReplyButton = () => {
     if (comment.replies && comment.parent === null) {
       // if parent comment
@@ -38,13 +77,6 @@ export default function Comment(props) {
         </button>
       );
     }
-  };
-
-  const handleChange = (e) => {
-    let { value } = e.target;
-
-    const item = { content: value };
-    setActiveItem(item);
   };
 
   const renderReplyBox = () => {
@@ -73,34 +105,9 @@ export default function Comment(props) {
       return null;
     }
   };
-
-  const postReply = () => {
-    //if five or more characters
-    if (activeItem.content.length >= 5) {
-      axios
-        .post(`/api/comments/${comment.id}/reply`, activeItem, headers)
-        .then(() => {
-          if (removeCommentFromParentList !== null) {
-            removeCommentFromParentList();
-          }
-        });
-    } else {
-      alert("comments must be longer than 5 characters");
-    }
-  };
-
-  const renderReplies = () => {
-    if (comment.replies) {
-      // if this comment has replies, and is NOT a reply
-      return comment.replies.map((reply) => (
-        <>
-          <hr />
-          <Comment comment={reply} />
-        </>
-      ));
-    }
-  };
-
+  if (!comment) {
+    return null;
+  }
   return (
     <Container>
       <div className="list-group-item bg-light justify-content-center preserve-line-breaks">

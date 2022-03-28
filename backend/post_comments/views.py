@@ -13,6 +13,7 @@ from vote.models import DOWN, Vote
 from rest_framework import viewsets, generics, views, status
 from vote.views import VoteMixin
 from django.db.models.expressions import Exists, OuterRef
+from django.db.models import Prefetch
 
 # post's comments /api/posts/6/comments
 class SinglePostCommentsView(generics.ListAPIView):
@@ -30,6 +31,22 @@ class SinglePostCommentsView(generics.ListAPIView):
 
         if request_order == "score":
             order = "-vote_score"
+
+        # query to see if the logged in user has upvoted or downvoted the current comment
+        prefetch_query = PostComment.objects.annotate(
+            is_voted_down=Exists(
+                Vote.objects.filter(
+                    user_id=user_id,
+                    action=DOWN,
+                    object_id=OuterRef("pk"),
+                )
+            ),
+            is_voted_up=Exists(
+                Vote.objects.filter(
+                    user_id=user_id, action=UP, object_id=OuterRef("pk")
+                )
+            ),
+        )
 
         # get comments related to post passed in through URL,
         # annotate is_voted_down and is_voted_up
@@ -49,6 +66,10 @@ class SinglePostCommentsView(generics.ListAPIView):
                         user_id=user_id, action=UP, object_id=OuterRef("pk")
                     )
                 ),
+            )
+            # get replies and properly annotate them
+            .prefetch_related(
+                Prefetch("replies", queryset=prefetch_query.order_by("-date"))
             )
             .order_by(order)
         )

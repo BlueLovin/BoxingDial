@@ -16,7 +16,6 @@ export default function Inbox() {
     if (loggedIn) {
       axios.get("/api/inbox", headers).then((res) => {
         setNotificationList(res.data);
-        console.log(res.data);
       });
     } else {
       return <Redirect to="/404" />;

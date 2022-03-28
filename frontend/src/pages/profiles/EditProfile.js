@@ -23,7 +23,6 @@ export default function EditProfile() {
   };
 
   useEffect(() => {
-    console.log("render");
     if (loggedIn === true) {
       setNewProfile(user.profile);
       setFieldCharCounts({

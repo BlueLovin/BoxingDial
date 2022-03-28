@@ -140,6 +140,37 @@ export default function PostPageComments(props) {
     }
   };
 
+  const addReplyToView = (parentComment, newReply) => {
+    // add reply to beginning of parent comment locally
+    parentComment.replies = [newReply, ...parentComment.replies];
+
+    // replace the parent comment with our new modified comment with new reply array
+    const updatedList = commentList.map((comment) => {
+      if (comment.id === parentComment.id) {
+        return parentComment;
+      }
+      return comment;
+    });
+
+    setCommentList(updatedList);
+  };
+
+  const removeReplyFromView = (parentComment, reply) => {
+    // update reply list locally
+    parentComment.replies = parentComment.replies.filter(
+      (_reply) => _reply !== reply
+    );
+
+    // set parent comment to our modified comment with new reply list
+    const updatedReplyList = commentList.map((comment) => {
+      if (comment.id === parentComment.id) {
+        return { ...parentComment };
+      }
+      return comment;
+    });
+
+    setCommentList(updatedReplyList);
+  };
   // update state after deleting comment
   const removeCommentFromView = (comment) => {
     setCommentList(commentList.filter((c) => comment !== c));
@@ -151,6 +182,8 @@ export default function PostPageComments(props) {
       <Comment
         comment={comment}
         removeCommentFromParentList={() => removeCommentFromView(comment)}
+        removeReply={removeReplyFromView}
+        addNewReply={addReplyToView}
         key={comment.id}
       />
     ));
