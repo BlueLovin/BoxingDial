@@ -80,6 +80,8 @@ export default function PostPageComments(props) {
     });
   };
 
+  // when you update the reply list of a comment locally, pass it here and
+  // this function will update the comment in the state
   const replaceComment = (newComment) => {
     return commentList.map((comment) => {
       if (comment.id === newComment.id) {
@@ -139,13 +141,13 @@ export default function PostPageComments(props) {
           </DropdownToggle>
           <DropdownMenu right>
             <DropdownItem
-              active={commentOrder === "date" ? true : false}
+              active={commentOrder === "date"}
               onClick={() => setCommentOrder("date")}
             >
               Date
             </DropdownItem>
             <DropdownItem
-              active={commentOrder === "score" ? true : false}
+              active={commentOrder === "score"}
               onClick={() => setCommentOrder("score")}
             >
               Score
