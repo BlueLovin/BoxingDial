@@ -31,7 +31,6 @@ export default function Notification(props) {
     } else {
       history.push(`/post/${post_id}`);
     }
-    window.location.reload();
   };
 
   const deleteNotification = async () => {
