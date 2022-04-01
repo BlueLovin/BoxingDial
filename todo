@@ -23,6 +23,7 @@
 []  integrate Storage/CDN service
 []  add profile pictures to profiles
 []  DMs
+[]  pagination backend and frontend
 []  add explore page
 []  emailing / email verification
 []  captcha on register page
