@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import { Button, Container, FormGroup, Input } from "reactstrap";
 import VotingButtons from "./UpvoteButtons";
+import HighlightedContent from "../posts/HighlightedContent";
 
 export default function Comment(props) {
   //props
@@ -19,7 +20,9 @@ export default function Comment(props) {
   const [user] = userVal;
   const [headers] = headersVal;
   //state
-  const [activeItem, setActiveItem] = useState({ content: "" });
+  const [activeItem, setActiveItem] = useState({
+    content: `@${comment.username} `,
+  });
   const [showReplyBox, setShowReplyBox] = useState(false);
 
   const deleteComment = () => {
@@ -44,7 +47,7 @@ export default function Comment(props) {
         .post(`/api/comments/${comment.id}/reply`, activeItem, headers)
         .then((res) => {
           addNewReply(comment, res.data.result);
-          setActiveItem({ content: "" });
+          setActiveItem({ content: `@${comment.username}` });
           setShowReplyBox(false);
         });
     } else {
@@ -111,7 +114,9 @@ export default function Comment(props) {
   return (
     <Container>
       <div className="list-group-item bg-light justify-content-center preserve-line-breaks">
-        <p>{comment.content}</p>
+        <p>
+          <HighlightedContent post={comment} />
+        </p>
         <div className="list-group-item p-auto m-auto d-flex justify-content-between align-items-center">
           <div>
             <div className="text-muted">

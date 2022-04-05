@@ -5,7 +5,7 @@ from accounts.serializers import (
 )
 from fights.serializers.common import SmallFightSerializer, TinyFightSerializer
 from post_comments.models import PostComment
-from post_comments.serializers import CommentSerializer
+from post_comments.serializers import CommentSerializer, PostCommentEntitiesSerializer
 from rest_framework import serializers
 
 from .models import Post, PostEntities, PostLike
@@ -26,6 +26,7 @@ class TruncatedPostSerializer(serializers.ModelSerializer):
 class FeedCommentSerializer(serializers.ModelSerializer):
     post = TruncatedPostSerializer(many=False)
     owner = SmallUserWithProfileSerializer(many=False)
+    entities = PostCommentEntitiesSerializer(many=False)
 
     class Meta:
         model = PostComment
@@ -35,6 +36,7 @@ class FeedCommentSerializer(serializers.ModelSerializer):
             "date",
             "content",
             "owner",
+            "entities",
             "username",
             "vote_score",
             "is_voted_up",

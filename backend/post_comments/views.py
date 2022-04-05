@@ -151,7 +151,7 @@ class CreatePostCommentView(generics.CreateAPIView):
             mentioning_themself = request.user == comment.owner
             blocked = UserManager.is_user_blocked_either_way(
                 None, request, comment.owner.profile
-            ) 
+            )
 
             if mentioning_themself or blocked:
                 continue
@@ -335,9 +335,8 @@ class CommentReplyView(views.APIView):
             username=username,
             parent=parent_comment,
             content=content,
-            entities=entities
+            entities=entities,
         )
-
 
         # create notification for parent comment owner
         self.create_reply_notification(new_comment, parent_comment)

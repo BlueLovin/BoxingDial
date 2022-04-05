@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 export default function HighlightedContent({ post = {} }) {
-  const regex = new RegExp("(@[0-9a-z]*)", "gi");
+  const regex = /(@[0-9a-z]*)/gi;
   const content = post.content;
   const parts = content.split(regex);
   const mentionedUsers = post.entities.mentioned_users.map((u) => u.username);
@@ -12,7 +12,7 @@ export default function HighlightedContent({ post = {} }) {
     <span>
       {parts.filter(String).map((word, i) => {
         const userMention = regex.test(word);
-        
+
         // regular word
         if (!userMention) {
           return <span key={i}>{word}</span>;
