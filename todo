@@ -19,6 +19,8 @@
     - [x]  notifications can not be sent to someone who blocks you
 [x] decouple comments and post views
 []  mention other users in comments and posts
+    - [x] posts
+    -  [] comments
 []  click a link and go to a highlighted comment
 []  repost other people's post
 []  integrate Storage/CDN service
