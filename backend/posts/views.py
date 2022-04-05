@@ -104,7 +104,7 @@ class CreatePostView(generics.CreateAPIView):
 
         for mentioned_user in post.entities.mentioned_users.all():
 
-            notification_text = f"{post.owner.username} commented mentioned you in their post: {post.content[:25]}"
+            notification_text = f"{post.owner.username} commented mentioned you in their post: {post.content[:10]}..."
 
             Notification.objects.create(
                 recipient=mentioned_user,
