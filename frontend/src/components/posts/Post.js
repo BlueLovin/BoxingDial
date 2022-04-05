@@ -3,6 +3,7 @@ import { Container } from "reactstrap";
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { UserContext } from "../../UserContext";
+import HighlightedContent from "./HighlightedContent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 
@@ -67,6 +68,14 @@ export default function Post(props) {
     return dateTime.toLocaleString();
   };
 
+  const renderContent = () => {
+    if (post.entities.mentioned_users !== []) {
+      return <HighlightedContent post={post} />;
+    }
+
+    return post.content;
+  };
+
   return (
     <Container>
       <div className="list-group-item p-3">
@@ -78,7 +87,7 @@ export default function Post(props) {
         </span>
         <br />
         <span className="font-weight-light list-group-item bg-light p-2 m-1 preserve-line-breaks">
-          {post.content}
+          {renderContent()}
         </span>
 
         <div className="text-right m-1">{formatDateTime(post.date)}</div>

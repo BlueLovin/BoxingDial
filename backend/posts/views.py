@@ -122,10 +122,10 @@ class CreatePostView(generics.CreateAPIView):
             return []
 
         for mention in mentions:
-            mentioned_username = mention[1:]
-
             if mention == "@":
                 continue
+
+            mentioned_username = mention[1:]
 
             try:
                 mentioned_user = User.objects.get(username=mentioned_username)

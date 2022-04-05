@@ -88,6 +88,14 @@ class PostLikeSerializer(serializers.ModelSerializer):
         fields = ("user", "liked_on", "post")
 
 
+class PostEntitiesSerializer(serializers.ModelSerializer):
+    mentioned_users = SmallUserSerializer(many=True)
+
+    class Meta:
+        model = PostEntities
+        fields = ("mentioned_users",)
+
+
 class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True)
     fight = SmallFightSerializer(many=False)
@@ -95,6 +103,7 @@ class PostSerializer(serializers.ModelSerializer):
     like_count = serializers.IntegerField()
     liked = serializers.BooleanField(default=False)
     owner = SmallUserWithProfileSerializer(many=False)
+    entities = PostEntitiesSerializer(many=False)
 
     class Meta:
         model = Post
@@ -107,6 +116,7 @@ class PostSerializer(serializers.ModelSerializer):
             "like_count",
             "content",
             "comments",
+            "entities",
             "owner",
             "username",
         )
@@ -118,14 +128,6 @@ class CreatePostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ("id", "date", "fight", "content")
-
-
-class PostEntitiesSerializer(serializers.ModelSerializer):
-    mentioned_users = SmallUserSerializer(many=True)
-
-    class Meta:
-        model = PostEntities
-        fields = ("mentioned_users",)
 
 
 class SmallPostSerializer(serializers.ModelSerializer):
