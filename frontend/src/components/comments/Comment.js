@@ -69,17 +69,14 @@ export default function Comment(props) {
     }
   };
   const renderReplyButton = () => {
-    if (comment.replies && comment.parent === null) {
-      // if parent comment
-      return (
-        <button
-          className="btn btn-primary"
-          onClick={() => setShowReplyBox(!showReplyBox)}
-        >
-          Reply
-        </button>
-      );
-    }
+    return (
+      <button
+        className="btn btn-primary"
+        onClick={() => setShowReplyBox(!showReplyBox)}
+      >
+        Reply
+      </button>
+    );
   };
 
   const renderReplyBox = () => {

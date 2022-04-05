@@ -319,10 +319,10 @@ class CommentReplyView(views.APIView):
         if owner.is_anonymous:
             raise BoxingDialResponses.NOT_LOGGED_IN_RESPONSE
 
+        # if replying to a reply
         if parent_comment.parent != None:
-            return Response(
-                {"result": "can not reply to reply"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            # reply to top level comment
+            parent_comment = parent_comment.parent
 
         username = owner.username
 
