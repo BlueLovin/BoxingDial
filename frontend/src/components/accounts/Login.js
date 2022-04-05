@@ -54,6 +54,7 @@ export default function Login() {
 
     setActiveItem({
       // reset password box
+      username: activeItem.username,
       password: "",
     });
   };
