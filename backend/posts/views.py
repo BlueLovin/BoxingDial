@@ -1,26 +1,31 @@
+import re
+
+from accounts.managers import UserManager
+from accounts.models import UserFollowing
+from backend.permissions import IsOwnerOrReadOnly
+from backend.responses import BoxingDialResponses
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count, Prefetch
+from django.db.models.expressions import Exists, OuterRef, Value
+from fights.models import Fight
+from notifications.models import Notification
+from rest_framework import generics, status, views, viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from vote.managers import UP
 from vote.models import DOWN, Vote
-from accounts.models import UserFollowing
-from django.db.models.expressions import Exists, OuterRef, Value
-from rest_framework import viewsets, generics, views, status
-from rest_framework.permissions import IsAuthenticated
-from accounts.managers import UserManager
-from backend.responses import BoxingDialResponses
-from fights.models import Fight
+from vote.views import VoteMixin
 
-from .models import Post, PostComment, PostLike
+from .models import Post, PostComment, PostEntities, PostLike
 from .serializers import (
+    CommentSerializer,
     CreatePostSerializer,
     PostLikeSerializer,
     PostSerializer,
-    CommentSerializer,
     SmallPostSerializer,
 )
-from backend.permissions import IsOwnerOrReadOnly
-from django.contrib.auth.models import User
-from django.db.models import Count, Prefetch
-from rest_framework.response import Response
-from vote.views import VoteMixin
+
 
 # all posts /api/posts
 class PostsView(generics.ListAPIView):
@@ -62,10 +67,18 @@ class CreatePostView(generics.CreateAPIView):
             else:
                 fight_obj = None
 
+        entities = self.create_entities(content)
+
         new_post = Post.objects.create(
-            owner=owner, username=username, content=content, fight=fight_obj
+            owner=owner,
+            username=username,
+            content=content,
+            fight=fight_obj,
+            entities=entities,
         )
         new_post.comments.set([])
+
+        self.send_notifications_to_mentioned_users(new_post)
 
         annotated_query = (
             Post.objects.filter(id=new_post.id)
@@ -78,6 +91,50 @@ class CreatePostView(generics.CreateAPIView):
         )
 
         return Response(SmallPostSerializer(annotated_query).data)
+
+    def create_entities(self, content: str):
+        mentioned_users = self.get_user_mentions(content)
+
+        entities = PostEntities.objects.create()
+        entities.mentioned_users.set(mentioned_users)
+
+        return entities
+
+    def send_notifications_to_mentioned_users(self, post):
+
+        for mentioned_user in post.entities.mentioned_users.all():
+
+            notification_text = f"{post.owner.username} commented mentioned you in their post: {post.content[:25]}"
+
+            Notification.objects.create(
+                recipient=mentioned_user,
+                sender=post.owner.username,
+                text=notification_text,
+                post_id=post.id,
+            )
+
+    def get_user_mentions(self, content: str):
+        mention_re = "@[0-9a-z]*"
+        mentions = re.findall(mention_re, content)
+        mentioned_users = []
+
+        if len(mentions) == 0:
+            return []
+
+        for mention in mentions:
+            mentioned_username = mention[1:]
+
+            if mention == "@":
+                continue
+
+            try:
+                mentioned_user = User.objects.get(username=mentioned_username)
+                mentioned_users.append(mentioned_user)
+
+            except ObjectDoesNotExist:
+                pass
+
+        return mentioned_users
 
 
 # single post - /api/posts/{postID}

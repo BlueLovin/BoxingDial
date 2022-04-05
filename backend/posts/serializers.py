@@ -1,14 +1,14 @@
-from django.contrib.auth.models import User
-from rest_framework import serializers
-from rest_framework.permissions import IsAuthenticated
 from accounts.serializers import (
     SmallUserSerializer,
     SmallUserWithProfileSerializer,
     UserWithFollowageSerializer,
 )
+from django.contrib.auth.models import User
 from fights.serializers.common import SmallFightSerializer, TinyFightSerializer
-from .models import Post, PostComment, PostLike
-from notifications.models import Notification
+from rest_framework import serializers
+from rest_framework.permissions import IsAuthenticated
+
+from .models import Post, PostComment, PostEntities, PostLike
 
 
 class TinyPostSerializer(serializers.ModelSerializer):
@@ -19,6 +19,7 @@ class TinyPostSerializer(serializers.ModelSerializer):
 
 class ReplySerializer(serializers.ModelSerializer):
     owner = SmallUserWithProfileSerializer(many=False)
+
     class Meta:
         model = PostComment
         fields = (
@@ -119,12 +120,21 @@ class CreatePostSerializer(serializers.ModelSerializer):
         fields = ("id", "date", "fight", "content")
 
 
+class PostEntitiesSerializer(serializers.ModelSerializer):
+    mentioned_users = SmallUserSerializer(many=True)
+
+    class Meta:
+        model = PostEntities
+        fields = ("mentioned_users",)
+
+
 class SmallPostSerializer(serializers.ModelSerializer):
     fight = TinyFightSerializer(many=False)
     comment_count = serializers.IntegerField()
     like_count = serializers.IntegerField()
     liked = serializers.BooleanField(default=False)
     owner = SmallUserWithProfileSerializer(many=False)
+    entities = PostEntitiesSerializer(many=False)
 
     class Meta:
         model = Post
@@ -134,6 +144,7 @@ class SmallPostSerializer(serializers.ModelSerializer):
             "fight",
             "content",
             "liked",
+            "entities",
             "comment_count",
             "like_count",
             "owner",

@@ -35,6 +35,12 @@ class PostLike(models.Model):
     liked_on = models.DateTimeField(auto_now_add=True)
 
 
+class PostEntities(models.Model):
+    mentioned_users = models.ManyToManyField(
+        User, related_name="user_mentions", blank=True
+    )
+
+
 class Post(models.Model):
     fight = models.ForeignKey(
         Fight, on_delete=models.CASCADE, related_name="posts", null=True
@@ -46,6 +52,9 @@ class Post(models.Model):
     username = models.TextField()
     likes = models.ManyToManyField(User, related_name="user", through=PostLike)
     date = models.DateTimeField(auto_now_add=True)
+    entities = models.ForeignKey(
+        PostEntities, on_delete=models.CASCADE, related_name="entities", blank=True
+    )
 
     objects = UserManager()
 
