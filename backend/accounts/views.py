@@ -56,7 +56,7 @@ class UserView(generics.GenericAPIView):
         following = this_user.followers.filter(user_id=request.user.id).exists()
         follows_you = request.user.followers.filter(user_id=this_user.id).exists()
         blocks_you = UserManager.user_blocks_you(None, request, this_user.profile)
-        blocked = UserManager.is_user_blocked(None, request, this_user.profile)
+        blocked = UserManager.is_blocked_by_you(None, request, this_user.profile)
 
         profile_data = ProfileSerializer(this_user_profile).data
         return Response(
@@ -103,7 +103,7 @@ class UserCommentListView(generics.ListAPIView):
         if request.user.is_authenticated:
             if UserManager.user_blocks_you(None, request, this_user_profile):
                 return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
-            elif UserManager.is_user_blocked(None, request, this_user_profile):
+            elif UserManager.is_blocked_by_you(None, request, this_user_profile):
                 return BoxingDialResponses.BLOCKED_USER_RESPONSE
 
         return Response(

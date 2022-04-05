@@ -3,7 +3,7 @@ from django.db import models
 
 
 class UserManager(models.Manager):
-    def is_user_blocked(self, request, user_profile):
+    def is_blocked_by_you(self, request, user_profile):
         client_has_profile = hasattr(request.user, "profile")
 
         if client_has_profile == False:
@@ -20,6 +20,13 @@ class UserManager(models.Manager):
 
         client_user_profile = request.user.profile
         return client_user_profile in user_profile.blocked_users.all()
+
+    def is_user_blocked_either_way(self, request, user_profile):
+        blocked = UserManager.is_blocked_by_you(UserManager, request, user_profile)
+        blocks_you = UserManager.user_blocks_you(UserManager,
+            request, user_profile
+        )
+        return blocked or blocks_you
 
     # this excludes the users that you block
     def exclude_blocked_users(self, request):

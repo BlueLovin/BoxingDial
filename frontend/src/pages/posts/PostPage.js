@@ -22,6 +22,7 @@ export default function Comments() {
   const [currentPost, setCurrentPost] = useState({
     content: "",
   });
+  const [error, setError] = useState("");
 
   const toggleModal = () => {
     setModal(!modal);
@@ -35,9 +36,15 @@ export default function Comments() {
         setCurrentPost(res.data);
       })
       .catch((res) => {
+        const data = res.response.data;
+        if (data.error) {
+          setError(res.response.data.error);
+          return;
+        }
         // if invalid token, try again without headers
-        if (res.data["detail"] === "Invalid token.") {
+        if (res.response.data.detail === "Invalid token.") {
           setHeaders(null);
+          return;
         }
         history.push("/404");
       });
@@ -62,6 +69,10 @@ export default function Comments() {
       </>
     );
   };
+
+  if (error !== "") {
+    return <h1 class="text-center">{error}</h1>;
+  }
 
   return (
     <div>

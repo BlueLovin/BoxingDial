@@ -14,3 +14,5 @@ class BoxingDialResponses:
         {"error": "content must contain a minimum of 5 characters"}, status=400
     )
     NOT_LOGGED_IN_RESPONSE = Response({"error": "not logged in"}, status=400)
+    
+    POST_DOES_NOT_EXIST_RESPONSE = Response({"error": "Post does not exist"}, status=400)

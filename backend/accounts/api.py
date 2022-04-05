@@ -187,7 +187,7 @@ class AddFollowerView(generics.GenericAPIView):
             )
 
         # if you block a user, you can not follow them.
-        if UserManager.is_user_blocked(None, request, follow.profile):
+        if UserManager.is_blocked_by_you(None, request, follow.profile):
             return Response(
                 "You cannot follow a user that you have blocked.",
                 HTTPStatus.BAD_REQUEST,

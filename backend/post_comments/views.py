@@ -254,7 +254,7 @@ class CommentReplyView(views.APIView):
         # don't allow user to reply to user that is blocked
         blocked = UserManager.user_blocks_you(
             None, request, parent_comment.owner.profile
-        ) or UserManager.is_user_blocked(None, request, parent_comment.owner.profile)
+        ) or UserManager.is_blocked_by_you(None, request, parent_comment.owner.profile)
         if blocked:
             return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
 

@@ -78,7 +78,7 @@ class CreatePostView(generics.CreateAPIView):
         )
         new_post.comments.set([])
 
-        self.send_notifications_to_mentioned_users(new_post)
+        self.send_notifications_to_mentioned_users(request, new_post)
 
         annotated_query = (
             Post.objects.filter(id=new_post.id)
@@ -100,12 +100,14 @@ class CreatePostView(generics.CreateAPIView):
 
         return entities
 
-    def send_notifications_to_mentioned_users(self, post):
-
+    def send_notifications_to_mentioned_users(self, request, post):
         for mentioned_user in post.entities.mentioned_users.all():
-
+            print(post.owner.profile)
+            if UserManager.is_user_blocked_either_way(
+                None, request, post.owner.profile
+            ):
+                continue
             notification_text = f"{post.owner.username} commented mentioned you in their post: {post.content[:10]}..."
-
             Notification.objects.create(
                 recipient=mentioned_user,
                 sender=post.owner.username,
@@ -166,19 +168,21 @@ class PostView(generics.RetrieveDestroyAPIView):
             ),
         )
 
+        post_query = Post.objects.filter(id=pk)
+        if post_query.first() == None:
+            return BoxingDialResponses.POST_DOES_NOT_EXIST_RESPONSE
+
         if logged_in:
-            post_query = Post.objects.filter(id=pk)
             post_owner_profile = post_query.first().owner.profile
 
             if UserManager.user_blocks_you(None, request, post_owner_profile):
                 return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
-            elif UserManager.is_user_blocked(None, request, post_owner_profile):
+            elif UserManager.is_blocked_by_you(None, request, post_owner_profile):
                 return BoxingDialResponses.BLOCKED_USER_RESPONSE
 
             return Response(
                 PostSerializer(
-                    Post.objects.filter(id=pk)
-                    .annotate(like_count=Count("likes", distinct=True))
+                    post_query.annotate(like_count=Count("likes", distinct=True))
                     .prefetch_related(
                         Prefetch(
                             "comments",
@@ -202,9 +206,7 @@ class PostView(generics.RetrieveDestroyAPIView):
         else:
             return Response(
                 PostSerializer(
-                    Post.objects.exclude_blocked_users(request)
-                    .filter(id=pk)
-                    .annotate(like_count=Count("likes", distinct=True))
+                    post_query.annotate(like_count=Count("likes", distinct=True))
                     .prefetch_related(
                         Prefetch(
                             "comments", queryset=PostComment.objects.order_by("-id")
