@@ -1,20 +1,24 @@
-from rest_framework import serializers
-from rest_framework.response import Response
+import re
+
 from accounts.managers import UserManager
-from posts.models import Post
-from .models import PostComment
-from notifications.models import Notification
-from backend.responses import BoxingDialResponses
 from backend.permissions import IsOwnerOrReadOnly
-from rest_framework.permissions import IsAuthenticated
-from posts.serializers import CommentSerializer, ReplySerializer
+from backend.responses import BoxingDialResponses
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Prefetch
+from django.db.models.expressions import Exists, OuterRef
 from notifications.models import Notification
+from posts.models import Post
+from post_comments.serializers import CommentSerializer, ReplySerializer
+from rest_framework import generics, serializers, status, views, viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from vote.managers import UP
 from vote.models import DOWN, Vote
-from rest_framework import viewsets, generics, views, status
 from vote.views import VoteMixin
-from django.db.models.expressions import Exists, OuterRef
-from django.db.models import Prefetch
+
+from .models import PostComment, PostCommentEntities
+
 
 # post's comments /api/posts/6/comments
 class SinglePostCommentsView(generics.ListAPIView):
@@ -119,9 +123,7 @@ class CreatePostCommentView(generics.CreateAPIView):
 
         # must contain at least 3 non whitespace characters
         if len(content.replace(" ", "")) < 3:
-            return Response(
-                {"error": "content must contain at least 3 characters."}, status=400
-            )
+            return BoxingDialResponses.CONTENT_TOO_SHORT_RESPONSE
 
         post_id = request.data.pop("post")
         post = Post.objects.get(id=post_id)
@@ -129,11 +131,13 @@ class CreatePostCommentView(generics.CreateAPIView):
         if UserManager.user_blocks_you(None, self.request, post.owner.profile):
             return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
 
+        entities = self.create_entities(content)
+
         comment = PostComment.objects.create(
-            owner=owner, username=username, post=post, **request.data
+            owner=owner, username=username, post=post, **request.data, entities=entities
         )
         self.create_notification(comment, post)
-
+        self.send_notifications_to_mentioned_users(request, comment, False)
         # upvote comment
         comment.votes.up(owner.id)
 
@@ -141,6 +145,59 @@ class CreatePostCommentView(generics.CreateAPIView):
         comment.is_voted_up = True
         comment.vote_score = 1
         return Response(CommentSerializer(comment).data)
+
+    def send_notifications_to_mentioned_users(self, request, comment, isReply):
+        for mentioned_user in comment.entities.mentioned_users.all():
+            mentioning_themself = request.user == comment.owner
+            blocked = UserManager.is_user_blocked_either_way(
+                None, request, comment.owner.profile
+            ) 
+
+            if mentioning_themself or blocked:
+                continue
+
+            if isReply:
+                notification_text = f"{comment.owner.username} replied to your comment: '{comment.parent.content[:10]}...': '{comment.content[:25]}'"
+            else:
+                notification_text = f"{comment.owner.username} mentioned you in a comment: {comment.content[:10]}..."
+
+            Notification.objects.create(
+                recipient=mentioned_user,
+                sender=comment.owner.username,
+                text=notification_text,
+                post_id=comment.post.id,
+            )
+
+    def get_user_mentions(self, content: str):
+        mention_re = "@[0-9a-z]*"
+        mentions = re.findall(mention_re, content)
+        mentioned_users = []
+
+        if len(mentions) == 0:
+            return []
+
+        for mention in mentions:
+            if mention == "@" or mention in mentioned_users:
+                continue
+
+            mentioned_username = mention[1:]
+
+            try:
+                mentioned_user = User.objects.get(username=mentioned_username)
+                mentioned_users.append(mentioned_user)
+
+            except ObjectDoesNotExist:
+                continue
+
+        return mentioned_users
+
+    def create_entities(self, content: str):
+        mentioned_users = self.get_user_mentions(content)
+
+        entities = PostCommentEntities.objects.create()
+        entities.mentioned_users.set(mentioned_users)
+
+        return entities
 
 
 # all comments /api/comments
@@ -269,15 +326,22 @@ class CommentReplyView(views.APIView):
 
         username = owner.username
 
+        # create this object so we can re-use its functions
+        c = CreatePostCommentView()
+        entities = c.create_entities(content)
+
         new_comment = PostComment.objects.create(
             owner=owner,
             username=username,
             parent=parent_comment,
             content=content,
+            entities=entities
         )
+
 
         # create notification for parent comment owner
         self.create_reply_notification(new_comment, parent_comment)
+        c.send_notifications_to_mentioned_users(request, new_comment, True)
 
         # upvote comment
         new_comment.votes.up(owner.id)

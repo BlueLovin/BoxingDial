@@ -3,57 +3,18 @@ from accounts.serializers import (
     SmallUserWithProfileSerializer,
     UserWithFollowageSerializer,
 )
-from django.contrib.auth.models import User
 from fights.serializers.common import SmallFightSerializer, TinyFightSerializer
+from post_comments.models import PostComment
+from post_comments.serializers import CommentSerializer
 from rest_framework import serializers
-from rest_framework.permissions import IsAuthenticated
 
 from .models import Post, PostEntities, PostLike
-from post_comments.models import PostComment
 
 
 class TinyPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ("id", "content", "date", "owner", "username")
-
-
-class ReplySerializer(serializers.ModelSerializer):
-    owner = SmallUserWithProfileSerializer(many=False)
-
-    class Meta:
-        model = PostComment
-        fields = (
-            "id",
-            "owner",
-            "content",
-            "username",
-            "vote_score",
-            "is_voted_up",
-            "is_voted_down",
-        )
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    replies = ReplySerializer(read_only=True, many=True)
-    owner = SmallUserWithProfileSerializer(many=False)
-
-    class Meta:
-        model = PostComment
-        fields = (
-            "id",
-            "post",
-            "content",
-            "owner",
-            "username",
-            "vote_score",
-            "is_voted_up",
-            "is_voted_down",
-            "replies",
-            "parent",
-        )
-
-        requires_context = True
 
 
 class TruncatedPostSerializer(serializers.ModelSerializer):

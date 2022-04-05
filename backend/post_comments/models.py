@@ -4,12 +4,20 @@ from accounts.managers import UserManager
 from django.contrib.auth.models import User
 from posts.models import Post
 
-# Create your models here.
+
+class PostCommentEntities(models.Model):
+    mentioned_users = models.ManyToManyField(
+        User, related_name="comment_user_mentions", blank=True
+    )
+
+
 class PostComment(VoteModel, models.Model):
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE, related_name="comments", blank=True, null=True
     )
-
+    entities = models.ForeignKey(
+        PostCommentEntities, on_delete=models.CASCADE, related_name="comment_entities", blank=True
+    )
     content = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(

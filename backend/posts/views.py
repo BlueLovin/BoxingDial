@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from vote.managers import UP
 from vote.models import DOWN, Vote
 from vote.views import VoteMixin
- 
+
 from post_comments.models import PostComment
 from .models import Post, PostEntities, PostLike
 from .serializers import (
@@ -103,11 +103,14 @@ class CreatePostView(generics.CreateAPIView):
 
     def send_notifications_to_mentioned_users(self, request, post):
         for mentioned_user in post.entities.mentioned_users.all():
-            print(post.owner.profile)
-            if UserManager.is_user_blocked_either_way(
+            blocked = UserManager.is_user_blocked_either_way(
                 None, request, post.owner.profile
-            ):
+            )
+            mentioning_themself = post.owner == request.user
+
+            if mentioning_themself or blocked:
                 continue
+            
             notification_text = f"{post.owner.username} commented mentioned you in their post: {post.content[:10]}..."
             Notification.objects.create(
                 recipient=mentioned_user,
