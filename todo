@@ -20,7 +20,7 @@
 [x] decouple comments and post views
 []  mention other users in comments and posts
     - [x] posts
-    -  [] comments
+    - []  comments
 []  click a link and go to a highlighted comment
 []  repost other people's post
 []  integrate Storage/CDN service

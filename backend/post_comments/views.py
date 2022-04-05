@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from rest_framework.response import Response
 from accounts.managers import UserManager
-from posts.models import Post, PostComment
+from posts.models import Post
+from .models import PostComment
 from notifications.models import Notification
 from backend.responses import BoxingDialResponses
 from backend.permissions import IsOwnerOrReadOnly

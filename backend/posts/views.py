@@ -16,8 +16,9 @@ from rest_framework.response import Response
 from vote.managers import UP
 from vote.models import DOWN, Vote
 from vote.views import VoteMixin
-
-from .models import Post, PostComment, PostEntities, PostLike
+ 
+from post_comments.models import PostComment
+from .models import Post, PostEntities, PostLike
 from .serializers import (
     CommentSerializer,
     CreatePostSerializer,

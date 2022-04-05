@@ -8,7 +8,8 @@ from fights.serializers.common import SmallFightSerializer, TinyFightSerializer
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Post, PostComment, PostEntities, PostLike
+from .models import Post, PostEntities, PostLike
+from post_comments.models import PostComment
 
 
 class TinyPostSerializer(serializers.ModelSerializer):

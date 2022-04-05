@@ -5,7 +5,8 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from itertools import chain
 from .models import UserFollowing
-from posts.models import Post, PostComment, PostLike
+from posts.models import Post, PostLike
+from post_comments.models import PostComment
 from vote.models import Vote, DOWN, UP
 
 

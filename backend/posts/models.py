@@ -1,29 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-from accounts.managers import UserManager
 from fights.models import Fight
-from vote.models import VoteModel
-
-
-class PostComment(VoteModel, models.Model):
-    post = models.ForeignKey(
-        "Post", on_delete=models.CASCADE, related_name="comments", blank=True, null=True
-    )
-
-    content = models.TextField()
-    date = models.DateTimeField(auto_now_add=True)
-    owner = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="comments", null=True
-    )
-
-    parent = models.ForeignKey(
-        "self", null=True, blank=True, related_name="replies", on_delete=models.CASCADE
-    )
-
-    username = models.TextField(blank=True)
-
-    objects = UserManager()
-
+from accounts.managers import UserManager
 
 class PostLike(models.Model):
     user = models.ForeignKey(User, related_name="user_likes", on_delete=models.CASCADE)

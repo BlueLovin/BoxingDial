@@ -17,7 +17,8 @@ from accounts.serializers import (
 from accounts.managers import UserManager
 from accounts.models import UserFollowing
 from backend.responses import BoxingDialResponses
-from posts.models import Post, PostComment, PostLike
+from posts.models import Post, PostLike
+from post_comments.models import PostComment
 from posts.serializers import CommentSerializer, SmallPostSerializer
 
 
