@@ -15,12 +15,12 @@ export default function PostLikesModal(props) {
     const fetchLikes = () => {
       if (loggedIn) {
         // fetch with auth headers if logged in
-        axios.get(`/api/posts/${postID}/likes`, headers).then((res) => {
+        axios.get(`/posts/${postID}/likes`, headers).then((res) => {
           setLikeList(res.data);
         });
       } else {
         // fetch without authorization headers if logged out
-        axios.get(`/api/posts/${postID}/likes`).then((res) => {
+        axios.get(`/posts/${postID}/likes`).then((res) => {
           setLikeList(res.data);
         });
       }

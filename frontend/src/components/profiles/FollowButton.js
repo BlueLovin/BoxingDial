@@ -22,7 +22,7 @@ export default function FollowButton(props) {
       follow: profile.id,
     };
     axios
-      .post(`/api/users/follow`, data, headers)
+      .post(`/users/follow`, data, headers)
       .then(() => setIsFollowing(true));
   };
 
@@ -31,7 +31,7 @@ export default function FollowButton(props) {
       unfollow: profile.id,
     };
     axios
-      .post(`/api/users/unfollow`, data, headers)
+      .post(`/users/unfollow`, data, headers)
       .then(() => setIsFollowing(false));
   };
 

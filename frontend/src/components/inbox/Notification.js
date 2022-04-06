@@ -17,7 +17,7 @@ export default function Notification(props) {
 
   const markAsRead = async () => {
     if (read === false && loggedIn) {
-      await axios.post(`/api/inbox/${this_notification.id}/read`, {}, headers);
+      await axios.post(`/inbox/${this_notification.id}/read`, {}, headers);
       setRead(true);
     }
   };
@@ -36,7 +36,7 @@ export default function Notification(props) {
   const deleteNotification = async () => {
     if (loggedIn) {
       await axios.post(
-        `/api/inbox/${this_notification.id}/delete`,
+        `/inbox/${this_notification.id}/delete`,
         {},
         headers
       );

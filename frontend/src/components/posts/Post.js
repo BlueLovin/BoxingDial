@@ -24,7 +24,7 @@ export default function Post(props) {
   const history = useHistory();
 
   const deletePost = (_post) => {
-    axios.delete(`/api/posts/${_post.id}/`, headers).then(() => {
+    axios.delete(`/posts/${_post.id}/`, headers).then(() => {
       if (removePostFromParentList != null) {
         removePostFromParentList();
       } else {
@@ -46,7 +46,7 @@ export default function Post(props) {
       alert("login to be able to like posts!");
       return;
     }
-    axios.post(`/api/posts/${_post.id}/like`, {}, headers).then((res) => {
+    axios.post(`/posts/${_post.id}/like`, {}, headers).then((res) => {
       const result = res.data["result"];
       // LIKE
       if (result === "liked") {

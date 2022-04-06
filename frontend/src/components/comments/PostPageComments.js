@@ -38,7 +38,7 @@ export default function PostPageComments(props) {
     // only if rerender, never on mount
     if (isMounted.current) {
       axios
-        .get(`/api/posts/${post.id}/comments?order_by=${commentOrder}`, headers)
+        .get(`/posts/${post.id}/comments?order_by=${commentOrder}`, headers)
         .then((res) => setCommentList(res.data));
     } else {
       // DO NOTHING ON MOUNT
@@ -67,7 +67,7 @@ export default function PostPageComments(props) {
     }
 
     axios // create
-      .post("/api/comments/create", item, headers)
+      .post("/comments/create", item, headers)
       .then((res) => {
         setCommentList((oldList) => [res.data, ...oldList]);
         setCommentCount((c) => c + 1);

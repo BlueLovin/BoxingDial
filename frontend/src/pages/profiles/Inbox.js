@@ -14,7 +14,7 @@ export default function Inbox() {
 
   useEffect(() => {
     if (loggedIn) {
-      axios.get("/api/inbox", headers).then((res) => {
+      axios.get("/inbox/", headers).then((res) => {
         setNotificationList(res.data);
       });
     } else {
@@ -24,14 +24,14 @@ export default function Inbox() {
 
   const deleteAll = async () => {
     if (loggedIn) {
-      await axios.post("api/inbox/clear", {}, headers);
+      await axios.post("/inbox/clear", {}, headers);
       window.location.reload();
     }
   };
 
   const readAll = async () => {
     if (loggedIn) {
-      await axios.post("api/inbox/read-all", {}, headers);
+      await axios.post("/inbox/read-all", {}, headers);
       window.location.reload();
     }
   };

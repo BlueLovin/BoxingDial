@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://127.0.0.1:8000",
+  "proxy": "http://127.0.0.1:8000/api",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^12.1.10",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
+    "eslint": "^7.32.0",
     "npm": "^7.17.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

@@ -12,7 +12,7 @@ export default function PopularPosts() {
   useEffect(() => {
     const refreshPostList = () => {
       axios
-        .get("/api/posts/popular", headers)
+        .get("/posts/popular", headers)
         .then((res) => setPostList(res.data))
         .catch((err) => console.log(err));
     };

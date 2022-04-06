@@ -31,7 +31,7 @@ export default function Comments() {
   //get post with headers
   const getPost = useCallback(() => {
     axios
-      .get(`/api/posts/${postID}/`, headers) // get current post
+      .get(`/posts/${postID}/`, headers) // get current post
       .then((res) => {
         setCurrentPost(res.data);
       })

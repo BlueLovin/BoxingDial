@@ -16,13 +16,13 @@ export default function BlockButton(props) {
 
   const block = () => {
     axios
-      .put(`/api/user/block/${profile.id}/`, {}, headers)
+      .put(`/user/block/${profile.id}/`, {}, headers)
       .then(() => setIsBlocked(true));
   };
 
   const unblock = () => {
     axios
-      .put(`/api/user/unblock/${profile.id}/`, {}, headers)
+      .put(`/user/unblock/${profile.id}/`, {}, headers)
       .then(() => setIsBlocked(false));
   };
 

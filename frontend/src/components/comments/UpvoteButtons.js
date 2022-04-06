@@ -106,7 +106,7 @@ export default function VotingButtons(props) {
   const vote = (direction) => {
     if (loggedIn) {
       const data = serializeDirection(direction);
-      axios.post(`/api/comments/${comment.id}/vote/`, data, headers);
+      axios.post(`/comments/${comment.id}/vote/`, data, headers);
       if (direction === "up") {
         setCommentScore(scoreBeforeVote + 1);
         setVoteDirection(DIRECTION.UP);
@@ -121,7 +121,7 @@ export default function VotingButtons(props) {
   };
   //unvote sets the state back to the "scoreBeforeVote" variable
   const unvote = async () => {
-    await axios.delete(`/api/comments/${comment.id}/vote/`, headers);
+    await axios.delete(`/comments/${comment.id}/vote/`, headers);
     setVoteDirection(DIRECTION.NEUTRAL);
     setCommentScore(scoreBeforeVote);
   };

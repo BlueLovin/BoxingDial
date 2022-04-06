@@ -19,7 +19,7 @@ export default function UserFeed() {
 
   const fetchPostsAndComments = useCallback(() => {
     if (loggedIn) {
-      axios.get("/api/feed/recent", headers).then((res) => {
+      axios.get("/feed/recent", headers).then((res) => {
         setFeed(res.data);
       });
     }
@@ -34,7 +34,7 @@ export default function UserFeed() {
   };
   const submitPost = (item) => {
     axios
-      .post("/api/post/create/", item, headers)
+      .post("/post/create/", item, headers)
       .then((res) => {
         toggleModal();
         console.log(res.data);

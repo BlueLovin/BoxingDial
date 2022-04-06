@@ -25,7 +25,7 @@ export default function DeleteAccount() {
     const temp_headers = { ...headers, data: data };
 
     axios
-      .delete("/api/user/delete", temp_headers)
+      .delete("/user/delete", temp_headers)
       .then(() => {
         // send to home page and reload page.
         history.push("/");

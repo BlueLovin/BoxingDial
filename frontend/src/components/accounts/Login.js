@@ -41,7 +41,7 @@ export default function Login() {
   const submitUser = (item) => {
     // create user object
     axios
-      .post("/api/token-auth/login", item)
+      .post("/token-auth/login", item)
       .then((res) => {
         setToken(res.data.token);
         localStorage.removeItem("token");

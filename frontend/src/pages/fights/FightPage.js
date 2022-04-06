@@ -29,7 +29,7 @@ export default function FightPage() {
 
   const fetchFightData = useCallback(() => {
     setLoading(true);
-    axios.get(`/api/fights/${fightID}/`, headers).then((res) => {
+    axios.get(`/fights/${fightID}/`, headers).then((res) => {
       const data = res.data;
       setFightData(data);
       setPostList(data.posts);
@@ -66,7 +66,7 @@ export default function FightPage() {
   const submitPost = (item) => {
     toggle();
     axios
-      .post("/api/post/create/", item, headers)
+      .post("/post/create/", item, headers)
       .then((res) => setPostList((p) => [res.data, ...p]));
   };
 

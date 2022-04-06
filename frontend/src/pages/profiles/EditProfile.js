@@ -44,7 +44,7 @@ export default function EditProfile() {
 
   const sumbitNewProfile = (e) => {
     e.preventDefault();
-    axios.post("/api/user/change-profile", profile, headers).then(() => {
+    axios.post("/user/change-profile", profile, headers).then(() => {
       history.push(`/user/${user.username}`);
     });
   };

@@ -45,7 +45,7 @@ export default function Register() {
     }
 
     axios
-      .post("/api/token-auth/register", item)
+      .post("/token-auth/register", item)
       .then((res) => {
         setError(false);
         setUser(res.data.user);

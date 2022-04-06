@@ -12,7 +12,7 @@ export default function PopularFights() {
 
   const refreshPostList = () => {
     axios
-      .get("/api/fights/popular")
+      .get("/fights/popular")
       .then((res) => setFightList(res.data))
       .catch((err) => console.log(err));
   };

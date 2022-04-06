@@ -33,7 +33,7 @@ export default function App() {
     const setLoggedInUser = () => {
       if (token) {
         axios
-          .get("/api/token-auth/user", {
+          .get("/token-auth/user", {
             headers: {
               Authorization: `Token ${token}`,
             },

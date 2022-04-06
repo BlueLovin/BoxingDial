@@ -18,7 +18,7 @@ export default function ShowUser() {
   const Logout = () => {
     setUser(null);
     axios
-      .post("/api/token-auth/logout", {}, headers)
+      .post("/token-auth/logout", {}, headers)
       .then(() => {
         localStorage.removeItem("token");
         setToken(undefined);

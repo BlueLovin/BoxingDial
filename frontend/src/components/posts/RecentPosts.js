@@ -12,7 +12,7 @@ export default function RecentPosts() {
 
   const refreshPostList = () => {
     axios
-      .get("/api/posts/")
+      .get("/posts/")
       .then((res) => setpostList(res.data))
       .catch((err) => console.log(err));
   };

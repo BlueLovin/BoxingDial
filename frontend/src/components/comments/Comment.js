@@ -26,7 +26,7 @@ export default function Comment(props) {
   const [showReplyBox, setShowReplyBox] = useState(false);
 
   const deleteComment = () => {
-    axios.delete(`/api/comments/${comment.id}/`, headers).then(() => {
+    axios.delete(`/comments/${comment.id}/`, headers).then(() => {
       if (removeCommentFromParentList) {
         removeCommentFromParentList();
       }
@@ -44,7 +44,7 @@ export default function Comment(props) {
     //if five or more characters
     if (activeItem.content.length >= 5) {
       axios
-        .post(`/api/comments/${comment.id}/reply`, activeItem, headers)
+        .post(`/comments/${comment.id}/reply`, activeItem, headers)
         .then((res) => {
           addNewReply(comment, res.data.result);
           setActiveItem({ content: `@${comment.username}` });
@@ -63,11 +63,13 @@ export default function Comment(props) {
           <Comment
             comment={reply}
             removeCommentFromParentList={() => removeReply(comment, reply)}
+            addNewReply={() => addNewReply}
           />
         </>
       ));
     }
   };
+
   const renderReplyButton = () => {
     return (
       <button
