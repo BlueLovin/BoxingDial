@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useContext, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import { Button, Container, FormGroup, Input } from "reactstrap";
@@ -13,6 +13,7 @@ export default function Comment(props) {
     removeCommentFromParentList = null,
     addNewReply = null,
     removeReply = null,
+    parentComment = null,
   } = props;
   const comment = props.comment;
   //context
@@ -24,6 +25,7 @@ export default function Comment(props) {
     content: `@${comment.username} `,
   });
   const [showReplyBox, setShowReplyBox] = useState(false);
+  console.log("rerender");
 
   const deleteComment = () => {
     axios.delete(`/comments/${comment.id}/`, headers).then(() => {
@@ -40,20 +42,35 @@ export default function Comment(props) {
     setActiveItem(item);
   };
 
-  const postReply = () => {
-    //if five or more characters
-    if (activeItem.content.length >= 5) {
-      axios
-        .post(`/comments/${comment.id}/reply`, activeItem, headers)
-        .then((res) => {
-          addNewReply(comment, res.data.result);
-          setActiveItem({ content: `@${comment.username}` });
-          setShowReplyBox(false);
-        });
-    } else {
-      alert("comments must be longer than 5 characters");
+  const addNewReplyToView = (newReply) => {
+    //replying to parent comment
+    if (parentComment === null) {
+      addNewReply(comment, newReply);
     }
+
+    // replying to reply
+    else {
+      addNewReply(parentComment, newReply);
+    }
+
+    // reset text box
+    setActiveItem({ content: `@${comment.username} ` });
+    setShowReplyBox(false);
   };
+
+  const postReply = useCallback(() => {
+    //if five or more characters
+    if (activeItem.content.length <= 5) {
+      alert("comments must be longer than 5 characters");
+      return;
+    }
+
+    axios
+      .post(`/comments/${comment.id}/reply`, activeItem, headers)
+      .then((res) => {
+        addNewReplyToView(res.data.result);
+      });
+  }, [activeItem]);
 
   const renderReplies = () => {
     if (comment.replies) {
@@ -62,8 +79,9 @@ export default function Comment(props) {
           <hr />
           <Comment
             comment={reply}
+            parentComment={comment}
             removeCommentFromParentList={() => removeReply(comment, reply)}
-            addNewReply={() => addNewReply}
+            addNewReply={addNewReply}
           />
         </>
       ));

@@ -8,7 +8,7 @@
 [x] notifications
 [x] add bio/screen name to user profiles
 [x] delete account, account settings, more account control
-[x] block/mute/report other users
+[x] block other users
     - [x] prevent viewing a blocked user's profile/posts/comments and vice versa 
     - [x] be able to unblock
     - [x] update frontend to handle user blocking
@@ -18,9 +18,9 @@
         - [x] return a "user doesnt exist" frontend if the user blocks you
     - [x]  notifications can not be sent to someone who blocks you
 [x] decouple comments and post views
-[]  mention other users in comments and posts
+[x] mention other users in comments and posts
     - [x] posts
-    - []  comments
+    - [x] comments
 []  click a link and go to a highlighted comment
 []  repost other people's post
 []  integrate Storage/CDN service

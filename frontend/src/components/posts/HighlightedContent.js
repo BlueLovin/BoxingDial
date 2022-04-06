@@ -6,8 +6,6 @@ export default function HighlightedContent({ post = {} }) {
   const content = post.content;
   const parts = content.split(regex);
   const mentionedUsers = post.entities.mentioned_users.map((u) => u.username);
-  console.log(mentionedUsers);
-
   return (
     <span>
       {parts.filter(String).map((word, i) => {
