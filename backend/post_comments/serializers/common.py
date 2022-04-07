@@ -1,11 +1,6 @@
-from accounts.serializers import (
-    SmallUserSerializer,
-    SmallUserWithProfileSerializer,
-)
-
+from accounts.serializers import SmallUserSerializer, SmallUserWithProfileSerializer
 from rest_framework import serializers
-
-from .models import PostComment, PostCommentEntities
+from ..models import PostComment, PostCommentEntities
 
 
 class PostCommentEntitiesSerializer(serializers.ModelSerializer):

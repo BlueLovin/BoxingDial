@@ -1,5 +1,6 @@
 from django.db.models.expressions import Exists, OuterRef
-from posts.serializers import FeedCommentSerializer, SmallPostSerializer
+from posts.serializers import SmallPostSerializer
+from post_comments.serializers.nested import FeedCommentSerializer
 from django.db.models.aggregates import Count
 from rest_framework import generics, permissions
 from rest_framework.response import Response

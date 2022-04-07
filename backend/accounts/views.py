@@ -20,7 +20,7 @@ from backend.responses import BoxingDialResponses
 from posts.models import Post, PostLike
 from post_comments.models import PostComment
 from posts.serializers import SmallPostSerializer
-from post_comments.serializers import CommentSerializer
+from post_comments.serializers.common import CommentSerializer
 
 
 # all users - /api/users

@@ -9,7 +9,7 @@ from django.db.models import Prefetch
 from django.db.models.expressions import Exists, OuterRef
 from notifications.models import Notification
 from posts.models import Post
-from post_comments.serializers import CommentSerializer, ReplySerializer
+from post_comments.serializers.common import CommentSerializer, ReplySerializer
 from rest_framework import generics, serializers, status, views, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
