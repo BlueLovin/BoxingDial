@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import { Button, Container, FormGroup, Input } from "reactstrap";
-import VotingButtons from "./UpvoteButtons";
+import VotingButtons from "./VotingButtons";
 import HighlightedContent from "../posts/HighlightedContent";
 
 export default function Comment(props) {
@@ -16,61 +16,65 @@ export default function Comment(props) {
     parentComment = null,
   } = props;
   const comment = props.comment;
+
   //context
-  const { userVal, headersVal } = useContext(UserContext);
+  const { userVal, headersVal, loggedInVal } = useContext(UserContext);
   const [user] = userVal;
+  const [loggedIn] = loggedInVal;
   const [headers] = headersVal;
   //state
-  const [activeItem, setActiveItem] = useState({
+  const [newReply, setNewReply] = useState({
     content: `@${comment.username} `,
   });
   const [showReplyBox, setShowReplyBox] = useState(false);
-  console.log("rerender");
 
   const deleteComment = () => {
     axios.delete(`/comments/${comment.id}/`, headers).then(() => {
       if (removeCommentFromParentList) {
-        removeCommentFromParentList();
+        removeCommentFromParentList(comment);
       }
     });
   };
 
-  const handleChange = (e) => {
-    let { value } = e.target;
+  const handleChange = useCallback(
+    (e) => {
+      let { value } = e.target;
 
-    const item = { content: value };
-    setActiveItem(item);
-  };
+      const item = { content: value };
+      setNewReply(item);
+    },
+    [setNewReply]
+  );
 
-  const addNewReplyToView = (newReply) => {
+  const addNewReplyToView = (_newReply) => {
     //replying to parent comment
     if (parentComment === null) {
-      addNewReply(comment, newReply);
+      addNewReply(comment, _newReply);
     }
 
     // replying to reply
     else {
-      addNewReply(parentComment, newReply);
+      addNewReply(parentComment, _newReply);
     }
 
     // reset text box
-    setActiveItem({ content: `@${comment.username} ` });
+    setNewReply({ content: `@${comment.username} ` });
     setShowReplyBox(false);
   };
 
-  const postReply = useCallback(() => {
+  const postReply = () => {
     //if five or more characters
-    if (activeItem.content.length <= 5) {
+    if (newReply.content.length <= 5) {
       alert("comments must be longer than 5 characters");
       return;
     }
 
     axios
-      .post(`/comments/${comment.id}/reply`, activeItem, headers)
+      .post(`/comments/${comment.id}/reply`, newReply, headers)
       .then((res) => {
         addNewReplyToView(res.data.result);
       });
-  }, [activeItem]);
+  };
 
   const renderReplies = () => {
     if (comment.replies) {
@@ -92,7 +96,13 @@ export default function Comment(props) {
     return (
       <button
         className="btn btn-primary"
-        onClick={() => setShowReplyBox(!showReplyBox)}
+        onClick={() => {
+          if (!loggedIn) {
+            alert("Log in to reply to comments!");
+            return;
+          }
+          setShowReplyBox(!showReplyBox);
+        }}
       >
         Reply
       </button>
@@ -100,31 +110,32 @@ export default function Comment(props) {
   };
 
   const renderReplyBox = () => {
-    if (showReplyBox) {
-      return (
-        <span className="p-4 ">
-          <h4 className="text-center">share your thoughts</h4>
-          <FormGroup>
-            <Input
-              type="textarea"
-              name="content"
-              onChange={handleChange}
-              value={activeItem.content}
-            />
-          </FormGroup>
-          <Button
-            className="float-right btn-lg"
-            color="success"
-            onClick={() => postReply()}
-          >
-            Post
-          </Button>
-        </span>
-      );
-    } else {
+    if (!showReplyBox) {
       return null;
     }
+
+    return (
+      <span className="p-4 ">
+        <h4 className="text-center">share your thoughts</h4>
+        <FormGroup>
+          <Input
+            type="textarea"
+            name="content"
+            onChange={handleChange}
+            value={newReply.content}
+          />
+        </FormGroup>
+        <Button
+          className="float-right btn-lg"
+          color="success"
+          onClick={() => postReply()}
+        >
+          Post
+        </Button>
+      </span>
+    );
   };
+
   if (!comment) {
     return null;
   }
@@ -159,10 +170,7 @@ export default function Comment(props) {
             {renderReplyButton()}
             {user && user.username === comment.owner.username ? (
               <React.Fragment>
-                <button
-                  className="btn-sm btn-danger"
-                  onClick={() => deleteComment()}
-                >
+                <button className="btn-sm btn-danger" onClick={deleteComment}>
                   Delete
                 </button>
               </React.Fragment>

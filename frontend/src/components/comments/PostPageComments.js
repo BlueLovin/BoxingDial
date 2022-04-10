@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { UserContext } from "../../UserContext";
 import { Link } from "react-router-dom";
 import {
@@ -28,13 +34,16 @@ export default function PostPageComments(props) {
   const [commentList, setCommentList] = useState([]);
   const [commentCount, setCommentCount] = useState(0);
   const [commentOrder, setCommentOrder] = useState("date");
-  const [activeItem, setActiveItem] = useState({
+  const [newComment, setNewComment] = useState({
     post: post.id,
     content: "",
   });
   const isMounted = useRef(false);
 
   useEffect(() => {
+    if (post.id === undefined) {
+      return;
+    }
     // only if rerender, never on mount
     if (isMounted.current) {
       axios
@@ -44,10 +53,11 @@ export default function PostPageComments(props) {
       // DO NOTHING ON MOUNT
       isMounted.current = true;
     }
-  }, [commentOrder, headers, post.id, loggedIn]);
+  }, [commentOrder, post.id, headers, loggedIn]);
 
   useEffect(() => {
     setCommentCount(post.comment_count);
+    setCommentList(post.comments);
   }, [post]);
 
   var handleChange = (e) => {
@@ -57,7 +67,7 @@ export default function PostPageComments(props) {
       post: post.id,
       [name]: value,
     };
-    setActiveItem(item);
+    setNewComment(item);
   };
 
   const submitComment = (item) => {
@@ -73,7 +83,7 @@ export default function PostPageComments(props) {
         setCommentCount((c) => c + 1);
       });
 
-    setActiveItem({
+    setNewComment({
       // RESET TEXT BOX
       post: post.id,
       content: "",
@@ -82,48 +92,60 @@ export default function PostPageComments(props) {
 
   // when you update the reply list of a comment locally, pass it here and
   // this function will update the comment in the state
-  const replaceComment = (newComment) => {
-    return commentList.map((comment) => {
-      if (comment.id === newComment.id) {
-        return newComment;
-      }
-      return comment;
-    });
-  };
+  const replaceComment = useCallback(
+    (_newComment) => {
+      return commentList.map((comment) => {
+        if (comment.id === _newComment.id) {
+          return _newComment;
+        }
+        return comment;
+      });
+    },
+    [commentList]
+  );
 
-  const addReplyToView = (parentComment, newReply) => {
-    // add reply to beginning of parent comment locally
-    parentComment.replies = [newReply, ...parentComment.replies];
+  const addReplyToView = useCallback(
+    (parentComment, newReply) => {
+      // add reply to beginning of parent comment locally
+      parentComment.replies = [newReply, ...parentComment.replies];
 
-    // replace the parent comment with our new modified comment with new reply array
-    const updatedList = replaceComment(parentComment);
+      // replace the parent comment with our new modified comment with new reply array
+      const updatedList = replaceComment(parentComment);
 
-    setCommentList(updatedList);
-  };
+      setCommentList(updatedList);
+    },
+    [replaceComment]
+  );
 
-  const removeReplyFromView = (parentComment, reply) => {
-    // update reply list locally
-    parentComment.replies = parentComment.replies.filter(
-      (_reply) => _reply !== reply
-    );
+  const removeReplyFromView = useCallback(
+    (parentComment, reply) => {
+      // update reply list locally
+      parentComment.replies = parentComment.replies.filter(
+        (_reply) => _reply !== reply
+      );
 
-    // set parent comment to our modified comment with new reply list
-    const updatedReplyList = replaceComment(parentComment);
+      // set parent comment to our modified comment with new reply list
+      const updatedReplyList = replaceComment(parentComment);
 
-    setCommentList(updatedReplyList);
-  };
+      setCommentList(updatedReplyList);
+    },
+    [setCommentList, replaceComment]
+  );
 
   // update state after deleting comment
-  const removeCommentFromView = (comment) => {
-    setCommentList(commentList.filter((c) => comment !== c));
-    setCommentCount((c) => c - 1);
-  };
+  const removeCommentFromView = useCallback(
+    (comment) => {
+      setCommentList(commentList.filter((c) => comment !== c));
+      setCommentCount((c) => c - 1);
+    },
+    [setCommentCount, setCommentList, commentList]
+  );
 
   const renderComments = () => {
     return commentList.map((comment) => (
       <Comment
         comment={comment}
-        removeCommentFromParentList={() => removeCommentFromView(comment)}
+        removeCommentFromParentList={removeCommentFromView}
         removeReply={removeReplyFromView}
         addNewReply={addReplyToView}
         key={comment.id}
@@ -167,14 +189,14 @@ export default function PostPageComments(props) {
             <Input
               type="textarea"
               name="content"
-              value={activeItem.content}
+              value={newComment.content}
               onChange={handleChange}
             />
           </FormGroup>
           <Button
             className="float-right btn-lg"
             color="success"
-            onClick={() => submitComment(activeItem)}
+            onClick={() => submitComment(newComment)}
           >
             Post
           </Button>
