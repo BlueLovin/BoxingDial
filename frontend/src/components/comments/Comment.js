@@ -94,6 +94,8 @@ export default function Comment(props) {
   };
 
   const renderReplyButton = () => {
+    if (!addNewReply) return null;
+
     return (
       <button
         className="btn btn-primary"
@@ -129,7 +131,7 @@ export default function Comment(props) {
         <Button
           className="float-right btn-lg"
           color="success"
-          onClick={() => postReply()}
+          onClick={postReply}
         >
           Post
         </Button>
