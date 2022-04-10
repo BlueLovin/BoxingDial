@@ -146,7 +146,7 @@ class CreatePostCommentView(generics.CreateAPIView):
         comment.vote_score = 1
         return Response(CommentSerializer(comment).data)
 
-    def send_notifications_to_mentioned_users(self, request, comment, isReply):
+    def send_notifications_to_mentioned_users(self, request, comment, is_reply):
         for mentioned_user in comment.entities.mentioned_users.all():
             mentioning_themself = request.user == comment.owner
             blocked = UserManager.is_user_blocked_either_way(
@@ -156,7 +156,7 @@ class CreatePostCommentView(generics.CreateAPIView):
             if mentioning_themself or blocked:
                 continue
 
-            if isReply:
+            if is_reply:
                 notification_text = f"{comment.owner.username} replied to your comment: '{comment.parent.content[:10]}...': '{comment.content[:25]}'"
             else:
                 notification_text = f"{comment.owner.username} mentioned you in a comment: {comment.content[:10]}..."
