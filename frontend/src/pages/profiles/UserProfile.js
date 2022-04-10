@@ -30,9 +30,7 @@ export default function UserProfile() {
   const [user] = userVal;
 
   // get user posts if you are not blocking this profile
-  useEffect(() => {
-    setIsBlocked(profile.blocked);
-  }, [profile, headers, username]);
+  useEffect(() => setIsBlocked(profile.blocked), [profile, headers, username]);
 
   useEffect(() => {
     const fetchUserPosts = () => {
@@ -41,9 +39,9 @@ export default function UserProfile() {
         (profile.blocked === false || profile.blocked === undefined);
 
       if (profile !== undefined && notBlocked) {
-        axios.get(`/users/${username}/posts/`, headers).then((res) => {
-          setPostsList(res.data);
-        });
+        axios
+          .get(`/users/${username}/posts/`, headers)
+          .then((res) => setPostsList(res.data));
       } else {
         setPostsList([]);
       }
@@ -64,17 +62,16 @@ export default function UserProfile() {
           setIsBlocked(res.data.blocked);
           setUserBlocksYou(res.data.blocks_you);
         })
-        .catch(() => {
-          window.location = "/404/"; //404 if user doesnt exist
-        });
+        //404 if user doesnt exist
+        .catch(() => (window.location = "/404/"));
       // set profile followers list
-      axios.get(`/users/${username}/following/`).then((res) => {
-        setFollowingList(res.data);
-      });
+      axios
+        .get(`/users/${username}/following/`)
+        .then((res) => setFollowingList(res.data));
       // set profile following list
-      axios.get(`/users/${username}/followers/`).then((res) => {
-        setFollowersList(res.data);
-      });
+      axios
+        .get(`/users/${username}/followers/`)
+        .then((res) => setFollowersList(res.data));
     };
     fetchProfile();
   }, [username, headers]);

@@ -7,10 +7,8 @@ export default function SmallFight(props) {
   let fightData = props.fightData;
   const history = useHistory();
 
-  const goToFight = () => {
-    history.push(`/fight/${fightData.id}`);
-  };
-
+  const goToFight = () => history.push(`/fight/${fightData.id}`);
+  
   return (
     <>
       <Link to={`/fight/${fightData.id}`}>

@@ -9,9 +9,9 @@ export default function ProfileComments(props) {
   const { headersVal } = useContext(UserContext);
   const [headers] = headersVal;
   useEffect(() => {
-    axios.get(`/users/${username}/comments/`, headers).then((res) => {
-      setCommentsList(res.data);
-    });
+    axios
+      .get(`/users/${username}/comments/`, headers)
+      .then((res) => setCommentsList(res.data));
   }, [headers, username]);
 
   const renderProfileComments = () => {

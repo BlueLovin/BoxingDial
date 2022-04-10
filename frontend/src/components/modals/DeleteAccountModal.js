@@ -4,10 +4,8 @@ import { Button, Modal, ModalHeader, ModalBody } from "reactstrap";
 const DeleteAccountModal = React.memo((props) => {
   let { toggle, onSave, password, setPassword, error } = props;
 
-  const handleChange = (e) => {
-    setPassword(e.target.value.trim());
-  };
-
+  const handleChange = (e) => setPassword(e.target.value.trim());
+  
   return (
     <Modal isOpen={true} toggle={toggle} autoFocus={false}>
       <ModalHeader toggle={toggle}>Delete Account</ModalHeader>

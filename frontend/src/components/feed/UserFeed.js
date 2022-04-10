@@ -19,19 +19,14 @@ export default function UserFeed() {
 
   const fetchPostsAndComments = useCallback(() => {
     if (loggedIn) {
-      axios.get("/feed/recent", headers).then((res) => {
-        setFeed(res.data);
-      });
+      axios.get("/feed/recent", headers).then((res) => setFeed(res.data));
     }
   }, [loggedIn, headers]);
 
-  useEffect(() => {
-    fetchPostsAndComments();
-  }, [fetchPostsAndComments]);
+  useEffect(() => fetchPostsAndComments(), [fetchPostsAndComments]);
 
-  const toggleModal = () => {
-    setModal(!modal);
-  };
+  const toggleModal = () => setModal(!modal);
+
   const submitPost = (item) => {
     axios
       .post("/post/create/", item, headers)
@@ -61,10 +56,8 @@ export default function UserFeed() {
       </div>
     );
   };
-  const removePostFromView = (item) => {
-    setFeed(feed.filter((i) => item !== i));
-  };
-
+  const removePostFromView = (item) => setFeed(feed.filter((i) => item !== i));
+  
   const renderPosts = () => {
     if (feed && feed.length > 0) {
       return feed.map((item) => (

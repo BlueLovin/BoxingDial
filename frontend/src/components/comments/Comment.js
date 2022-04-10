@@ -8,14 +8,14 @@ import HighlightedContent from "../posts/HighlightedContent";
 
 export default function Comment(props) {
   //props
-  const { contextButton = false } = props;
   const {
+    comment,
     removeCommentFromParentList = null,
+    contextButton = false,
     addNewReply = null,
     removeReply = null,
     parentComment = null,
   } = props;
-  const comment = props.comment;
 
   //context
   const { userVal, headersVal, loggedInVal } = useContext(UserContext);
@@ -63,17 +63,18 @@ export default function Comment(props) {
   };
 
   const postReply = () => {
+    const newReplyLength =
+      newReply.content.length - `@${comment.username} `.length;
+
     //if five or more characters
-    if (newReply.content.length <= 5) {
+    if (newReplyLength <= 5) {
       alert("comments must be longer than 5 characters");
       return;
     }
 
     axios
       .post(`/comments/${comment.id}/reply`, newReply, headers)
-      .then((res) => {
-        addNewReplyToView(res.data.result);
-      });
+      .then((res) => addNewReplyToView(res.data.result));
   };
 
   const renderReplies = () => {
@@ -159,7 +160,7 @@ export default function Comment(props) {
           </div>
           {contextButton && comment.post !== null ? (
             <Link to={`/post/${comment.post}`}>
-              <span className="">context</span>
+              <span>context</span>
             </Link>
           ) : null}
 

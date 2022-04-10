@@ -7,7 +7,7 @@ import Post from "../../components/posts/Post";
 import PostLikesModal from "../../components/modals/PostLikesModal";
 import PostPageComments from "../../components/comments/PostPageComments";
 
-export default function Comments() {
+export default function PostPage() {
   //props
   const params = useParams();
   const postID = params.id;
@@ -24,17 +24,13 @@ export default function Comments() {
   });
   const [error, setError] = useState("");
 
-  const toggleModal = () => {
-    setModal(!modal);
-  };
+  const toggleModal = () => setModal(!modal);
 
   //get post with headers
   const getPost = useCallback(() => {
     axios
       .get(`/posts/${postID}/`, headers) // get current post
-      .then((res) => {
-        setCurrentPost(res.data);
-      })
+      .then((res) => setCurrentPost(res.data))
       .catch((res) => {
         const data = res.response.data;
         if (data.error) {
@@ -50,9 +46,7 @@ export default function Comments() {
       });
   }, [postID, history, headers, setHeaders]);
 
-  useEffect(() => {
-    getPost();
-  }, [getPost]);
+  useEffect(() => getPost(), [getPost]);
 
   const renderPost = (post) => {
     return (

@@ -19,10 +19,9 @@ export default function PopularPosts() {
     refreshPostList();
   }, [headers]);
 
-  const removePostFromView = (post) => {
+  const removePostFromView = (post) =>
     setPostList(postList.filter((i) => post !== i));
-  };
-
+    
   const renderPosts = () => {
     return postList.slice(0, 5).map((post) => (
       <div key={post.id}>

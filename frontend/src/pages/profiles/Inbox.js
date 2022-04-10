@@ -14,9 +14,9 @@ export default function Inbox() {
 
   useEffect(() => {
     if (loggedIn) {
-      axios.get("/inbox/", headers).then((res) => {
-        setNotificationList(res.data);
-      });
+      axios
+        .get("/inbox/", headers)
+        .then((res) => setNotificationList(res.data));
     } else {
       return <Redirect to="/404" />;
     }
@@ -37,7 +37,6 @@ export default function Inbox() {
   };
 
   const showNotifications = () => {
-    console.table(notificationList);
     if (notificationList.length < 1) {
       return <div className="text-center">Nothing to see here...</div>;
     }

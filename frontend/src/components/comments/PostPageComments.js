@@ -39,7 +39,7 @@ export default function PostPageComments(props) {
     content: "",
   });
   const isMounted = useRef(false);
-
+ 
   useEffect(() => {
     if (post.id === undefined) {
       return;
@@ -225,7 +225,7 @@ export default function PostPageComments(props) {
       </Container>
       {renderOrderBy()}
       <br />
-      <div>{commentList != null ? renderComments() : null}</div>
+      <div>{commentList == null || renderComments()}</div>
     </>
   );
 }

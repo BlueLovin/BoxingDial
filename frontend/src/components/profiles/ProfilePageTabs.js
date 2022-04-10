@@ -31,9 +31,7 @@ export function ProfilePageTabs({
         <NavItem>
           <NavLink
             className={activeTab === "3" ? "active" : ""}
-            onClick={() => {
-              setActiveTab("3");
-            }}
+            onClick={() => setActiveTab("3")}
           >
             Following
           </NavLink>
@@ -41,9 +39,7 @@ export function ProfilePageTabs({
         <NavItem>
           <NavLink
             className={activeTab === "4" ? "active" : ""}
-            onClick={() => {
-              setActiveTab("4");
-            }}
+            onClick={() => setActiveTab("4")}
           >
             Followers
           </NavLink>

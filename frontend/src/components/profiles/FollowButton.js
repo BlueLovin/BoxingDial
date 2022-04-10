@@ -13,17 +13,13 @@ export default function FollowButton(props) {
   const [headers] = headersVal;
   const [loggedIn] = loggedInVal;
 
-  useEffect(() => {
-    setIsFollowing(profile.is_following);
-  }, [profile]);
+  useEffect(() => setIsFollowing(profile.is_following), [profile]);
 
   const follow = () => {
     let data = {
       follow: profile.id,
     };
-    axios
-      .post(`/users/follow`, data, headers)
-      .then(() => setIsFollowing(true));
+    axios.post(`/users/follow`, data, headers).then(() => setIsFollowing(true));
   };
 
   const unfollow = () => {
@@ -41,25 +37,13 @@ export default function FollowButton(props) {
         if (isFollowing === false) {
           return (
             <>
-              <Button
-                onClick={() => {
-                  follow();
-                }}
-              >
-                Follow
-              </Button>
+              <Button onClick={follow}>Follow</Button>
             </>
           );
         } else if (isFollowing != null) {
           return (
             <>
-              <Button
-                onClick={() => {
-                  unfollow();
-                }}
-              >
-                Unfollow
-              </Button>
+              <Button onClick={unfollow}>Unfollow</Button>
             </>
           );
         }

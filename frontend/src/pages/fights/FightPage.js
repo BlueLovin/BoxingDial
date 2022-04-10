@@ -39,9 +39,7 @@ export default function FightPage() {
     setLoading(false);
   }, [fightID, headers]);
 
-  useEffect(() => {
-    fetchFightData();
-  }, [fetchFightData]);
+  useEffect(() => fetchFightData(), [fetchFightData]);
 
   const removePostFromFeed = (post) => {
     setPostList((list) => list.filter((p) => post !== p));
@@ -59,10 +57,8 @@ export default function FightPage() {
     ));
   };
 
-  const toggle = () => {
-    setModal(!modal);
-  };
-
+  const toggle = () => setModal(!modal);
+  
   const submitPost = (item) => {
     toggle();
     axios

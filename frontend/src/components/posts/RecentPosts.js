@@ -6,9 +6,7 @@ import Post from "./Post";
 export default function RecentPosts() {
   const [postList, setpostList] = useState([]);
 
-  useEffect(() => {
-    refreshPostList();
-  }, []);
+  useEffect(() => refreshPostList(), []);
 
   const refreshPostList = () => {
     axios

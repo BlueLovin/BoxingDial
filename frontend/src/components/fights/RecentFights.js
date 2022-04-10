@@ -6,9 +6,7 @@ import SmallFight from "./SmallFight";
 export default function RecentFights() {
   const [fightList, setFightList] = useState([]);
 
-  useEffect(() => {
-    refreshPostList();
-  }, []);
+  useEffect(() => refreshPostList(), []);
 
   const refreshPostList = () => {
     axios
@@ -17,21 +15,19 @@ export default function RecentFights() {
       .catch((err) => console.log(err));
   };
   const renderFights = () => {
-    return fightList
-      .slice(0, 3)
-      .map((fightData) => (
-        <div className="border rounded p-3" key={fightData.id}>
-          <SmallFight fightData={fightData} />
-        </div>
-      ));
+    return fightList.slice(0, 3).map((fightData) => (
+      <div className="border rounded p-3" key={fightData.id}>
+        <SmallFight fightData={fightData} />
+      </div>
+    ));
   };
   return (
     <>
-    <Container>
-          <div className="card p-3">
-            <h4 className="text-center">Recent Fights</h4>
-            {renderFights()}
-          </div>
+      <Container>
+        <div className="card p-3">
+          <h4 className="text-center">Recent Fights</h4>
+          {renderFights()}
+        </div>
       </Container>
     </>
   );

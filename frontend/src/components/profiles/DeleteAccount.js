@@ -16,9 +16,7 @@ export default function DeleteAccount() {
   const history = useHistory();
   const [error, setError] = useState("");
 
-  const toggleModal = () => {
-    setModal(!modal);
-  };
+  const toggleModal = () => setModal(!modal);
 
   const deleteAccount = () => {
     const data = { password: password };
@@ -31,9 +29,7 @@ export default function DeleteAccount() {
         history.push("/");
         window.location.reload();
       })
-      .catch((err) => {
-        setError(err.response.data.error);
-      });
+      .catch((err) => setError(err.response.data.error));
   };
 
   const verifyUserDecision = () => {
