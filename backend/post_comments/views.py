@@ -158,15 +158,17 @@ class CreatePostCommentView(generics.CreateAPIView):
                 continue
 
             if is_reply:
-                notification_text = f"{comment.owner.username} replied to your comment: '{comment.parent.content[:10]}...': '{comment.content[:25]}'"
+                notification_text = f"{comment.owner.username} replied to your comment on: '{comment.parent.content[:10]}...': '{comment.content[:25]}'"
+                post_id = comment.parent.post.id
             else:
                 notification_text = f"{comment.owner.username} mentioned you in a comment: {comment.content[:10]}..."
+                post_id = comment.post.id
 
             Notification.objects.create(
                 recipient=mentioned_user,
-                sender=comment.owner.username,
+                sender=request.user.username,
                 text=notification_text,
-                post_id=comment.post.id,
+                post_id=post_id,
                 comment_id=comment.id,
             )
 
@@ -343,7 +345,7 @@ class CommentReplyView(views.APIView):
 
         # create notification for parent comment owner
         self.create_reply_notification(new_comment, parent_comment)
-        c.send_notifications_to_mentioned_users(request, parent_comment, True)
+        c.send_notifications_to_mentioned_users(request, new_comment, True)
 
         # upvote comment
         new_comment.votes.up(owner.id)

@@ -213,7 +213,11 @@ class AddFollowerView(generics.GenericAPIView):
         # send notification to user who received the follow
         notification_text = f"{user.username} just followed you!"
         Notification.objects.get_or_create(
-            recipient=follow, text=notification_text, post_id=-1, sender=user
+            recipient=follow,
+            text=notification_text,
+            post_id=-1,
+            comment_id=-1,
+            sender=user,
         )
 
         return Response(
