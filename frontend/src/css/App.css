@@ -2,6 +2,20 @@
   text-align: center;
 }
 
+@keyframes yellowfade {
+  from {
+    background: yellow;
+  }
+  to {
+    background: #f8f9fa;
+  }
+}
+
+.highlight-background {
+  animation-name: yellowfade;
+  animation-duration: 1.5s;
+  background-color: #f8f9fa;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;

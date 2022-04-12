@@ -5,7 +5,8 @@ import { UserContext } from "../../UserContext";
 import { useHistory } from "react-router";
 
 export default function Notification(props) {
-  const { text, date, is_read, post_id, sender } = props.notification;
+  const { text, date, is_read, post_id, comment_id, sender } =
+    props.notification;
   const this_notification = props.notification;
 
   const { loggedInVal, headersVal } = useContext(UserContext);
@@ -28,18 +29,23 @@ export default function Notification(props) {
     // takes you to the sender's profile instead
     if (post_id === -1) {
       history.push(`/user/${sender}`);
-    } else {
-      history.push(`/post/${post_id}`);
+    }
+    // takes you to a post
+    else {
+      var url = `/post/${post_id}`;
+
+      // if the comment id is not -1, it will take you to the
+      // post page and highlight the comment
+      if (comment_id !== -1) {
+        url += `/${comment_id}`;
+      }
+      history.push(url);
     }
   };
 
   const deleteNotification = async () => {
     if (loggedIn) {
-      await axios.post(
-        `/inbox/${this_notification.id}/delete`,
-        {},
-        headers
-      );
+      await axios.post(`/inbox/${this_notification.id}/delete`, {}, headers);
       window.location.reload();
     }
   };

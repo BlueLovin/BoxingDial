@@ -22,7 +22,7 @@ import axios from "axios";
 
 export default function PostPageComments(props) {
   //props
-  const { post } = props;
+  const { post, setLoaded } = props;
 
   //context
   const { userVal, loggedInVal, headersVal } = useContext(UserContext);
@@ -39,7 +39,7 @@ export default function PostPageComments(props) {
     content: "",
   });
   const isMounted = useRef(false);
- 
+
   useEffect(() => {
     if (post.id === undefined) {
       return;
@@ -52,8 +52,9 @@ export default function PostPageComments(props) {
     } else {
       // DO NOTHING ON MOUNT
       isMounted.current = true;
+      setLoaded(true);
     }
-  }, [commentOrder, post.id, headers, loggedIn]);
+  }, [commentOrder, post.id, headers, loggedIn, setLoaded]);
 
   useEffect(() => {
     setCommentCount(post.comment_count);
@@ -149,6 +150,7 @@ export default function PostPageComments(props) {
         removeReply={removeReplyFromView}
         addNewReply={addReplyToView}
         key={comment.id}
+        id={comment.id}
       />
     ));
   };

@@ -87,6 +87,8 @@ export default function Comment(props) {
             parentComment={comment}
             removeCommentFromParentList={() => removeReply(comment, reply)}
             addNewReply={addNewReply}
+            key={reply.id}
+            id={reply.id}
           />
         </>
       ));
@@ -144,7 +146,10 @@ export default function Comment(props) {
   }
   return (
     <Container>
-      <div className="list-group-item bg-light justify-content-center preserve-line-breaks">
+      <div
+        id={comment.id}
+        className="list-group-item bg-light justify-content-center preserve-line-breaks"
+      >
         <p>
           <HighlightedContent post={comment} />
         </p>

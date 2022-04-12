@@ -1,4 +1,11 @@
-import React, { useEffect, useState, useContext, useCallback } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useContext,
+  useCallback,
+  useRef,
+} from "react";
 import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../../UserContext";
@@ -9,8 +16,7 @@ import PostPageComments from "../../components/comments/PostPageComments";
 
 export default function PostPage() {
   //props
-  const params = useParams();
-  const postID = params.id;
+  const { postID, highlightCommentID = null } = useParams();
 
   //context
   const { headersVal } = useContext(UserContext);
@@ -23,6 +29,23 @@ export default function PostPage() {
     content: "",
   });
   const [error, setError] = useState("");
+  const [childrenLoaded, setChildrenLoaded] = useState(false);
+  const highlightedCommentRef = useRef(null);
+
+  useLayoutEffect(() => {
+    console.log(parseInt(highlightCommentID));
+
+    const highlightedComment = document.getElementById(
+      parseInt(highlightCommentID)
+    );
+    if (highlightedComment === null) {
+      return;
+    }
+    console.log("WNEIWNA");
+    highlightedComment.scrollIntoView({ behavior: "smooth", block: "start" });
+    highlightedComment.classList.remove("bg-light");
+    highlightedComment.classList.add("highlight-background");
+  }, [currentPost, highlightCommentID, childrenLoaded]);
 
   const toggleModal = () => setModal(!modal);
 
@@ -75,7 +98,8 @@ export default function PostPage() {
         <>
           {renderPost(currentPost)}
 
-          <PostPageComments post={currentPost} />
+          <PostPageComments post={currentPost} setLoaded={setChildrenLoaded} />
+
           {modal ? (
             <PostLikesModal toggle={toggleModal} postID={postID} />
           ) : null}

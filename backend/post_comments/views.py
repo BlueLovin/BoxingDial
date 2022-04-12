@@ -105,6 +105,7 @@ class CreatePostCommentView(generics.CreateAPIView):
                 sender=new_comment.username,
                 text=notification_text,
                 post_id=parent_post.id,
+                comment_id=new_comment.id,
             )
 
     def post(self, request, format=None):
@@ -148,7 +149,7 @@ class CreatePostCommentView(generics.CreateAPIView):
 
     def send_notifications_to_mentioned_users(self, request, comment, is_reply):
         for mentioned_user in comment.entities.mentioned_users.all():
-            mentioning_themself = request.user == comment.owner
+            mentioning_themself = request.user == mentioned_user
             blocked = UserManager.is_user_blocked_either_way(
                 None, request, comment.owner.profile
             )
@@ -166,6 +167,7 @@ class CreatePostCommentView(generics.CreateAPIView):
                 sender=comment.owner.username,
                 text=notification_text,
                 post_id=comment.post.id,
+                comment_id=comment.id,
             )
 
     def get_user_mentions(self, content: str):
@@ -292,6 +294,7 @@ class CommentReplyView(views.APIView):
             sender=new_comment.owner,
             text=notification_text,
             post_id=parent_comment.post.id,
+            comment_id=new_comment.id,
         )
 
     # create reply
@@ -340,7 +343,7 @@ class CommentReplyView(views.APIView):
 
         # create notification for parent comment owner
         self.create_reply_notification(new_comment, parent_comment)
-        c.send_notifications_to_mentioned_users(request, new_comment, True)
+        c.send_notifications_to_mentioned_users(request, parent_comment, True)
 
         # upvote comment
         new_comment.votes.up(owner.id)

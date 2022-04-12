@@ -20,7 +20,7 @@ export default function Routes() {
         <Home />
       </Route>
 
-      <Route path="/post/:id" exact>
+      <Route path="/post/:postID/:highlightCommentID?" exact>
         <Comments />
       </Route>
 

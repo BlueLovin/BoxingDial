@@ -110,13 +110,14 @@ class CreatePostView(generics.CreateAPIView):
 
             if mentioning_themself or blocked:
                 continue
-            
+
             notification_text = f"{post.owner.username} commented mentioned you in their post: {post.content[:10]}..."
             Notification.objects.create(
                 recipient=mentioned_user,
                 sender=post.owner.username,
                 text=notification_text,
                 post_id=post.id,
+                comment_id=-1,
             )
 
     def get_user_mentions(self, content: str):
