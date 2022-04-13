@@ -166,7 +166,7 @@ export default function Comment(props) {
             </Link>
           </div>
           {contextButton && comment.post !== null ? (
-            <Link to={`/post/${comment.post}`}>
+            <Link to={`/post/${comment.post}/${comment.id}`}>
               <span>context</span>
             </Link>
           ) : null}

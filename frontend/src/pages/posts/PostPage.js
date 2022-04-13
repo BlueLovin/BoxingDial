@@ -22,7 +22,7 @@ export default function PostPage() {
   const history = useHistory();
 
   //state
-  const [modal, setModal] = useState(false);
+  const [showLikeModal, setShowLikeModal] = useState(false);
   const [headers, setHeaders] = headersVal;
   const [currentPost, setCurrentPost] = useState({
     content: "",
@@ -38,14 +38,17 @@ export default function PostPage() {
       if (highlightedComment === null) {
         return;
       }
-      highlightedComment.scrollIntoView({ behavior: "smooth", block: "center" });
+      highlightedComment.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
       highlightedComment.classList.remove("bg-light");
       highlightedComment.classList.add("highlight-background");
     };
     highlightComment();
   }, [currentPost, highlightCommentID, childrenLoaded]);
 
-  const toggleModal = () => setModal(!modal);
+  const toggleLikeModal = () => setShowLikeModal(!showLikeModal);
 
   //get post with headers
   const getPost = useCallback(() => {
@@ -73,11 +76,7 @@ export default function PostPage() {
     return (
       <>
         {post.content ? (
-          <Post
-            post={post}
-            fullPostPage={true}
-            toggleModal={() => toggleModal()}
-          />
+          <Post post={post} fullPostPage={true} toggleModal={toggleLikeModal} />
         ) : (
           "loading"
         )}
@@ -90,7 +89,7 @@ export default function PostPage() {
   }
 
   return (
-    <div>
+    <>
       <br />
       {currentPost ? (
         <>
@@ -98,13 +97,13 @@ export default function PostPage() {
 
           <PostPageComments post={currentPost} setLoaded={setChildrenLoaded} />
 
-          {modal ? (
-            <PostLikesModal toggle={toggleModal} postID={postID} />
+          {showLikeModal ? (
+            <PostLikesModal toggle={toggleLikeModal} postID={postID} />
           ) : null}
         </>
       ) : (
         "loading"
       )}
-    </div>
+    </>
   );
 }

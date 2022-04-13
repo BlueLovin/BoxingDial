@@ -10,7 +10,7 @@ from django.db.models.expressions import Exists, OuterRef
 from notifications.models import Notification
 from posts.models import Post
 from post_comments.serializers.common import CommentSerializer, ReplySerializer
-from rest_framework import generics, serializers, status, views, viewsets
+from rest_framework import generics, serializers, views, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from vote.managers import UP
