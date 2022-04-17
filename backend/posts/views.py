@@ -18,12 +18,13 @@ from vote.models import DOWN, Vote
 from vote.views import VoteMixin
 
 from post_comments.models import PostComment
-from .models import Post, PostEntities, PostLike
+from .models import Post, PostEntities, PostLike, Repost
 from .serializers import (
     CommentSerializer,
     CreatePostSerializer,
     PostLikeSerializer,
     PostSerializer,
+    RepostSerializer,
     SmallPostSerializer,
 )
 
@@ -284,7 +285,7 @@ class PopularPostsView(generics.ListAPIView):
 
 
 class PostLikeApiView(views.APIView):
-    def post(self, request, post, format=None):
+    def post(self, request, post_id, format=None):
 
         user = request.user
 
@@ -294,7 +295,7 @@ class PostLikeApiView(views.APIView):
                 {"result": "not logged in"},
             )
 
-        post = Post.objects.get(id=post)
+        post = Post.objects.get(id=post_id)
 
         post_like_obj = PostLike.objects.filter(user=user, post=post)
         if post_like_obj.exists():
@@ -315,3 +316,31 @@ class PostLikeApiView(views.APIView):
 class PostCommentViewSet(viewsets.ModelViewSet, VoteMixin):
     queryset = PostComment.objects.all()
     serializer_class = CommentSerializer
+
+
+class RepostView(generics.CreateAPIView):
+    def post(self, request, post_id, *args, **kwargs):
+        if request.user.is_anonymous:
+            return BoxingDialResponses.NOT_LOGGED_IN_RESPONSE
+
+        try:
+            post = Post.objects.get(id=post_id)
+        except ObjectDoesNotExist:
+            return BoxingDialResponses.POST_DOES_NOT_EXIST_RESPONSE
+
+        # already reposted
+        if Repost.objects.filter(post=post, reposter=request.user).exists():
+            return Response(200)
+
+        repost_message = ""
+
+        if "content" in request.data:
+            repost_message = request.data["content"]
+
+        new_repost = Repost.objects.create(
+            post=post, reposter=request.user, repost_message=repost_message
+        )
+
+        data = RepostSerializer(new_repost).data
+
+        return Response(data, 200)

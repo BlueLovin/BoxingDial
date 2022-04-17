@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from fights.models import Fight
 from accounts.managers import UserManager
 
+
 class PostLike(models.Model):
     user = models.ForeignKey(User, related_name="user_likes", on_delete=models.CASCADE)
 
@@ -23,7 +24,7 @@ class Post(models.Model):
     fight = models.ForeignKey(
         Fight, on_delete=models.CASCADE, related_name="posts", null=True
     )
-    content = models.TextField()
+    content = models.TextField(max_length=500)
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="posts", null=True
     )
@@ -45,3 +46,12 @@ class Post(models.Model):
 
     def __str__(self):
         return self.content
+
+
+class Repost(models.Model):
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name="reposts", null=True
+    )
+    reposter = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reposts")
+    date_reposted = models.DateTimeField(auto_now_add=True)
+    repost_message = models.TextField()

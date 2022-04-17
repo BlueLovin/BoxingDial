@@ -1,3 +1,4 @@
+from email.policy import default
 from accounts.serializers import (
     SmallUserSerializer,
     SmallUserWithProfileSerializer,
@@ -7,7 +8,7 @@ from fights.serializers.common import SmallFightSerializer, TinyFightSerializer
 from post_comments.serializers.common import CommentSerializer
 from rest_framework import serializers
 
-from .models import Post, PostEntities, PostLike
+from .models import Post, PostEntities, PostLike, Repost
 
 
 class TinyPostSerializer(serializers.ModelSerializer):
@@ -79,6 +80,7 @@ class SmallPostSerializer(serializers.ModelSerializer):
     liked = serializers.BooleanField(default=False)
     owner = SmallUserWithProfileSerializer(many=False)
     entities = PostEntitiesSerializer(many=False)
+    feed_type = serializers.CharField(default="post")
 
     class Meta:
         model = Post
@@ -86,6 +88,7 @@ class SmallPostSerializer(serializers.ModelSerializer):
             "id",
             "date",
             "fight",
+            "feed_type",
             "content",
             "liked",
             "entities",
@@ -94,3 +97,12 @@ class SmallPostSerializer(serializers.ModelSerializer):
             "owner",
             "username",
         )
+
+
+class RepostSerializer(serializers.ModelSerializer):
+    post = TinyPostSerializer(many=False)
+    feed_type = serializers.CharField(default="repost")
+
+    class Meta:
+        model = Repost
+        fields = ("date_reposted", "reposter", "post", "repost_message", "feed_type")

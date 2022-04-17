@@ -10,5 +10,6 @@ urlpatterns = [
     path("api/posts/<int:pk>/likes", post_views.PostLikesView.as_view()),
     path("api/post/create/", post_views.CreatePostView.as_view()),
     path("api/posts/popular", post_views.PopularPostsView.as_view()),
-    path("api/posts/<int:post>/like", post_views.PostLikeApiView.as_view()),
+    path("api/posts/<int:post_id>/like", post_views.PostLikeApiView.as_view()),
+    path("api/posts/<int:post_id>/repost", post_views.RepostView.as_view()),
 ]

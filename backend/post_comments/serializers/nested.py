@@ -10,6 +10,7 @@ class FeedCommentSerializer(serializers.ModelSerializer):
     post = TruncatedPostSerializer(many=False)
     owner = SmallUserWithProfileSerializer(many=False)
     entities = PostCommentEntitiesSerializer(many=False)
+    feed_type = serializers.CharField(default="comment")
 
     class Meta:
         model = PostComment
@@ -17,6 +18,7 @@ class FeedCommentSerializer(serializers.ModelSerializer):
             "id",
             "post",
             "date",
+            "feed_type",
             "content",
             "owner",
             "entities",
