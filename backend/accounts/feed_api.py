@@ -72,6 +72,13 @@ class UserFeedByRecentView(generics.GenericAPIView):
         user_reposts = (
             Repost.objects.filter(reposter__exact=request.user)
             .prefetch_related(Prefetch("post", post_annotation))
+            .annotate(
+                is_reposted=Exists(
+                    Repost.objects.filter(
+                        reposter=request.user, post=OuterRef("post__pk")
+                    )
+                )
+            )
             .order_by("-id")
         )
 

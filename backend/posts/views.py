@@ -338,13 +338,11 @@ class RepostView(generics.CreateAPIView):
         if "content" in request.data:
             repost_message = request.data["content"]
 
-        new_repost = Repost.objects.create(
+        Repost.objects.create(
             post=post, reposter=request.user, repost_message=repost_message
         )
 
-        data = RepostSerializer(new_repost).data
-
-        return Response(data, 200)
+        return Response(200)
 
     # un-repost
     def delete(self, request, post_id):
@@ -353,9 +351,8 @@ class RepostView(generics.CreateAPIView):
 
         try:
             post = Post.objects.get(id=post_id)
+            Repost.objects.get(post=post, reposter=request.user).delete()
         except ObjectDoesNotExist:
             return BoxingDialResponses.POST_DOES_NOT_EXIST_RESPONSE
-
-        Repost.objects.get(post=post, reposter=request.user).delete()
 
         return Response(200)
