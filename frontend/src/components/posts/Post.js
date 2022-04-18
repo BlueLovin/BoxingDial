@@ -145,8 +145,10 @@ export default function Post(props) {
           ) : null}
 
           <div>
-            {/* if the post belongs to the logged in user */}
-            {user && user.username === post.username ? (
+            {/* show delete button */}
+            {user &&
+            user.username === post.username &&
+            removePostFromParentList != null ? (
               <React.Fragment>
                 <button
                   className="btn-sm btn-danger"

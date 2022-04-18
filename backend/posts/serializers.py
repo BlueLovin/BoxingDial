@@ -100,8 +100,10 @@ class SmallPostSerializer(serializers.ModelSerializer):
 
 
 class RepostSerializer(serializers.ModelSerializer):
-    post = TinyPostSerializer(many=False)
+    reposter = SmallUserWithProfileSerializer(many=False)
+    post = SmallPostSerializer(many=False)
     feed_type = serializers.CharField(default="repost")
+
 
     class Meta:
         model = Repost

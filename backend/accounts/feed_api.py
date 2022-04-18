@@ -2,6 +2,7 @@ from django.db.models.expressions import Exists, OuterRef
 from posts.serializers import RepostSerializer, SmallPostSerializer
 from post_comments.serializers.nested import FeedCommentSerializer
 from django.db.models.aggregates import Count
+from django.db.models.query import Prefetch
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from itertools import chain
@@ -39,7 +40,24 @@ class UserFeedByRecentView(generics.GenericAPIView):
         )
 
         # get reposts from followed users
-        reposts = Repost.objects.filter(reposter__in=following_user_ids).order_by("-id")
+        reposts = (
+            Repost.objects.filter(reposter__in=following_user_ids)
+            .prefetch_related(
+                Prefetch(
+                    "post",
+                    Post.objects.annotate(
+                        comment_count=Count("comments", distinct=True),
+                        liked=Exists(
+                            PostLike.objects.filter(
+                                post=OuterRef("pk"), user=request.user
+                            )
+                        ),
+                        like_count=Count("post_likes", distinct=True),
+                    ),
+                )
+            )
+            .order_by("-id")
+        )
 
         comments = (
             PostComment.objects.exclude_blocked_users(request)
@@ -77,8 +95,23 @@ class UserFeedByRecentView(generics.GenericAPIView):
         )
 
         # get posts and comments from logged in user
-        user_reposts = Repost.objects.filter(reposter__exact=request.user).order_by(
-            "-id"
+        user_reposts = (
+            Repost.objects.filter(reposter__exact=request.user)
+            .prefetch_related(
+                Prefetch(
+                    "post",
+                    Post.objects.annotate(
+                        comment_count=Count("comments", distinct=True),
+                        liked=Exists(
+                            PostLike.objects.filter(
+                                post=OuterRef("pk"), user=request.user
+                            )
+                        ),
+                        like_count=Count("post_likes", distinct=True),
+                    ),
+                )
+            )
+            .order_by("-id")
         )
 
         user_comments = (

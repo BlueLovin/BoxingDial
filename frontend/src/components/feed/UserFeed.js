@@ -1,12 +1,11 @@
 import { UserContext } from "../../UserContext";
 import axios from "axios";
 import { useContext, useEffect, useState, useCallback } from "react";
-import Post from "../posts/Post";
-import { FeedComment } from "../comments/FeedComment";
 import PostModal from "../modals/PostModal";
 import { Button, Card, Container } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import FeedItem from "./FeedItem";
 
 export default function UserFeed() {
   const [feed, setFeed] = useState(null);
@@ -57,26 +56,12 @@ export default function UserFeed() {
     );
   };
   const removePostFromView = (item) => setFeed(feed.filter((i) => item !== i));
-  
+
   const renderPosts = () => {
     if (feed && feed.length > 0) {
       return feed.map((item) => (
         <div key={item.id}>
-          {item.comment_count != null ? (
-            // if the item contains a "comment_count" field, it is a post
-            <Post
-              key={item.id}
-              post={item}
-              removePostFromParentList={() => removePostFromView(item)}
-            />
-          ) : (
-            // and if it doesn't... it is definitely a comment
-            <FeedComment
-              key={item.id}
-              comment={item}
-              removeCommentFromParentList={() => removePostFromView(item)}
-            />
-          )}
+          <FeedItem item={item} removeItem={removePostFromView} />
           <hr />
         </div>
       ));
