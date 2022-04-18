@@ -31,6 +31,9 @@ class UserFeedByRecentView(generics.GenericAPIView):
                 PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
             ),
             like_count=Count("post_likes", distinct=True),
+            is_reposted=Exists(
+                Repost.objects.filter(reposter=request.user, post=OuterRef("pk"))
+            ),
         )
 
         # get posts from followed users
@@ -116,6 +119,6 @@ class UserFeedByRecentView(generics.GenericAPIView):
         )
 
         # sort combined list by date
-        newlist = sorted(combined, key=lambda k: k["date"], reverse=True)
+        feed_response = sorted(combined, key=lambda k: k["date"], reverse=True)
 
-        return Response(newlist)
+        return Response(feed_response)

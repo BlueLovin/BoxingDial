@@ -204,6 +204,11 @@ class PostView(generics.RetrieveDestroyAPIView):
                         liked=Exists(  # see if a PostLike object exists matching the client user and post.
                             PostLike.objects.filter(post=pk, user=request.user)
                         ),
+                        is_reposted=Exists(
+                            Repost.objects.filter(
+                                reposter=request.user, post=OuterRef("pk")
+                            )
+                        ),
                     )
                     .first()
                 ).data,

@@ -5,6 +5,7 @@ import axios from "axios";
 import { UserContext } from "../../UserContext";
 import HighlightedContent from "./HighlightedContent";
 import LikeButton from "./Buttons/LikeButton";
+import RepostButton from "./Buttons/RepostButton";
 
 export default function Post(props) {
   const {
@@ -69,7 +70,7 @@ export default function Post(props) {
                   post={post}
                   fullPostPage={fullPostPage}
                 />
-                <p>placeholder</p>
+                <RepostButton post={post} />
                 <p>share</p>
                 <p>copy</p>
               </div>
@@ -83,6 +84,7 @@ export default function Post(props) {
                   post={post}
                   fullPostPage={fullPostPage}
                 />
+                <RepostButton post={post} />
                 {/* comments link */}
                 <Link to={`/post/${post.id}`}>
                   {post.comment_count} comments
