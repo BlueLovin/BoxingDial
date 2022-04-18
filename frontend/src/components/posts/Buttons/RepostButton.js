@@ -37,7 +37,7 @@ export default function RepostButton(props) {
 
   return (
     <button className={buttonClass} onClick={repost}>
-      Repost
+      {isReposted ? "Reposted" : "Repost"}
     </button>
   );
 }
