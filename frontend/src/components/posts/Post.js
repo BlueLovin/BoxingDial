@@ -1,11 +1,10 @@
 import { Link, useHistory } from "react-router-dom";
 import { Container } from "reactstrap";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import axios from "axios";
 import { UserContext } from "../../UserContext";
 import HighlightedContent from "./HighlightedContent";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import LikeButton from "./Buttons/LikeButton";
 
 export default function Post(props) {
   const {
@@ -15,9 +14,7 @@ export default function Post(props) {
     toggleModal = null,
   } = props;
 
-  const [likeCount, setLikeCount] = useState(post.like_count);
   const { userVal, headersVal } = useContext(UserContext);
-  const [buttonClass, setButtonClass] = useState("btn-sm btn-primary");
 
   const [user] = userVal;
   const [headers] = headersVal;
@@ -29,36 +26,6 @@ export default function Post(props) {
         removePostFromParentList();
       } else {
         history.goBack();
-      }
-    });
-  };
-
-  useEffect(() => {
-    if (post.liked) {
-      setButtonClass("btn-sm btn-danger");
-    } else {
-      setButtonClass("btn-sm btn-primary");
-    }
-  }, [post]);
-
-  const likePost = (_post) => {
-    if (!user) {
-      alert("login to be able to like posts!");
-      return;
-    }
-    axios.post(`/posts/${_post.id}/like`, {}, headers).then((res) => {
-      const result = res.data["result"];
-      // LIKE
-      if (result === "liked") {
-        // increment like count if server responds "liked"
-        setLikeCount(likeCount + 1);
-        setButtonClass("btn-sm btn-danger");
-      }
-      // UNLIKE
-      if (result === "unliked") {
-        // vice versa with "unliked"
-        setLikeCount(likeCount - 1);
-        setButtonClass("btn-sm btn-primary");
       }
     });
   };
@@ -97,20 +64,11 @@ export default function Post(props) {
           {fullPostPage ? (
             <>
               <div className="list-group-item p-auto m-auto d-flex justify-content-between align-items-center">
-                <p>
-                  <button
-                    className={buttonClass}
-                    onClick={() => likePost(post)}
-                  >
-                    <FontAwesomeIcon icon={faHeart} />
-                  </button>{" "}
-                  {/* likes area */}
-                  <Link onClick={() => toggleModal()} to="#">
-                    {likeCount > 1 || likeCount === 0
-                      ? `${likeCount} likes`
-                      : `${likeCount} like`}
-                  </Link>
-                </p>
+                <LikeButton
+                  toggleModal={toggleModal}
+                  post={post}
+                  fullPostPage={fullPostPage}
+                />
                 <p>placeholder</p>
                 <p>share</p>
                 <p>copy</p>
@@ -120,10 +78,11 @@ export default function Post(props) {
             <>
               <div className="d-flex justify-content-between align-items-center">
                 {/* like button */}
-                <button className={buttonClass} onClick={() => likePost(post)}>
-                  <FontAwesomeIcon icon={faHeart} />
-                  {" " + likeCount}
-                </button>
+                <LikeButton
+                  toggleModal={toggleModal}
+                  post={post}
+                  fullPostPage={fullPostPage}
+                />
                 {/* comments link */}
                 <Link to={`/post/${post.id}`}>
                   {post.comment_count} comments

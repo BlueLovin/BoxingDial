@@ -278,6 +278,9 @@ class PopularPostsView(generics.ListAPIView):
                 query.annotate(
                     like_count=Count("post_likes", distinct=True),
                     comment_count=Count("comments", distinct=True),
+                    liked=Exists(
+                        PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
+                    ),
                 ).order_by("-comment_count", "-like_count")[:5],
                 many=True,
             ).data
