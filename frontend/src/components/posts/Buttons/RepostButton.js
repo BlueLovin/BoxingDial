@@ -6,11 +6,11 @@ export default function RepostButton(props) {
   const [post] = useState(props.post);
   const [isReposted, setIsReposted] = useState(props.post.is_reposted);
   const [buttonClass, setButtonClass] = useState("btn-sm btn-primary");
-  const { headersVal } = useContext(UserContext);
+  const { headersVal, userVal } = useContext(UserContext);
   const [headers] = headersVal;
+  const [user] = userVal;
 
   useEffect(() => {
-    console.log(post);
     if (isReposted) {
       setButtonClass("btn-sm btn-success");
     } else {
@@ -19,6 +19,11 @@ export default function RepostButton(props) {
   }, [post, isReposted]);
 
   const repost = () => {
+    if (!user) {
+      alert("must be logged in to repost a post.");
+      return;
+    }
+
     if (isReposted) {
       axios
         .delete(`/posts/${post.id}/repost`, headers)
