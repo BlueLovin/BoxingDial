@@ -1,12 +1,12 @@
 from django.db.models.expressions import Exists, OuterRef
-from posts.serializers import SmallPostSerializer
+from posts.serializers import RepostSerializer, SmallPostSerializer
 from post_comments.serializers.nested import FeedCommentSerializer
 from django.db.models.aggregates import Count
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from itertools import chain
 from .models import UserFollowing
-from posts.models import Post, PostLike
+from posts.models import Post, PostLike, Repost
 from post_comments.models import PostComment
 from vote.models import Vote, DOWN, UP
 
@@ -24,7 +24,7 @@ class UserFeedByRecentView(generics.GenericAPIView):
             .distinct()
         )
 
-        # get posts from following users
+        # get posts from followed users
         posts = (
             Post.objects.exclude_blocked_users(request)
             .filter(owner__in=following_user_ids)
@@ -37,6 +37,9 @@ class UserFeedByRecentView(generics.GenericAPIView):
             )
             .order_by("-id")
         )
+
+        # get reposts from followed users
+        reposts = Repost.objects.filter(reposter__in=following_user_ids).order_by("-id")
 
         comments = (
             PostComment.objects.exclude_blocked_users(request)
@@ -62,7 +65,7 @@ class UserFeedByRecentView(generics.GenericAPIView):
 
         # get posts and comments from logged in user
         user_posts = (
-            Post.objects.filter(owner__in=[request.user])
+            Post.objects.filter(owner__exact=request.user)
             .annotate(
                 like_count=Count("post_likes", distinct=True),
                 liked=Exists(
@@ -73,10 +76,15 @@ class UserFeedByRecentView(generics.GenericAPIView):
             .order_by("-id")
         )
 
+        # get posts and comments from logged in user
+        user_reposts = Repost.objects.filter(reposter__exact=request.user).order_by(
+            "-id"
+        )
+
         user_comments = (
             # parent=None to exclude replies to other comments
             PostComment.objects.exclude(post__isnull=True)
-            .filter(owner__in=[request.user], parent=None, post=not None)
+            .filter(owner__exact=request.user, parent=None, post=not None)
             .annotate(
                 is_voted_down=Exists(
                     Vote.objects.filter(
@@ -99,6 +107,8 @@ class UserFeedByRecentView(generics.GenericAPIView):
             chain(
                 SmallPostSerializer(posts, many=True).data,
                 SmallPostSerializer(user_posts, many=True).data,
+                RepostSerializer(reposts, many=True).data,
+                RepostSerializer(user_reposts, many=True).data,
                 FeedCommentSerializer(comments, many=True).data,
                 FeedCommentSerializer(user_comments, many=True).data,
             )

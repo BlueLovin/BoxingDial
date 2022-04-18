@@ -53,5 +53,5 @@ class Repost(models.Model):
         Post, on_delete=models.CASCADE, related_name="reposts", null=True
     )
     reposter = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reposts")
-    date_reposted = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
     repost_message = models.TextField()

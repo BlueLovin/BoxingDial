@@ -319,6 +319,7 @@ class PostCommentViewSet(viewsets.ModelViewSet, VoteMixin):
 
 
 class RepostView(generics.CreateAPIView):
+    # repost
     def post(self, request, post_id, *args, **kwargs):
         if request.user.is_anonymous:
             return BoxingDialResponses.NOT_LOGGED_IN_RESPONSE
@@ -344,3 +345,17 @@ class RepostView(generics.CreateAPIView):
         data = RepostSerializer(new_repost).data
 
         return Response(data, 200)
+
+    # un-repost
+    def delete(self, request, post_id):
+        if request.user.is_anonymous:
+            return BoxingDialResponses.NOT_LOGGED_IN_RESPONSE
+
+        try:
+            post = Post.objects.get(id=post_id)
+        except ObjectDoesNotExist:
+            return BoxingDialResponses.POST_DOES_NOT_EXIST_RESPONSE
+
+        Repost.objects.get(post=post, reposter=request.user).delete()
+
+        return Response(200)

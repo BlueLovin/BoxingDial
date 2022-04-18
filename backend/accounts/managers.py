@@ -23,9 +23,7 @@ class UserManager(models.Manager):
 
     def is_user_blocked_either_way(self, request, user_profile):
         blocked = UserManager.is_blocked_by_you(UserManager, request, user_profile)
-        blocks_you = UserManager.user_blocks_you(UserManager,
-            request, user_profile
-        )
+        blocks_you = UserManager.user_blocks_you(UserManager, request, user_profile)
         return blocked or blocks_you
 
     # this excludes the users that you block

@@ -105,4 +105,4 @@ class RepostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Repost
-        fields = ("date_reposted", "reposter", "post", "repost_message", "feed_type")
+        fields = ("date", "reposter", "post", "repost_message", "feed_type")
