@@ -25,37 +25,21 @@ class UserFeedByRecentView(generics.GenericAPIView):
             .distinct()
         )
 
-        # get posts from followed users
-        posts = (
-            Post.objects.exclude_blocked_users(request)
-            .filter(owner__in=following_user_ids)
-            .annotate(
-                comment_count=Count("comments", distinct=True),
-                liked=Exists(
-                    PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
-                ),
-                like_count=Count("post_likes", distinct=True),
-            )
-            .order_by("-id")
+        post_annotation = Post.objects.exclude_blocked_users(request).annotate(
+            comment_count=Count("comments", distinct=True),
+            liked=Exists(
+                PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
+            ),
+            like_count=Count("post_likes", distinct=True),
         )
+
+        # get posts from followed users
+        posts = post_annotation.filter(owner__in=following_user_ids).order_by("-id")
 
         # get reposts from followed users
         reposts = (
             Repost.objects.filter(reposter__in=following_user_ids)
-            .prefetch_related(
-                Prefetch(
-                    "post",
-                    Post.objects.annotate(
-                        comment_count=Count("comments", distinct=True),
-                        liked=Exists(
-                            PostLike.objects.filter(
-                                post=OuterRef("pk"), user=request.user
-                            )
-                        ),
-                        like_count=Count("post_likes", distinct=True),
-                    ),
-                )
-            )
+            .prefetch_related(Prefetch("post", post_annotation))
             .order_by("-id")
         )
 
@@ -82,35 +66,12 @@ class UserFeedByRecentView(generics.GenericAPIView):
         )
 
         # get posts and comments from logged in user
-        user_posts = (
-            Post.objects.filter(owner__exact=request.user)
-            .annotate(
-                like_count=Count("post_likes", distinct=True),
-                liked=Exists(
-                    PostLike.objects.filter(post=OuterRef("pk"), user=self.request.user)
-                ),
-                comment_count=Count("comments", distinct=True),
-            )
-            .order_by("-id")
-        )
+        user_posts = post_annotation.filter(owner__exact=request.user).order_by("-id")
 
         # get posts and comments from logged in user
         user_reposts = (
             Repost.objects.filter(reposter__exact=request.user)
-            .prefetch_related(
-                Prefetch(
-                    "post",
-                    Post.objects.annotate(
-                        comment_count=Count("comments", distinct=True),
-                        liked=Exists(
-                            PostLike.objects.filter(
-                                post=OuterRef("pk"), user=request.user
-                            )
-                        ),
-                        like_count=Count("post_likes", distinct=True),
-                    ),
-                )
-            )
+            .prefetch_related(Prefetch("post", post_annotation))
             .order_by("-id")
         )
 
