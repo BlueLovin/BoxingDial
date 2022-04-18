@@ -151,7 +151,10 @@ export default function Comment(props) {
         className="list-group-item bg-light justify-content-center preserve-line-breaks"
       >
         <p>
-          <HighlightedContent post={comment} />
+          <HighlightedContent
+            content={comment.content}
+            userList={comment.entities.mentioned_users}
+          />
         </p>
         <div className="list-group-item p-auto m-auto d-flex justify-content-between align-items-center">
           <div>

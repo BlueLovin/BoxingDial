@@ -1,11 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function HighlightedContent({ post = {} }) {
+export default function HighlightedContent({ content = "", userList = [] }) {
   const regex = /(@[0-9a-z]*)/gi;
-  const content = post.content;
   const parts = content.split(regex);
-  const mentionedUsers = post.entities.mentioned_users.map((u) => u.username);
+  const mentionedUsers = userList.map((u) => u.username);
   return (
     <span>
       {parts.filter(String).map((word, i) => {

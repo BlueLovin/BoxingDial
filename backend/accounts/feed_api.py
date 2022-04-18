@@ -1,3 +1,4 @@
+from math import comb
 from django.db.models.expressions import Exists, OuterRef
 from posts.serializers import RepostSerializer, SmallPostSerializer
 from post_comments.serializers.nested import FeedCommentSerializer
@@ -14,6 +15,31 @@ from vote.models import Vote, DOWN, UP
 
 class UserFeedByRecentView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
+
+    def remove_duplicate_reposts(self, reposts_list: list) -> list:
+        post_ids = []
+        reposts = {}
+        for repost in reposts_list:
+            post_id = repost["post"]["id"]
+
+            if post_id in post_ids:
+                if post_id not in reposts:
+                    reposts[post_id] = repost
+
+                if "users_who_reposted" not in reposts[post_id]:
+                    reposts[post_id]["users_who_reposted"] = []
+
+                reposts[post_id]["users_who_reposted"].append(repost["reposter"])
+            else:
+                reposts[post_id] = repost
+
+                if "users_who_reposted" not in reposts[post_id]:
+                    reposts[post_id]["users_who_reposted"] = []
+
+                reposts[post_id]["users_who_reposted"].append(repost["reposter"])
+                post_ids.append(post_id)
+
+        return list(reposts.values())
 
     def get(self, request, format=None):
         user_id = request.user.id
@@ -106,13 +132,21 @@ class UserFeedByRecentView(generics.GenericAPIView):
             .order_by("-id")
         )
 
+        combined_reposts = list(
+            chain(
+                RepostSerializer(reposts, many=True).data,
+                RepostSerializer(user_reposts, many=True).data,
+            )
+        )
+
+        combined_reposts = self.remove_duplicate_reposts(combined_reposts)
+
         # combine post list and comment list
         combined = list(
             chain(
                 SmallPostSerializer(posts, many=True).data,
                 SmallPostSerializer(user_posts, many=True).data,
-                RepostSerializer(reposts, many=True).data,
-                RepostSerializer(user_reposts, many=True).data,
+                combined_reposts,
                 FeedCommentSerializer(comments, many=True).data,
                 FeedCommentSerializer(user_comments, many=True).data,
             )

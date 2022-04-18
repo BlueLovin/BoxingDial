@@ -38,7 +38,10 @@ export default function Post(props) {
 
   const renderContent = () => {
     if (post.entities.mentioned_users !== []) {
-      return <HighlightedContent post={post} />;
+      <HighlightedContent
+        content={post.content}
+        userList={post.entities.mentioned_users}
+      />;
     }
 
     return post.content;
