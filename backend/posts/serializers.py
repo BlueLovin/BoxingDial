@@ -48,6 +48,7 @@ class PostSerializer(serializers.ModelSerializer):
     owner = SmallUserWithProfileSerializer(many=False)
     entities = PostEntitiesSerializer(many=False)
     is_reposted = serializers.BooleanField(default=False)
+    repost_count = serializers.IntegerField()
 
     class Meta:
         model = Post
@@ -56,9 +57,10 @@ class PostSerializer(serializers.ModelSerializer):
             "date",
             "fight",
             "is_reposted",
-            "comment_count",
             "liked",
+            "comment_count",
             "like_count",
+            "repost_count",
             "content",
             "comments",
             "entities",
@@ -84,6 +86,7 @@ class SmallPostSerializer(serializers.ModelSerializer):
     entities = PostEntitiesSerializer(many=False)
     feed_type = serializers.CharField(default="post")
     is_reposted = serializers.BooleanField(default=False)
+    repost_count = serializers.IntegerField()
 
     class Meta:
         model = Post
@@ -98,6 +101,7 @@ class SmallPostSerializer(serializers.ModelSerializer):
             "entities",
             "comment_count",
             "like_count",
+            "repost_count",
             "owner",
             "username",
         )

@@ -1,9 +1,14 @@
+import { faRetweet } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { UserContext } from "../../../UserContext";
 
 export default function RepostButton(props) {
   const [post] = useState(props.post);
+  const { toggleModal, fullPostPage } = props;
+  const [repostCount, setRepostCount] = useState(props.post.repost_count);
   const [isReposted, setIsReposted] = useState(props.post.is_reposted);
   const [buttonClass, setButtonClass] = useState("btn-sm btn-primary");
   const { headersVal, userVal } = useContext(UserContext);
@@ -27,17 +32,33 @@ export default function RepostButton(props) {
     if (isReposted) {
       axios
         .delete(`/posts/${post.id}/repost`, headers)
-        .then(() => setIsReposted(false));
+        .then(() => setIsReposted(false))
+        .then(() => setRepostCount((c) => c - 1));
     } else {
       axios
         .post(`/posts/${post.id}/repost`, {}, headers)
-        .then(() => setIsReposted(true));
+        .then(() => setIsReposted(true))
+        .then(() => setRepostCount((c) => c + 1));
     }
   };
 
   return (
-    <button className={buttonClass} onClick={repost}>
-      {isReposted ? "Reposted" : "Repost"}
-    </button>
+    <>
+      <p>
+        <button className={buttonClass} onClick={repost}>
+          <FontAwesomeIcon icon={faRetweet} />
+          {` ${repostCount}`}
+        </button>{" "}
+        {fullPostPage && (
+          <Link onClick={toggleModal} to="#">
+            {repostCount > 1
+              ? `${repostCount} reposts`
+              : `${repostCount} repost`}
+            
+          </Link>
+        )}
+      </p>
+      <p></p>
+    </>
   );
 }

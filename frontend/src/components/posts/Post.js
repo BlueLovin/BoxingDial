@@ -12,7 +12,8 @@ export default function Post(props) {
     post,
     fullPostPage = false,
     removePostFromParentList = null,
-    toggleModal = null,
+    toggleLikesModal = null,
+    toggleRepostsModal = null,
   } = props;
 
   const { userVal, headersVal } = useContext(UserContext);
@@ -38,10 +39,12 @@ export default function Post(props) {
 
   const renderContent = () => {
     if (post.entities.mentioned_users !== []) {
-      <HighlightedContent
-        content={post.content}
-        userList={post.entities.mentioned_users}
-      />;
+      return (
+        <HighlightedContent
+          content={post.content}
+          userList={post.entities.mentioned_users}
+        />
+      );
     }
 
     return post.content;
@@ -69,11 +72,15 @@ export default function Post(props) {
             <>
               <div className="list-group-item p-auto m-auto d-flex justify-content-between align-items-center">
                 <LikeButton
-                  toggleModal={toggleModal}
+                  toggleModal={toggleLikesModal}
                   post={post}
                   fullPostPage={fullPostPage}
                 />
-                <RepostButton post={post} />
+                <RepostButton
+                  post={post}
+                  toggleModal={toggleRepostsModal}
+                  fullPostPage={fullPostPage}
+                />
                 <p>share</p>
                 <p>copy</p>
               </div>
@@ -83,11 +90,15 @@ export default function Post(props) {
               <div className="d-flex justify-content-between align-items-center">
                 {/* like button */}
                 <LikeButton
-                  toggleModal={toggleModal}
+                  toggleModal={toggleLikesModal}
                   post={post}
                   fullPostPage={fullPostPage}
                 />
-                <RepostButton post={post} />
+                <RepostButton
+                  post={post}
+                  toggleModal={toggleRepostsModal}
+                  fullPostPage={fullPostPage}
+                />
                 {/* comments link */}
                 <Link to={`/post/${post.id}`}>
                   {post.comment_count} comments

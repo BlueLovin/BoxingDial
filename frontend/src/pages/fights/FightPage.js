@@ -19,7 +19,8 @@ export default function FightPage() {
 
   // state
   const [modal, setModal] = useState(false);
-  const [fightData, setFightData] = useState({});
+  const [fight, setFight] = useState({});
+  const [postCount, setPostCount] = useState(0);
   const [postList, setPostList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeItem, setActiveItem] = useState({
@@ -31,9 +32,10 @@ export default function FightPage() {
     setLoading(true);
     axios.get(`/fights/${fightID}/`, headers).then((res) => {
       const data = res.data;
-      setFightData(data);
+      setFight(data);
       setPostList(data.posts);
       setLoading(false);
+      setPostCount(data.posts_count);
     });
 
     setLoading(false);
@@ -43,6 +45,7 @@ export default function FightPage() {
 
   const removePostFromFeed = (post) => {
     setPostList((list) => list.filter((p) => post !== p));
+    setPostCount((c) => c - 1);
   };
 
   const renderPosts = () => {
@@ -58,17 +61,18 @@ export default function FightPage() {
   };
 
   const toggle = () => setModal(!modal);
-  
+
   const submitPost = (item) => {
     toggle();
     axios
       .post("/post/create/", item, headers)
-      .then((res) => setPostList((p) => [res.data, ...p]));
+      .then((res) => setPostList((p) => [res.data, ...p]))
+      .then(() => setPostCount((c) => c + 1));
   };
 
   const createItem = () => {
     const item = {
-      fight: fightData.id,
+      fight: fight.id,
       content: "",
       comments: [],
       owner: user.id,
@@ -105,11 +109,11 @@ export default function FightPage() {
       ) : (
         <>
           <div className="container w-75 bg-light bg-gradient preserve-line-breaks">
-            <Fight fightData={fightData} />
+            <Fight fightData={fight} />
             <br />
             {renderCreatePost()}
             <hr />
-            <h4 className="text-center">{fightData.posts_count} Posts</h4>
+            <h4 className="text-center">{postCount} Posts</h4>
             <br />
             {renderPosts()}
           </div>

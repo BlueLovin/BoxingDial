@@ -4,7 +4,7 @@ from rest_framework import generics
 
 from fights.serializers.common import SmallFightSerializer
 from .models import Fight
-from posts.models import Post, PostLike
+from posts.models import Post, PostLike, Repost
 from .serializers.nested import FightSerializer
 
 # single fight /api/fights/{id}
@@ -12,7 +12,6 @@ class FightView(generics.RetrieveAPIView):
     serializer_class = FightSerializer
 
     def get_queryset(self):
-
         user = self.request.user
 
         # if not logged in
@@ -25,6 +24,7 @@ class FightView(generics.RetrieveAPIView):
                         Post.objects.annotate(
                             like_count=Count("post_likes", distinct=True),
                             comment_count=Count("comments", distinct=True),
+                            repost_count=Count("reposts", distinct=True),
                         ).order_by("-id"),
                     )
                 )
@@ -41,6 +41,12 @@ class FightView(generics.RetrieveAPIView):
                         .annotate(
                             like_count=Count("post_likes", distinct=True),
                             comment_count=Count("comments", distinct=True),
+                            repost_count=Count("reposts", distinct=True),
+                            is_reposted=Exists(
+                                Repost.objects.filter(
+                                    reposter=user, post=OuterRef("pk")
+                                )
+                            ),
                             liked=Exists(
                                 PostLike.objects.filter(
                                     post=OuterRef("pk"), user=self.request.user
@@ -87,6 +93,7 @@ class PopularFightsView(generics.ListAPIView):
                     Post.objects.exclude_blocked_users(self.request).annotate(
                         comment_count=Count("comments", distinct=True),
                         like_count=Count("post_likes", distinct=True),
+                        repost_count=Count("reposts", distinct=True),
                     ),
                 )
             )

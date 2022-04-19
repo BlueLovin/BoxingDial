@@ -89,6 +89,7 @@ class CreatePostView(generics.CreateAPIView):
                 comment_count=Value(0),
                 liked=Value(False),
                 like_count=Value(0),
+                repost_count=Value(0),
             )
             .first()
         )
@@ -189,7 +190,10 @@ class PostView(generics.RetrieveDestroyAPIView):
 
             return Response(
                 PostSerializer(
-                    post_query.annotate(like_count=Count("likes", distinct=True))
+                    post_query.annotate(
+                        like_count=Count("likes", distinct=True),
+                        repost_count=Count("reposts", distinct=True),
+                    )
                     .prefetch_related(
                         Prefetch(
                             "comments",
@@ -284,6 +288,12 @@ class PopularPostsView(generics.ListAPIView):
                 query.annotate(
                     like_count=Count("post_likes", distinct=True),
                     comment_count=Count("comments", distinct=True),
+                    repost_count=Count("reposts", distinct=True),
+                    is_reposted=Exists(
+                        Repost.objects.filter(
+                            reposter=request.user, post=OuterRef("pk")
+                        )
+                    ),
                     liked=Exists(
                         PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
                     ),

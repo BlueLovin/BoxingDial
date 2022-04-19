@@ -17,7 +17,7 @@ from accounts.serializers import (
 from accounts.managers import UserManager
 from accounts.models import UserFollowing
 from backend.responses import BoxingDialResponses
-from posts.models import Post, PostLike
+from posts.models import Post, PostLike, Repost
 from post_comments.models import PostComment
 from posts.serializers import SmallPostSerializer
 from post_comments.serializers.common import CommentSerializer
@@ -150,6 +150,12 @@ class UserPostListView(generics.ListAPIView):
                     .annotate(
                         like_count=Count("post_likes", distinct=True),
                         comment_count=Count("comments", distinct=True),
+                        repost_count=Count("reposts", distinct=True),
+                        is_reposted=Exists(
+                            Repost.objects.filter(
+                                reposter=request.user, post=OuterRef("pk")
+                            )
+                        ),
                         liked=Exists(
                             PostLike.objects.filter(
                                 post=OuterRef("pk"), user=request.user

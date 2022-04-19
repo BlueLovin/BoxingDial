@@ -26,7 +26,7 @@ export default function Repost(props) {
       {renderStatusString()}
       <Post
         post={repost.post}
-        removePostFromParentView={() => removeItem(repost)}
+        removePostFromParentList={removeItem}
       />
     </>
   );

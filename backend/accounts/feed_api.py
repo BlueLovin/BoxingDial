@@ -57,6 +57,7 @@ class UserFeedByRecentView(generics.GenericAPIView):
                 PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
             ),
             like_count=Count("post_likes", distinct=True),
+            repost_count=Count("reposts", distinct=True),
             is_reposted=Exists(
                 Repost.objects.filter(reposter=request.user, post=OuterRef("pk"))
             ),

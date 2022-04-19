@@ -20,7 +20,7 @@ export default function FeedItem(props) {
         <Post
           key={item.id}
           post={item}
-          removeCommentFromParentList={() => removeItem(item)}
+          removePostFromParentList={() => removeItem(item)}
         />
       );
     case "repost":
