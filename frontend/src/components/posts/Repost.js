@@ -1,33 +1,13 @@
+import useRepostStatus from "../../hooks/useRepostStatus";
 import HighlightedContent from "./HighlightedContent";
 import Post from "./Post";
 
 export default function Repost(props) {
   const { repost, removeItem } = props;
+  const statusString = useRepostStatus(repost);
 
-  const statusString = () => {
-    var _statusString = "";
-    const numOfUsersWhoReposted = repost.users_who_reposted.length;
-    if (numOfUsersWhoReposted === 1) {
-      _statusString = `@${repost.reposter.username} reposted:`;
-    }
-
-    // build status string for each user that reposted
-    if (numOfUsersWhoReposted > 1 && numOfUsersWhoReposted < 4) {
-      for (var i = 0; i < numOfUsersWhoReposted; i++) {
-        const isLastItem = i === numOfUsersWhoReposted - 1;
-        const isFirstItem = i === 0;
-        const username = repost.users_who_reposted[i].username;
-        if (isLastItem) {
-          _statusString = _statusString.concat(` and @${username} reposted:`);
-        } else if (isFirstItem) {
-          _statusString = _statusString.concat(`@${username}`);
-        } else {
-          _statusString = _statusString.concat(`, @${username}`);
-        }
-      }
-    }
-
-    if (numOfUsersWhoReposted > 4) {
+  const renderStatusString = () => {
+    if (repost.users_who_reposted.length > 4) {
       // TODO:
       // return "and 5 others reposted... and open a modal of the ppl who reposted
     }
@@ -35,7 +15,7 @@ export default function Repost(props) {
     return (
       <p className="m-3">
         <HighlightedContent
-          content={_statusString}
+          content={statusString}
           userList={repost.users_who_reposted}
         />
       </p>
@@ -43,7 +23,7 @@ export default function Repost(props) {
   };
   return (
     <>
-      {statusString()}
+      {renderStatusString()}
       <Post
         post={repost.post}
         removePostFromParentView={() => removeItem(repost)}

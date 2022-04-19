@@ -23,6 +23,7 @@ from .serializers import (
     CommentSerializer,
     CreatePostSerializer,
     PostLikeSerializer,
+    PostRepostsListSerializer,
     PostSerializer,
     RepostSerializer,
     SmallPostSerializer,
@@ -231,7 +232,7 @@ class PostView(generics.RetrieveDestroyAPIView):
             )
 
 
-# single post - /api/posts/{postID}/likes
+# single post's likes - /api/posts/{postID}/likes
 class PostLikesView(generics.ListAPIView):
     serializer_class = PostLikeSerializer
 
@@ -364,3 +365,54 @@ class RepostView(generics.CreateAPIView):
             return BoxingDialResponses.POST_DOES_NOT_EXIST_RESPONSE
 
         return Response(200)
+
+
+# single post's reposts - /api/posts/{postID}/reposts
+class PostRepostsView(generics.ListAPIView):
+    serializer_class = RepostSerializer
+
+    def get(self, request, post_id):
+        post = Post.objects.get(id=post_id)
+        client_user_id = self.request.user.id
+
+        # check to see if a 'following' object exists matching the client user and current user in iteration, or vice versa
+        follows_you = Exists(
+            UserFollowing.objects.filter(
+                user_id=OuterRef("pk"), following_user_id=client_user_id
+            )
+        )
+        following = Exists(
+            UserFollowing.objects.filter(
+                user_id=client_user_id, following_user_id=OuterRef("pk")
+            )
+        )
+        post_annotation = Post.objects.exclude_blocked_users(request).annotate(
+            comment_count=Count("comments", distinct=True),
+            liked=Exists(
+                PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
+            ),
+            like_count=Count("post_likes", distinct=True),
+            is_reposted=Exists(
+                Repost.objects.filter(reposter=request.user, post=OuterRef("pk"))
+            ),
+        )
+
+        return Response(
+            PostRepostsListSerializer(
+                Repost.objects.filter(post=post)
+                .prefetch_related(
+                    Prefetch(
+                        "reposter",
+                        User.objects.annotate(
+                            posts_count=Count("posts"),
+                            is_following=following,
+                            follows_you=follows_you,
+                        ),
+                    )
+                )
+                .prefetch_related(Prefetch("post", post_annotation))
+                .order_by("-date"),
+                many=True,
+            ).data,
+            200,
+        )
