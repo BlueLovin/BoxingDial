@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import Post from "../../components/posts/Post";
 import { Button } from "reactstrap";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 import FollowButton from "../../components/profiles/FollowButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 import Comment from "../comments/Comment";
 
 export default function ProfileComments(props) {

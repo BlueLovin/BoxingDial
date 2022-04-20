@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Modal, ModalHeader, ModalBody } from "reactstrap";
-import SmallUser from "./components/profiles/SmallUser";
-import { ModalContext } from "./ModalContext";
+import SmallUser from "../profiles/SmallUser";
+import { ModalContext } from "../../context/ModalContext";
 
 export default function UserListModal() {
   const { toggleUserModal, userListVal, userModalVerbVal, showModal } =

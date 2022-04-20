@@ -6,6 +6,7 @@ export default function useUserListModalContext() {
   const [userModalVerb, setUserModalVerb] = useState("");
   const toggleUserModal = useCallback(() => {
     setShowUserModal(!showUserModal);
+    setModalUserList([]);
   }, [showUserModal]);
 
   return {

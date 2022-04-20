@@ -3,8 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ModalContext } from "../../../ModalContext";
-import { UserContext } from "../../../UserContext";
+import { ModalContext } from "../../../context/ModalContext";
+import { UserContext } from "../../../context/UserContext";
 
 export default function RepostButton(props) {
   const [post] = useState(props.post);

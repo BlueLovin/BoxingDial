@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter } from "react-router-dom";
 import axios from "axios";
-import { UserContext } from "./UserContext";
+import { UserContext } from "./context/UserContext";
 import NavigationBar from "./components/navbar/NavBar";
 import Routes from "./Routes";
-import { ModalContext } from "./ModalContext";
-import UserListModal from "./UserListModal";
-import useUserListModalContext from "./hooks/useUserListModal";
+import { ModalContext } from "./context/ModalContext";
+import UserListModal from "./components/modals/UserListModal";
+import useUserListModalContext from "./hooks/useUserListModalContext";
 
 export default function App() {
   const [user, setUser] = useState(); // set to undefined initially

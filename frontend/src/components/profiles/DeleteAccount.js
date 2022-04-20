@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState, useContext } from "react";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { Button } from "reactstrap";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 import DeleteAccountModal from "../modals/DeleteAccountModal";
 
 export default function DeleteAccount() {

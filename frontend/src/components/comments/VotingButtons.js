@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useContext, useState, useEffect } from "react";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowUp,

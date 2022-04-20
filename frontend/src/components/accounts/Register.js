@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Button } from "reactstrap";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function Register() {

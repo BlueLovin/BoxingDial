@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useContext } from "react";
 import { Button } from "reactstrap";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 
 // pass down the already-set "isBlocked" state. this is not calculated on mount here.
 export default function BlockButton(props) {

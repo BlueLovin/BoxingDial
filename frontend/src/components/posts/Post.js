@@ -2,7 +2,7 @@ import { Link, useHistory } from "react-router-dom";
 import { Container } from "reactstrap";
 import React, { useContext } from "react";
 import axios from "axios";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 import HighlightedContent from "./HighlightedContent";
 import LikeButton from "./Buttons/LikeButton";
 import RepostButton from "./Buttons/RepostButton";

@@ -1,4 +1,4 @@
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 import axios from "axios";
 import { useContext, useEffect, useState, useCallback } from "react";
 import PostModal from "../modals/PostModal";

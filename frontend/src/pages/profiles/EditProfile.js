@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { Button, FormGroup, Input } from "reactstrap";
 import DeleteAccount from "../../components/profiles/DeleteAccount";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 
 export default function EditProfile() {
   const { userVal, loggedInVal, headersVal } = useContext(UserContext);

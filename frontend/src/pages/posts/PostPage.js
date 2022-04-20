@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 
 import Post from "../../components/posts/Post";
 import PostPageComments from "../../components/comments/PostPageComments";

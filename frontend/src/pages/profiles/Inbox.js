@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
 import { Button } from "reactstrap";
 import Notification from "../../components/inbox/Notification";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 
 export default function Inbox() {
   const { loggedInVal, headersVal } = useContext(UserContext);

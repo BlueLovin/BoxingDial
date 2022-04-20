@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useCallback, useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 import { Button, Container, FormGroup, Input } from "reactstrap";
 import VotingButtons from "./VotingButtons";
 import HighlightedContent from "../posts/HighlightedContent";

@@ -2,7 +2,7 @@ import axios from "axios";
 import { Container } from "reactstrap";
 import { useContext, useEffect, useState } from "react";
 import Post from "./Post";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 
 export default function PopularPosts() {
   const [postList, setPostList] = useState([]);

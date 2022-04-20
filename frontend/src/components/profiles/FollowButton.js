@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Button } from "reactstrap";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 
 export default function FollowButton(props) {
   const { profile } = props;

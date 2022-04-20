@@ -1,7 +1,7 @@
 import { Button, Container } from "reactstrap";
 import axios from "axios";
 import { useContext, useState } from "react";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 import { useHistory } from "react-router";
 
 export default function Notification(props) {

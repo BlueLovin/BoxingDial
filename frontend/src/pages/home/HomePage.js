@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import RecentPosts from "../../components/posts/RecentPosts";
 import RecentFights from "../../components/fights/RecentFights";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 import { Row, Col } from "reactstrap";
 import UserFeed from "../../components/feed/UserFeed";
 

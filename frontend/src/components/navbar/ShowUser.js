@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import axios from "axios";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { faHandPeace } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

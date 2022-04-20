@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext, useCallback } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom/cjs/react-router-dom.min";
-import { UserContext } from "../../UserContext";
+import { UserContext } from "../../context/UserContext";
 import Post from "../../components/posts/Post";
 import Fight from "../../components/fights/Fight";
 import PostModal from "../../components/modals/PostModal";
