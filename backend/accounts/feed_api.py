@@ -1,4 +1,5 @@
 from math import comb
+from operator import itemgetter
 from django.db.models.expressions import Exists, OuterRef
 from posts.serializers import RepostSerializer, SmallPostSerializer
 from post_comments.serializers.nested import FeedCommentSerializer
@@ -22,6 +23,7 @@ class UserFeedByRecentView(generics.GenericAPIView):
         for repost in reposts_list:
             post_id = repost["post"]["id"]
 
+            # if we found a duplicate
             if post_id in post_ids:
                 if post_id not in reposts:
                     reposts[post_id] = repost
@@ -31,15 +33,25 @@ class UserFeedByRecentView(generics.GenericAPIView):
 
                 reposts[post_id]["users_who_reposted"].append(repost["reposter"])
             else:
+                post_ids.append(post_id)
                 reposts[post_id] = repost
 
                 if "users_who_reposted" not in reposts[post_id]:
                     reposts[post_id]["users_who_reposted"] = []
 
                 reposts[post_id]["users_who_reposted"].append(repost["reposter"])
-                post_ids.append(post_id)
 
         return list(reposts.values())
+
+    def remove_duplicate_posts(self, posts_list: list, reposts_list: list) -> list:
+        post_ids = list(map(itemgetter("id"), posts_list))
+        for repost in reposts_list:
+            repost_id = repost["post"]["id"]
+
+            if repost_id in post_ids:
+                posts_list.remove(repost["post"])
+
+        return posts_list
 
     def get(self, request, format=None):
         user_id = request.user.id
@@ -133,6 +145,13 @@ class UserFeedByRecentView(generics.GenericAPIView):
             .order_by("-id")
         )
 
+        combined_posts = list(
+            chain(
+                SmallPostSerializer(posts, many=True).data,
+                SmallPostSerializer(user_posts, many=True).data,
+            )
+        )
+
         combined_reposts = list(
             chain(
                 RepostSerializer(reposts, many=True).data,
@@ -141,12 +160,12 @@ class UserFeedByRecentView(generics.GenericAPIView):
         )
 
         combined_reposts = self.remove_duplicate_reposts(combined_reposts)
+        combined_posts = self.remove_duplicate_posts(combined_posts, combined_reposts)
 
         # combine post list and comment list
         combined = list(
             chain(
-                SmallPostSerializer(posts, many=True).data,
-                SmallPostSerializer(user_posts, many=True).data,
+                combined_posts,
                 combined_reposts,
                 FeedCommentSerializer(comments, many=True).data,
                 FeedCommentSerializer(user_comments, many=True).data,
