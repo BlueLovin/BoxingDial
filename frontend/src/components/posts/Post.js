@@ -76,10 +76,7 @@ export default function Post(props) {
                   post={post}
                   fullPostPage={fullPostPage}
                 />
-                <RepostButton
-                  post={post}
-                  fullPostPage={fullPostPage}
-                />
+                <RepostButton post={post} fullPostPage={fullPostPage} />
                 <p>share</p>
                 <p>copy</p>
               </div>

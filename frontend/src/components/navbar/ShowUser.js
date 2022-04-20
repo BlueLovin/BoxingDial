@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import axios from "axios";
 import { UserContext } from "../../context/UserContext";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { Link, useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { faHandPeace } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "reactstrap";
@@ -37,7 +37,7 @@ export default function ShowUser() {
       <div className="text-center">
         <span>
           {"Welcome, "}
-          <a href={`/user/${user.username}`}>{user.username}</a>
+          <Link to={`/user/${user.username}`}>{user.username}</Link>
           {"! "}
           <br />
           <Button onClick={() => Logout()} to="/">
