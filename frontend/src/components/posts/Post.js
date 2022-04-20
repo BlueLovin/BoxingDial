@@ -4,8 +4,8 @@ import React, { useContext } from "react";
 import axios from "axios";
 import { UserContext } from "../../context/UserContext";
 import HighlightedContent from "./HighlightedContent";
-import LikeButton from "./Buttons/LikeButton";
-import RepostButton from "./Buttons/RepostButton";
+import LikeButton from "./buttons/LikeButton";
+import RepostButton from "./buttons/RepostButton";
 
 export default function Post(props) {
   const {
