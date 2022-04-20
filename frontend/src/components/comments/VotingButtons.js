@@ -16,7 +16,7 @@ const DIRECTION = {
   NEUTRAL: "NEUTRAL",
 };
 
-function VotingButtons(props) {
+export const VotingButtons = React.memo((props) => {
   const comment = props.comment;
 
   const { headersVal, loggedInVal } = useContext(UserContext);
@@ -127,6 +127,6 @@ function VotingButtons(props) {
   };
 
   return <>{renderVotingButtons()}</>;
-}
+});
 
-export default React.memo(VotingButtons);
+export default VotingButtons;

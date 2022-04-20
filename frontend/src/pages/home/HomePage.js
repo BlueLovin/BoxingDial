@@ -5,7 +5,7 @@ import { UserContext } from "../../context/UserContext";
 import { Row, Col } from "reactstrap";
 import UserFeed from "../../components/feed/UserFeed";
 
-export default function HomePage() {
+export const HomePage = React.memo(() => {
   const { loggedInVal } = useContext(UserContext);
   const [loggedIn] = loggedInVal;
 
@@ -38,4 +38,5 @@ export default function HomePage() {
       {renderHome()}
     </main>
   );
-}
+});
+export default HomePage;

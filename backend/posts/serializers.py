@@ -126,7 +126,7 @@ class RepostSerializer(serializers.ModelSerializer):
 
 
 class PostRepostsListSerializer(serializers.ModelSerializer):
-    reposter = SmallUserWithProfileSerializer(many=False)
+    reposter = UserWithFollowageSerializer(many=False)
 
     class Meta:
         model = Repost

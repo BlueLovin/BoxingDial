@@ -1,13 +1,14 @@
-import { useContext } from "react";
+import React, { useContext } from "react";
 import { Modal, ModalHeader, ModalBody } from "reactstrap";
 import SmallUser from "../profiles/SmallUser";
 import { ModalContext } from "../../context/ModalContext";
 
-export default function UserListModal() {
+export const UserListModal = React.memo(() => {
   const { toggleUserModal, userListVal, userModalVerbVal, showModal } =
     useContext(ModalContext);
   const [modalUserList] = userListVal;
   const [userModalVerb] = userModalVerbVal;
+
   const renderReposts = () => {
     if (modalUserList.length !== 0) {
       return modalUserList.map((user) => (
@@ -23,4 +24,5 @@ export default function UserListModal() {
       <ModalBody>{renderReposts()}</ModalBody>
     </Modal>
   );
-}
+});
+export default UserListModal;

@@ -6,20 +6,21 @@ import { UserContext } from "../../../context/UserContext";
 
 import axios from "axios";
 import { ModalContext } from "../../../context/ModalContext";
+import usePostLikes from "../hooks/usePostLikes";
 
 export default function LikeButton(props) {
   const [post] = useState(props.post);
   const [likeCount, setLikeCount] = useState(post.like_count);
   const [buttonClass, setButtonClass] = useState("btn-sm btn-primary");
   const { fullPostPage } = props;
-  const { userVal, headersVal, loggedInVal } = useContext(UserContext);
+  const { userVal, headersVal } = useContext(UserContext);
   const { toggleUserModal, userListVal, userModalVerbVal } =
     useContext(ModalContext);
   const [, setModalUserList] = userListVal;
   const [, setUserModalVerb] = userModalVerbVal;
   const [user] = userVal;
-  const [loggedIn] = loggedInVal;
   const [headers] = headersVal;
+  const postLikes = usePostLikes(post.id);
 
   useEffect(() => {
     if (post.liked) {
@@ -28,22 +29,10 @@ export default function LikeButton(props) {
       setButtonClass("btn-sm btn-primary");
     }
   }, [post]);
-  const getUsersWhoLiked = () => {
-    if (loggedIn) {
-      // fetch with auth headers if logged in
-      axios
-        .get(`/posts/${post.id}/likes`, headers)
-        .then((res) => setModalUserList(res.data.map((like) => like.user)));
-    } else {
-      // fetch without authorization headers if logged out
-      axios
-        .get(`/posts/${post.id}/likes`)
-        .then((res) => setModalUserList(res.data.map((like) => like.user)));
-    }
-  };
+
   const showModal = () => {
+    postLikes.getUsersWhoLiked().then((userList) => setModalUserList(userList));
     setUserModalVerb("Liked");
-    getUsersWhoLiked();
     toggleUserModal();
   };
   const likePost = (_post) => {

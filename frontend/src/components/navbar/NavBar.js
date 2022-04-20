@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Navbar,
   Nav,
@@ -21,8 +21,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ShowInboxBell from "./ShowInboxBell";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
-export default function NavigationBar() {
+export const NavigationBar = React.memo(() => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = () => setIsOpen(!isOpen);
@@ -33,13 +34,13 @@ export default function NavigationBar() {
       <Collapse isOpen={isOpen} navbar>
         <Nav className="mr-auto m-auto" navbar>
           <NavItem>
-            <NavLink href="/">
+            <NavLink tag={Link} to="/">
               <FontAwesomeIcon icon={faHome} />
               {" Home"}
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="/posts/popular">
+            <NavLink tag={Link} to="/posts/popular">
               <FontAwesomeIcon icon={faPenFancy} />
               {" Popular Posts"}
             </NavLink>
@@ -50,8 +51,12 @@ export default function NavigationBar() {
               {" Fights"}
             </DropdownToggle>
             <DropdownMenu>
-              <DropdownItem href="/fights/popular">Popular</DropdownItem>
-              <DropdownItem href="/fights/recent">Recently Added</DropdownItem>
+              <DropdownItem tag={Link} to="/fights/popular">
+                Popular
+              </DropdownItem>
+              <DropdownItem tag={Link} to="/fights/recent">
+                Recently Added
+              </DropdownItem>
               <DropdownItem divider />
               <DropdownItem>Request a fight</DropdownItem>
             </DropdownMenu>
@@ -64,4 +69,5 @@ export default function NavigationBar() {
       </Collapse>
     </Navbar>
   );
-}
+});
+export default NavigationBar;

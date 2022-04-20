@@ -6,7 +6,7 @@ export default function useRepostStatus(repost) {
   }
 
   // build status string for each user that reposted
-  if (numOfUsersWhoReposted > 1 && numOfUsersWhoReposted < 4) {
+  if (numOfUsersWhoReposted > 1 && numOfUsersWhoReposted < 3) {
     for (var i = 0; i < numOfUsersWhoReposted; i++) {
       const isLastItem = i === numOfUsersWhoReposted - 1;
       const isFirstItem = i === 0;

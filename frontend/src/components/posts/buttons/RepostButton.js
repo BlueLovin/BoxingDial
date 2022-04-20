@@ -5,6 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ModalContext } from "../../../context/ModalContext";
 import { UserContext } from "../../../context/UserContext";
+import usePostReposts from "../hooks/usePostReposts";
 
 export default function RepostButton(props) {
   const [post] = useState(props.post);
@@ -16,10 +17,10 @@ export default function RepostButton(props) {
   const [repostCount, setRepostCount] = useState(props.post.repost_count);
   const [isReposted, setIsReposted] = useState(props.post.is_reposted);
   const [buttonClass, setButtonClass] = useState("btn-sm btn-primary");
-  const { headersVal, userVal, loggedInVal } = useContext(UserContext);
+  const { headersVal, userVal } = useContext(UserContext);
   const [headers] = headersVal;
-  const [loggedIn] = loggedInVal;
   const [user] = userVal;
+  const reposts = usePostReposts(post.id);
 
   useEffect(() => {
     if (isReposted) {
@@ -29,27 +30,11 @@ export default function RepostButton(props) {
     }
   }, [post, isReposted, setUserModalVerb]);
 
-  const getUsersWhoReposted = () => {
-    if (loggedIn) {
-      // fetch with auth headers if logged in
-      axios
-        .get(`/posts/${post.id}/reposts`, headers)
-        .then((res) =>
-          setModalUserList(res.data.map((_repost) => _repost.reposter))
-        );
-    } else {
-      // fetch without authorization headers if logged out
-      axios
-        .get(`/posts/${post.id}/reposts`)
-        .then((res) =>
-          setModalUserList(res.data.map((_repost) => _repost.reposter))
-        );
-    }
-  };
-
   const showModal = () => {
     setUserModalVerb("Reposted");
-    getUsersWhoReposted();
+    reposts
+      .getUsersWhoReposted()
+      .then((userList) => setModalUserList(userList));
     toggleUserModal();
   };
 
