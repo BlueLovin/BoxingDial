@@ -10,9 +10,7 @@ import axios from "axios";
 import { UserContext } from "../../UserContext";
 
 import Post from "../../components/posts/Post";
-import PostLikesModal from "../../components/modals/PostLikesModal";
 import PostPageComments from "../../components/comments/PostPageComments";
-import RepostsModal from "../../components/modals/RepostsModal";
 
 export default function PostPage() {
   //props
@@ -23,8 +21,6 @@ export default function PostPage() {
   const history = useHistory();
 
   //state
-  const [showLikeModal, setShowLikeModal] = useState(false);
-  const [showRepostsModal, setShowRepostsModal] = useState(false);
   const [headers, setHeaders] = headersVal;
   const [currentPost, setCurrentPost] = useState({
     content: "",
@@ -50,10 +46,6 @@ export default function PostPage() {
     highlightComment();
   }, [currentPost, highlightCommentID, childrenLoaded]);
 
-  const toggleLikeModal = () => setShowLikeModal(!showLikeModal);
-
-  const toggleRepostsModal = () => setShowRepostsModal(!showRepostsModal);
-
   //get post with headers
   const getPost = useCallback(() => {
     axios
@@ -75,17 +67,10 @@ export default function PostPage() {
   }, [postID, history, headers, setHeaders]);
 
   useEffect(() => getPost(), [getPost]);
-  useEffect(() => console.log(showRepostsModal), [showRepostsModal])
 
   const renderPost = (post) => {
     return (
-      <>
-        {post.content ? (
-          <Post post={post} fullPostPage={true} toggleLikesModal={toggleLikeModal} toggleRepostsModal={toggleRepostsModal}/>
-        ) : (
-          "loading"
-        )}
-      </>
+      <>{post.content ? <Post post={post} fullPostPage={true} /> : "loading"}</>
     );
   };
 
@@ -99,16 +84,7 @@ export default function PostPage() {
       {currentPost ? (
         <>
           {renderPost(currentPost)}
-
           <PostPageComments post={currentPost} setLoaded={setChildrenLoaded} />
-
-          {showLikeModal && (
-            <PostLikesModal toggle={toggleLikeModal} postID={postID} />
-          )}
-
-          {showRepostsModal && (
-            <RepostsModal toggle={toggleRepostsModal} postID={postID} />
-          )}
         </>
       ) : (
         "loading"

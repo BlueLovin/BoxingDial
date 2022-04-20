@@ -4,14 +4,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { UserContext } from "../../../UserContext";
 import axios from "axios";
+import { ModalContext } from "../../../ModalContext";
 
 export default function LikeButton(props) {
   const [post] = useState(props.post);
   const [likeCount, setLikeCount] = useState(post.like_count);
   const [buttonClass, setButtonClass] = useState("btn-sm btn-primary");
-  const { toggleModal, fullPostPage } = props;
-  const { userVal, headersVal } = useContext(UserContext);
+  const { fullPostPage } = props;
+  const { userVal, headersVal, loggedInVal } = useContext(UserContext);
+  const { toggleUserModal, userListVal, userModalVerbVal } =
+    useContext(ModalContext);
+  const [, setModalUserList] = userListVal;
+  const [, setUserModalVerb] = userModalVerbVal;
   const [user] = userVal;
+  const [loggedIn] = loggedInVal;
   const [headers] = headersVal;
 
   useEffect(() => {
@@ -21,7 +27,24 @@ export default function LikeButton(props) {
       setButtonClass("btn-sm btn-primary");
     }
   }, [post]);
-
+  const getUsersWhoLiked = () => {
+    if (loggedIn) {
+      // fetch with auth headers if logged in
+      axios
+        .get(`/posts/${post.id}/likes`, headers)
+        .then((res) => setModalUserList(res.data.map((like) => like.user)));
+    } else {
+      // fetch without authorization headers if logged out
+      axios
+        .get(`/posts/${post.id}/likes`)
+        .then((res) => setModalUserList(res.data.map((like) => like.user)));
+    }
+  };
+  const showModal = () => {
+    setUserModalVerb("Liked");
+    getUsersWhoLiked();
+    toggleUserModal();
+  };
   const likePost = (_post) => {
     if (!user) {
       alert("login to be able to like posts!");
@@ -50,7 +73,7 @@ export default function LikeButton(props) {
         <button className={buttonClass} onClick={() => likePost(post)}>
           <FontAwesomeIcon icon={faHeart} />
         </button>{" "}
-        <Link onClick={() => toggleModal()} to="#">
+        <Link onClick={showModal} to="#">
           {likeCount > 1 ? `${likeCount} likes` : `${likeCount} like`}
         </Link>
       </p>

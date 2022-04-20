@@ -11,6 +11,7 @@ export default function useRepostStatus(repost) {
       const isLastItem = i === numOfUsersWhoReposted - 1;
       const isFirstItem = i === 0;
       const username = repost.users_who_reposted[i].username;
+      
       if (isLastItem) {
         statusString = statusString.concat(` and @${username} reposted:`);
       } else if (isFirstItem) {

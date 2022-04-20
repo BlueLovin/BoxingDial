@@ -78,7 +78,6 @@ export default function Post(props) {
                 />
                 <RepostButton
                   post={post}
-                  toggleModal={toggleRepostsModal}
                   fullPostPage={fullPostPage}
                 />
                 <p>share</p>

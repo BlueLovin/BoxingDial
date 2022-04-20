@@ -4,6 +4,9 @@ import axios from "axios";
 import { UserContext } from "./UserContext";
 import NavigationBar from "./components/navbar/NavBar";
 import Routes from "./Routes";
+import { ModalContext } from "./ModalContext";
+import UserListModal from "./UserListModal";
+import useUserListModalContext from "./hooks/useUserListModal";
 
 export default function App() {
   const [user, setUser] = useState(); // set to undefined initially
@@ -11,6 +14,7 @@ export default function App() {
   const [loggedIn, setLoggedIn] = useState(null);
   const [headers, setHeaders] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { userModalContext } = useUserListModalContext();
 
   useEffect(() => {
     const getTokenAndSetHeaders = () => {
@@ -80,7 +84,10 @@ export default function App() {
           <NavigationBar />
 
           {/* SWITCH AND ROUTES HERE */}
-          <Routes />
+          <ModalContext.Provider value={userModalContext}>
+            <Routes />
+            <UserListModal />
+          </ModalContext.Provider>
         </UserContext.Provider>
       </BrowserRouter>
     );
