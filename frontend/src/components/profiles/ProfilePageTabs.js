@@ -1,6 +1,13 @@
 import React from "react";
 import ProfileComments from "../../components/profiles/ProfileComments";
-import { Nav, NavItem, TabContent, TabPane, NavLink } from "reactstrap";
+import {
+  Nav,
+  NavItem,
+  TabContent,
+  TabPane,
+  NavLink,
+  Container,
+} from "reactstrap";
 export function ProfilePageTabs({
   activeTab,
   setActiveTab,
@@ -46,7 +53,9 @@ export function ProfilePageTabs({
         </NavItem>
       </Nav>
       <TabContent activeTab={activeTab}>
-        <TabPane tabId="1">{renderProfilePosts()}</TabPane>
+        <TabPane tabId="1">
+          <Container>{renderProfilePosts()}</Container>
+        </TabPane>
         <TabPane tabId="2">
           {activeTab === "2" ? <ProfileComments username={username} /> : null}
         </TabPane>

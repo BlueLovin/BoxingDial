@@ -2,14 +2,14 @@ import { ProfilePageTabs } from "./../../components/profiles/ProfilePageTabs";
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import Post from "../../components/posts/Post";
-import { Button } from "reactstrap";
+import { Button, Card } from "reactstrap";
 import { UserContext } from "../../context/UserContext";
 import FollowButton from "../../components/profiles/FollowButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import BlockButton from "../../components/profiles/BlockButton";
 import { UserNotFoundPage } from "./UserNotFoundErrorPage";
+import FeedItem from "../../components/feed/FeedItem";
 
 export default function UserProfile() {
   const params = useParams();
@@ -82,13 +82,9 @@ export default function UserProfile() {
 
   const renderProfilePosts = () => {
     return postsList.map((post) => (
-      <div key={post.id}>
-        <br />
-        <Post
-          post={post}
-          removePostFromParentList={() => removePostFromView(post)}
-        />
-      </div>
+      <Card className="p-3 m-3">
+        <FeedItem item={post} removeItem={removePostFromView} />
+      </Card>
     ));
   };
 

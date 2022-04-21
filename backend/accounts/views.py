@@ -1,10 +1,12 @@
 from http import HTTPStatus
+from itertools import chain
 from django.db.models.aggregates import Count
 from django.db.models.expressions import Exists, OuterRef
 from django.http.response import HttpResponse
 from rest_framework import generics
 from django.contrib.auth.models import User
 from rest_framework import exceptions
+from django.db.models.query import Prefetch
 from rest_framework.exceptions import NotAuthenticated
 from rest_framework.response import Response
 from vote.models import DOWN, UP, Vote
@@ -16,10 +18,14 @@ from accounts.serializers import (
 )
 from accounts.managers import UserManager
 from accounts.models import UserFollowing
+from accounts.feed_api import UserFeedByRecentView
 from backend.responses import BoxingDialResponses
 from posts.models import Post, PostLike, Repost
 from post_comments.models import PostComment
-from posts.serializers import SmallPostSerializer
+from posts.serializers import (
+    RepostSerializer,
+    SmallPostSerializer,
+)
 from post_comments.serializers.common import CommentSerializer
 
 
@@ -140,46 +146,50 @@ class UserPostListView(generics.ListAPIView):
         client_user = request.user
         this_user_profile = User.objects.get(username=username).profile
 
-        if client_user.is_authenticated:
-            if UserManager.user_blocks_you(None, request, this_user_profile):
-                return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
+        if UserManager.user_blocks_you(None, request, this_user_profile):
+            return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
 
-            return Response(
-                SmallPostSerializer(
-                    Post.objects.filter(username=username)
-                    .annotate(
-                        like_count=Count("post_likes", distinct=True),
-                        comment_count=Count("comments", distinct=True),
-                        repost_count=Count("reposts", distinct=True),
-                        is_reposted=Exists(
-                            Repost.objects.filter(
-                                reposter=request.user, post=OuterRef("pk")
-                            )
-                        ),
-                        liked=Exists(
-                            PostLike.objects.filter(
-                                post=OuterRef("pk"), user=request.user
-                            )
-                        ),
-                    )
-                    .order_by("-id"),
-                    many=True,
-                ).data,
-                status=200,
+        if client_user.is_authenticated:
+            post_annotation = Post.objects.annotate(
+                comment_count=Count("comments", distinct=True),
+                liked=Exists(
+                    PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
+                ),
+                like_count=Count("post_likes", distinct=True),
+                repost_count=Count("reposts", distinct=True),
+                is_reposted=Exists(
+                    Repost.objects.filter(reposter=request.user, post=OuterRef("pk"))
+                ),
             )
+
         else:
-            return Response(
-                SmallPostSerializer(
-                    Post.objects.filter(username=username)
-                    .annotate(
-                        like_count=Count("post_likes", distinct=True),
-                        comment_count=Count("comments", distinct=True),
-                    )
-                    .order_by("-id"),
-                    many=True,
-                ).data,
-                status=200,
+            post_annotation = Post.objects.annotate(
+                like_count=Count("post_likes", distinct=True),
+                comment_count=Count("comments", distinct=True),
+                repost_count=Count("reposts", distinct=True),
             )
+
+        posts = SmallPostSerializer(
+            post_annotation.filter(username=username).order_by("-id"),
+            many=True,
+        ).data
+
+        reposts = RepostSerializer(
+            Repost.objects.filter(reposter__username=username)
+            .prefetch_related(Prefetch("post", post_annotation))
+            .order_by("-id"),
+            many=True,
+        ).data
+
+        v = UserFeedByRecentView()
+        reposts = v.remove_duplicate_reposts(reposts)
+
+        combined_posts = list(chain(posts, reposts))
+
+        # sort combined list by date
+        feed_response = sorted(combined_posts, key=lambda k: k["date"], reverse=True)
+
+        return Response(feed_response, 200)
 
 
 # change user profile /api/user/change-profile

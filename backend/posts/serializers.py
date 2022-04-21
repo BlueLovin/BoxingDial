@@ -112,6 +112,7 @@ class RepostSerializer(serializers.ModelSerializer):
     post = SmallPostSerializer(many=False)
     feed_type = serializers.CharField(default="repost")
     is_reposted = serializers.BooleanField(default=False)
+    users_who_reposted = serializers.ListField(default=list)
 
     class Meta:
         model = Repost
@@ -119,6 +120,7 @@ class RepostSerializer(serializers.ModelSerializer):
             "date",
             "reposter",
             "post",
+            "users_who_reposted",
             "is_reposted",
             "repost_message",
             "feed_type",

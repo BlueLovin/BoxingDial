@@ -1,4 +1,3 @@
-from math import comb
 from operator import itemgetter
 from django.db.models.expressions import Exists, OuterRef
 from posts.serializers import RepostSerializer, SmallPostSerializer
