@@ -39,8 +39,19 @@ class PostsView(generics.ListAPIView):
             Post.objects.exclude_blocked_users(self.request)
             .all()
             .annotate(
-                like_count=Count("post_likes", distinct=True),
+                like_count=Count("likes", distinct=True),
+                repost_count=Count("reposts", distinct=True),
                 comment_count=Count("comments", distinct=True),
+                liked=Exists(  # see if a PostLike object exists matching the client user and post.
+                    PostLike.objects.filter(
+                        post=OuterRef("pk"), user=self.request.user.id
+                    )
+                ),
+                is_reposted=Exists(
+                    Repost.objects.filter(
+                        reposter=self.request.user.id, post=OuterRef("pk")
+                    )
+                ),
             )
         )
 
@@ -176,7 +187,12 @@ class PostView(generics.RetrieveDestroyAPIView):
             ),
         )
 
-        post_query = Post.objects.filter(id=pk)
+        post_query = Post.objects.annotate(
+            like_count=Count("likes", distinct=True),
+            repost_count=Count("reposts", distinct=True),
+            comment_count=Count("comments", distinct=True),
+        ).filter(id=pk)
+
         if post_query.first() == None:
             return BoxingDialResponses.POST_DOES_NOT_EXIST_RESPONSE
 
@@ -191,8 +207,14 @@ class PostView(generics.RetrieveDestroyAPIView):
             return Response(
                 PostSerializer(
                     post_query.annotate(
-                        like_count=Count("likes", distinct=True),
-                        repost_count=Count("reposts", distinct=True),
+                        liked=Exists(  # see if a PostLike object exists matching the client user and post.
+                            PostLike.objects.filter(post=pk, user=request.user)
+                        ),
+                        is_reposted=Exists(
+                            Repost.objects.filter(
+                                reposter=request.user, post=OuterRef("pk")
+                            )
+                        ),
                     )
                     .prefetch_related(
                         Prefetch(
@@ -202,17 +224,6 @@ class PostView(generics.RetrieveDestroyAPIView):
                                     "replies", queryset=prefetch_query.order_by("-date")
                                 )
                             ).order_by("-date"),
-                        ),
-                    )
-                    .annotate(
-                        comment_count=Count("comments", distinct=True),
-                        liked=Exists(  # see if a PostLike object exists matching the client user and post.
-                            PostLike.objects.filter(post=pk, user=request.user)
-                        ),
-                        is_reposted=Exists(
-                            Repost.objects.filter(
-                                reposter=request.user, post=OuterRef("pk")
-                            )
                         ),
                     )
                     .first()
@@ -229,7 +240,8 @@ class PostView(generics.RetrieveDestroyAPIView):
                         ),
                     )
                     .annotate(
-                        comment_count=Count("comments", distinct=True),
+                        liked=Value(False),
+                        is_reposted=Value(False),
                     )
                     .first()
                 ).data
@@ -291,11 +303,13 @@ class PopularPostsView(generics.ListAPIView):
                     repost_count=Count("reposts", distinct=True),
                     is_reposted=Exists(
                         Repost.objects.filter(
-                            reposter=request.user, post=OuterRef("pk")
+                            reposter=request.user.id, post=OuterRef("pk")
                         )
                     ),
                     liked=Exists(
-                        PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
+                        PostLike.objects.filter(
+                            post=OuterRef("pk"), user=request.user.id
+                        )
                     ),
                 ).order_by("-comment_count", "-like_count")[:5],
                 many=True,
@@ -384,6 +398,7 @@ class PostRepostsView(generics.ListAPIView):
     def get(self, request, post_id):
         post = Post.objects.get(id=post_id)
         client_user_id = self.request.user.id
+        logged_in = self.request.user.is_anonymous == False
 
         # check to see if a 'following' object exists matching the client user and current user in iteration, or vice versa
         follows_you = Exists(
@@ -396,15 +411,23 @@ class PostRepostsView(generics.ListAPIView):
                 user_id=client_user_id, following_user_id=OuterRef("pk")
             )
         )
+
+        if logged_in:
+            liked = Exists(
+                PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
+            )
+            is_reposted = Exists(
+                Repost.objects.filter(reposter=request.user, post=OuterRef("pk"))
+            )
+        else:
+            liked = Value(False)
+            is_reposted = Value(False)
+
         post_annotation = Post.objects.exclude_blocked_users(request).annotate(
             comment_count=Count("comments", distinct=True),
-            liked=Exists(
-                PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
-            ),
             like_count=Count("post_likes", distinct=True),
-            is_reposted=Exists(
-                Repost.objects.filter(reposter=request.user, post=OuterRef("pk"))
-            ),
+            liked=liked,
+            is_reposted=is_reposted,
         )
 
         return Response(
