@@ -26,11 +26,11 @@ export const Repost = React.memo((props) => {
   const renderStatusString = () => {
     if (repost.users_who_reposted.length > 2) {
       return (
-        <>
+        <p className="m-3">
           <Link onClick={showModal} to="#">{`${
             repost.users_who_reposted[0].username
           } and ${repost.users_who_reposted.length - 1} others reposted`}</Link>
-        </>
+        </p>
       );
     }
 
