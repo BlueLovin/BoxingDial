@@ -1,5 +1,4 @@
 import re
-
 from accounts.managers import UserManager
 from accounts.models import UserFollowing
 from backend.permissions import IsOwnerOrReadOnly
@@ -16,7 +15,6 @@ from rest_framework.response import Response
 from vote.managers import UP
 from vote.models import DOWN, Vote
 from vote.views import VoteMixin
-
 from post_comments.models import PostComment
 from .models import Post, PostEntities, PostLike, Repost
 from .serializers import (
@@ -28,7 +26,6 @@ from .serializers import (
     RepostSerializer,
     SmallPostSerializer,
 )
-
 
 # all posts /api/posts
 class PostsView(generics.ListAPIView):
@@ -373,6 +370,19 @@ class RepostView(generics.CreateAPIView):
 
         Repost.objects.create(
             post=post, reposter=request.user, repost_message=repost_message
+        )
+
+        reposting_their_own_post = request.user == post.owner
+        if reposting_their_own_post:
+            return Response(200)
+
+        notification_text = f"{request.user} reposted your post: {post.content[:25]}..."
+        Notification.objects.get_or_create(
+            recipient=post.owner,
+            text=notification_text,
+            post_id=post.id,
+            comment_id=-1,
+            sender=request.user,
         )
 
         return Response(200)

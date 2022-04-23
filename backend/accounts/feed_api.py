@@ -1,5 +1,5 @@
 from operator import itemgetter
-from django.db.models.expressions import Exists, OuterRef
+from django.db.models.expressions import Exists, OuterRef, Value
 from posts.serializers import RepostSerializer, SmallPostSerializer
 from post_comments.serializers.nested import FeedCommentSerializer
 from django.db.models.aggregates import Count
@@ -16,31 +16,19 @@ from vote.models import Vote, DOWN, UP
 class UserFeedByRecentView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def remove_duplicate_reposts(self, reposts_list: list) -> list:
-        post_ids = []
-        reposts = {}
-        for repost in reposts_list:
+    def remove_duplicate_reposts(self, reposts_with_duplicates: list) -> list:
+        repost_objects = {}
+        for repost in reposts_with_duplicates:
             post_id = repost["post"]["id"]
 
-            # if we found a duplicate
-            if post_id in post_ids:
-                if post_id not in reposts:
-                    reposts[post_id] = repost
+            if post_id not in repost_objects:
+                repost_objects[post_id] = repost
 
-                if "users_who_reposted" not in reposts[post_id]:
-                    reposts[post_id]["users_who_reposted"] = []
+            is_reposted = repost_objects[post_id]["post"]["is_reposted"]
+            repost_objects[post_id]["is_reposted"] = is_reposted
+            repost_objects[post_id]["users_who_reposted"].append(repost["reposter"])
 
-                reposts[post_id]["users_who_reposted"].append(repost["reposter"])
-            else:
-                post_ids.append(post_id)
-                reposts[post_id] = repost
-
-                if "users_who_reposted" not in reposts[post_id]:
-                    reposts[post_id]["users_who_reposted"] = []
-
-                reposts[post_id]["users_who_reposted"].append(repost["reposter"])
-
-        return list(reposts.values())
+        return list(repost_objects.values())
 
     def remove_duplicate_posts(self, posts_list: list, reposts_list: list) -> list:
         post_ids = list(map(itemgetter("id"), posts_list))
@@ -62,7 +50,7 @@ class UserFeedByRecentView(generics.GenericAPIView):
             .distinct()
         )
 
-        post_annotation = Post.objects.exclude_blocked_users(request).annotate(
+        post_query = Post.objects.exclude_blocked_users(request).annotate(
             comment_count=Count("comments", distinct=True),
             liked=Exists(
                 PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
@@ -74,87 +62,68 @@ class UserFeedByRecentView(generics.GenericAPIView):
             ),
         )
 
-        # get posts from followed users
-        posts = post_annotation.filter(owner__in=following_user_ids).order_by("-id")
-
-        # get reposts from followed users
-        reposts = (
-            Repost.objects.filter(reposter__in=following_user_ids)
-            .prefetch_related(Prefetch("post", post_annotation))
-            .order_by("-id")
-        )
-
-        comments = (
+        comment_query = (
             PostComment.objects.exclude_blocked_users(request)
             .exclude(post__isnull=True)
+            .annotate(
+                is_voted_down=Exists(
+                    Vote.objects.filter(
+                        user_id=user_id,
+                        action=DOWN,
+                        object_id=OuterRef("pk"),
+                    )
+                ),
+                is_voted_up=Exists(
+                    Vote.objects.filter(
+                        user_id=user_id, action=UP, object_id=OuterRef("pk")
+                    )
+                ),
+            )
+        )
+
+        posts_from_followed_users = post_query.filter(
+            owner__in=following_user_ids
+        ).order_by("-id")
+
+        reposts_from_followed_users = (
+            Repost.objects.filter(reposter__in=following_user_ids)
+            .prefetch_related(Prefetch("post", post_query))
+            .order_by("-id")
+        )
+
+        comments_from_followed_users = (
+            comment_query
             # you are following owner of comment, and the comment is not a reply
-            .filter(owner__in=following_user_ids, parent=None)
-            .annotate(
-                is_voted_down=Exists(
-                    Vote.objects.filter(
-                        user_id=user_id,
-                        action=DOWN,
-                        object_id=OuterRef("pk"),
-                    )
-                ),
-                is_voted_up=Exists(
-                    Vote.objects.filter(
-                        user_id=user_id, action=UP, object_id=OuterRef("pk")
-                    )
-                ),
-            )
-            .order_by("-id")
+            .filter(owner__in=following_user_ids, parent=None).order_by("-id")
         )
 
-        # get posts and comments from logged in user
-        user_posts = post_annotation.filter(owner__exact=request.user).order_by("-id")
+        client_posts = post_query.filter(owner__exact=request.user).order_by("-id")
 
-        # get posts and comments from logged in user
-        user_reposts = (
+        client_reposts = (
             Repost.objects.filter(reposter__exact=request.user)
-            .prefetch_related(Prefetch("post", post_annotation))
-            .annotate(
-                is_reposted=Exists(
-                    Repost.objects.filter(
-                        reposter=request.user, post=OuterRef("post__pk")
-                    )
-                )
-            )
+            .prefetch_related(Prefetch("post", post_query))
+            .annotate(is_reposted=Value(True))
             .order_by("-id")
         )
 
-        user_comments = (
+        client_comments = (
             # parent=None to exclude replies to other comments
-            PostComment.objects.exclude(post__isnull=True)
-            .filter(owner__exact=request.user, parent=None, post=not None)
-            .annotate(
-                is_voted_down=Exists(
-                    Vote.objects.filter(
-                        user_id=user_id,
-                        action=DOWN,
-                        object_id=OuterRef("pk"),
-                    )
-                ),
-                is_voted_up=Exists(
-                    Vote.objects.filter(
-                        user_id=user_id, action=UP, object_id=OuterRef("pk")
-                    )
-                ),
-            )
-            .order_by("-id")
+            comment_query.filter(
+                owner__exact=request.user, parent=None, post=not None
+            ).order_by("-id")
         )
 
         combined_posts = list(
             chain(
-                SmallPostSerializer(posts, many=True).data,
-                SmallPostSerializer(user_posts, many=True).data,
+                SmallPostSerializer(posts_from_followed_users, many=True).data,
+                SmallPostSerializer(client_posts, many=True).data,
             )
         )
 
         combined_reposts = list(
             chain(
-                RepostSerializer(reposts, many=True).data,
-                RepostSerializer(user_reposts, many=True).data,
+                RepostSerializer(reposts_from_followed_users, many=True).data,
+                RepostSerializer(client_reposts, many=True).data,
             )
         )
 
@@ -166,8 +135,8 @@ class UserFeedByRecentView(generics.GenericAPIView):
             chain(
                 combined_posts,
                 combined_reposts,
-                FeedCommentSerializer(comments, many=True).data,
-                FeedCommentSerializer(user_comments, many=True).data,
+                FeedCommentSerializer(comments_from_followed_users, many=True).data,
+                FeedCommentSerializer(client_comments, many=True).data,
             )
         )
 
