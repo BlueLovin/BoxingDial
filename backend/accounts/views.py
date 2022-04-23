@@ -49,29 +49,26 @@ class UserView(generics.GenericAPIView):
     def get(self, request, username, format=None):
         logged_in = request.user.is_authenticated
 
-        # this_user is the user that the client user is viewing
-        this_user = User.objects.annotate(posts_count=Count("posts")).get(
+        client_user = User.objects.annotate(posts_count=Count("posts")).get(
             username=username
         )
+        client_viewing_themself = client_user == request.user or logged_in == False
 
-        if this_user == request.user or logged_in == False:
-            return Response(UserSerializer(this_user).data)
+        if client_viewing_themself:
+            return Response(UserSerializer(client_user).data)
 
-        # check viewing permissions
-        this_user_profile = this_user.profile
-
-        # check to see if user follows you or if you follow the user
-        following = this_user.followers.filter(user_id=request.user.id).exists()
-        follows_you = request.user.followers.filter(user_id=this_user.id).exists()
-        blocks_you = UserManager.user_blocks_you(None, request, this_user.profile)
-        blocked = UserManager.is_blocked_by_you(None, request, this_user.profile)
+        this_user_profile = client_user.profile
+        following = client_user.followers.filter(user_id=request.user.id).exists()
+        follows_you = request.user.followers.filter(user_id=client_user.id).exists()
+        blocks_you = UserManager.user_blocks_you(None, request, client_user.profile)
+        blocked = UserManager.is_blocked_by_you(None, request, client_user.profile)
 
         profile_data = ProfileSerializer(this_user_profile).data
         return Response(
             {
-                "id": this_user.id,
-                "username": this_user.username,
-                "posts_count": this_user.posts.count(),
+                "id": client_user.id,
+                "username": client_user.username,
+                "posts_count": client_user.posts.count(),
                 "is_following": following,
                 "follows_you": follows_you,
                 "profile": profile_data,
@@ -149,24 +146,20 @@ class UserPostListView(generics.ListAPIView):
         if UserManager.user_blocks_you(None, request, this_user_profile):
             return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE
 
+        post_annotation = Post.objects.annotate(
+            like_count=Count("post_likes", distinct=True),
+            comment_count=Count("comments", distinct=True),
+            repost_count=Count("reposts", distinct=True),
+        )
+
         if client_user.is_authenticated:
-            post_annotation = Post.objects.annotate(
-                comment_count=Count("comments", distinct=True),
+            post_annotation = post_annotation.annotate(
                 liked=Exists(
                     PostLike.objects.filter(post=OuterRef("pk"), user=request.user)
                 ),
-                like_count=Count("post_likes", distinct=True),
-                repost_count=Count("reposts", distinct=True),
                 is_reposted=Exists(
                     Repost.objects.filter(reposter=request.user, post=OuterRef("pk"))
                 ),
-            )
-
-        else:
-            post_annotation = Post.objects.annotate(
-                like_count=Count("post_likes", distinct=True),
-                comment_count=Count("comments", distinct=True),
-                repost_count=Count("reposts", distinct=True),
             )
 
         posts = SmallPostSerializer(
@@ -181,8 +174,7 @@ class UserPostListView(generics.ListAPIView):
             many=True,
         ).data
 
-        v = UserFeedByRecentView()
-        reposts = v.remove_duplicate_reposts(reposts)
+        reposts = UserFeedByRecentView().annotate_users_who_reposted(reposts)
 
         combined_posts = list(chain(posts, reposts))
 

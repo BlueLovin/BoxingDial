@@ -230,8 +230,7 @@ class PostView(generics.RetrieveDestroyAPIView):
         else:
             return Response(
                 PostSerializer(
-                    post_query.annotate(like_count=Count("likes", distinct=True))
-                    .prefetch_related(
+                    post_query.prefetch_related(
                         Prefetch(
                             "comments", queryset=PostComment.objects.order_by("-id")
                         ),

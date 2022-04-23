@@ -16,7 +16,7 @@ from vote.models import Vote, DOWN, UP
 class UserFeedByRecentView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def remove_duplicate_reposts(self, reposts_with_duplicates: list) -> list:
+    def annotate_users_who_reposted(self, reposts_with_duplicates: list) -> list:
         repost_objects = {}
         for repost in reposts_with_duplicates:
             post_id = repost["post"]["id"]
@@ -43,7 +43,6 @@ class UserFeedByRecentView(generics.GenericAPIView):
     def get(self, request, format=None):
         user_id = request.user.id
 
-        # get following user IDs
         following_user_ids = (
             UserFollowing.objects.filter(user_id=request.user)
             .values_list("following_user_id_id", flat=True)
@@ -127,11 +126,10 @@ class UserFeedByRecentView(generics.GenericAPIView):
             )
         )
 
-        combined_reposts = self.remove_duplicate_reposts(combined_reposts)
+        combined_reposts = self.annotate_users_who_reposted(combined_reposts)
         combined_posts = self.remove_duplicate_posts(combined_posts, combined_reposts)
 
-        # combine post list and comment list
-        combined = list(
+        combined_posts_and_comments = list(
             chain(
                 combined_posts,
                 combined_reposts,
@@ -141,6 +139,8 @@ class UserFeedByRecentView(generics.GenericAPIView):
         )
 
         # sort combined list by date
-        feed_response = sorted(combined, key=lambda k: k["date"], reverse=True)
+        feed_response = sorted(
+            combined_posts_and_comments, key=lambda k: k["date"], reverse=True
+        )
 
         return Response(feed_response)
