@@ -9,7 +9,7 @@ import django.contrib.auth.password_validation as validators
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ["screen_name", "bio"]
+        fields = ["screen_name", "bio", "avatar_url"]
 
 
 # User Serializer

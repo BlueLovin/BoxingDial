@@ -38,14 +38,31 @@ export default function EditProfile() {
   const handleChange = (e) => {
     let { name, value } = e.target;
 
+    console.log(profile);
+    if (name === "new_avatar") {
+      setNewProfile((p) => ({ ...p, new_avatar: e.target.files[0] }));
+      return;
+    }
     setNewProfile((p) => ({ ...p, [name]: value }));
     setFieldCharCounts((oldCount) => ({ ...oldCount, [name]: value.length }));
   };
 
   const sumbitNewProfile = (e) => {
     e.preventDefault();
+
+    const _headers = { ...headers, "content-type": "multipart/form-data" };
+    let formData = new FormData();
+    if (profile.new_avatar) {
+      formData.append(
+        "new_avatar",
+        profile.new_avatar,
+        profile.new_avatar.name
+      );
+    }
+    formData.append("bio", profile.bio);
+    formData.append("screen_name", profile.screen_name);
     axios
-      .post("/user/change-profile", profile, headers)
+      .post("/user/change-profile", formData, _headers)
       .then(() => history.push(`/user/${user.username}`));
   };
 
@@ -58,7 +75,7 @@ export default function EditProfile() {
             <div>screen name:</div>
             <Input
               type="text"
-              name={"screen_name"}
+              name="screen_name"
               value={profile.screen_name}
               onChange={handleChange}
               maxLength={MAX_CHAR_COUNT.screen_name}
@@ -69,12 +86,16 @@ export default function EditProfile() {
             <div>bio:</div>
             <Input
               type="textarea"
-              name={"bio"}
+              name="bio"
               value={profile.bio}
               onChange={handleChange}
               maxLength={MAX_CHAR_COUNT.bio}
             />
             {`${fieldCharCounts.bio} / 500`}
+          </FormGroup>
+          <FormGroup>
+            <div>avatar:</div>
+            <Input type="file" name="new_avatar" onChange={handleChange} />
           </FormGroup>
           <Button type="submit" className="btn btn-primary">
             Update

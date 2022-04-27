@@ -123,10 +123,16 @@ export default function UserProfile() {
     );
   }
 
+  if (!profile.profile) {
+    return "loading";
+  }
+
   return (
     <>
       <h1 className="text-center">
         {/* show screen name if they have one */}
+        <img className="avatar" src={profile.profile.avatar_url} alt="avatar" />
+        
         {`${
           profile.profile ? profile.profile.screen_name : username
         }'s Profile`}

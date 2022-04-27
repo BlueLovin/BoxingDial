@@ -12,7 +12,7 @@ class UserProfile(models.Model):
     )
     blocked_users = models.ManyToManyField("UserProfile", blank=True)
 
-    # avatar = models.ImageField()
+    avatar_url = models.ImageField(upload_to="avatars/")
 
 
 class UserFollowing(models.Model):
@@ -24,5 +24,4 @@ class UserFollowing(models.Model):
         User, related_name="followers", on_delete=models.CASCADE
     )
 
-    # add info about when user started following
     followed_on = models.DateTimeField(auto_now_add=True)

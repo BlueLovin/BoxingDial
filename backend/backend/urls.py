@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 from post_comments.views import PostCommentsView
+from django.conf import settings  # new
+from django.conf.urls.static import static  # new
 
 
 router = routers.DefaultRouter()
@@ -16,3 +18,5 @@ urlpatterns = [
     path("", include("posts.urls")),
     path("", include("post_comments.urls")),
 ]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

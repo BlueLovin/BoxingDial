@@ -1,5 +1,7 @@
 from http import HTTPStatus
 from itertools import chain
+import re
+from django.conf import settings
 from django.db.models.aggregates import Count
 from django.db.models.expressions import Exists, OuterRef
 from django.http.response import HttpResponse
@@ -16,6 +18,7 @@ from accounts.serializers import (
     UserFollowingSerializer,
     UserSerializer,
 )
+from PIL import Image
 from accounts.managers import UserManager
 from accounts.models import UserFollowing
 from accounts.feed_api import UserFeedByRecentView
@@ -190,6 +193,9 @@ class ChangeUserProfileView(generics.UpdateAPIView):
 
     def post(self, request, *args, **kwargs):
         user = request.user
+
+        settings.AWS_S3_FILE_OVERWRITE = True
+
         if user.is_anonymous:
             raise NotAuthenticated
 
@@ -199,7 +205,17 @@ class ChangeUserProfileView(generics.UpdateAPIView):
         if "screen_name" in request.data:
             user.profile.screen_name = request.data["screen_name"]
 
+        if "new_avatar" in request.data:
+            new_avatar = request.data["new_avatar"]
+            re_pattern = re.compile("\.[0-9A-Za-z]+$")
+            file_extension = re.search(re_pattern, new_avatar.name).group(0)
+            user.profile.avatar_url.save(
+                f"{request.user.username}{file_extension}", new_avatar 
+            )
+
         user.profile.save()
+
+        settings.AWS_S3_FILE_OVERWRITE = False
 
         return Response(ProfileSerializer(user.profile).data)
 
