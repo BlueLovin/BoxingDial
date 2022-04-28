@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom/cjs/react-router-dom.min";
 import { UserContext } from "../../context/UserContext";
@@ -28,7 +28,7 @@ export default function FightPage() {
     content: "",
   });
 
-  const fetchFightData = useCallback(() => {
+  useEffect(() => {
     setLoading(true);
     axios.get(`/fights/${fightID}/`, headers).then((res) => {
       const data = res.data;
@@ -37,11 +37,7 @@ export default function FightPage() {
       setLoading(false);
       setPostCount(data.posts_count);
     });
-
-    setLoading(false);
   }, [fightID, headers]);
-
-  useEffect(() => fetchFightData(), [fetchFightData]);
 
   const removePostFromFeed = (post) => {
     setPostList((list) => list.filter((p) => post !== p));

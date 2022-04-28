@@ -1,7 +1,9 @@
 from http import HTTPStatus
+from io import BytesIO
 from itertools import chain
 import re
 from django.conf import settings
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.aggregates import Count
 from django.db.models.expressions import Exists, OuterRef
 from django.http.response import HttpResponse
@@ -191,10 +193,34 @@ class UserPostListView(generics.ListAPIView):
 class ChangeUserProfileView(generics.UpdateAPIView):
     serializer_class = UserSerializer
 
+    def resize_avatar(self, request, img):
+        img = Image.open(img)
+
+        if img.height > 300 or img.width > 300:
+            new_size = new_width, new_height = (300, 300)
+            img.thumbnail(new_size, Image.ANTIALIAS)
+            width, height = img.size
+            cropped_img = img.crop(
+                (
+                    (width - new_width) / 2,
+                    (height - new_height) / 2,
+                    (width + new_width) / 2,
+                    (height + new_height) / 2,
+                )
+            )
+            thumbnail_io = BytesIO()
+            cropped_img.save(thumbnail_io, img.format)
+            return InMemoryUploadedFile(
+                thumbnail_io,
+                "avatar_url",
+                request.user.username,
+                f"image/{img.format}",
+                thumbnail_io.tell(),
+                None,
+            )
+
     def post(self, request, *args, **kwargs):
         user = request.user
-
-        settings.AWS_S3_FILE_OVERWRITE = True
 
         if user.is_anonymous:
             raise NotAuthenticated
@@ -209,13 +235,12 @@ class ChangeUserProfileView(generics.UpdateAPIView):
             new_avatar = request.data["new_avatar"]
             re_pattern = re.compile("\.[0-9A-Za-z]+$")
             file_extension = re.search(re_pattern, new_avatar.name).group(0)
+            new_avatar = self.resize_avatar(request, new_avatar)
             user.profile.avatar_url.save(
-                f"{request.user.username}{file_extension}", new_avatar 
+                f"{request.user.username}{file_extension}", new_avatar
             )
 
         user.profile.save()
-
-        settings.AWS_S3_FILE_OVERWRITE = False
 
         return Response(ProfileSerializer(user.profile).data)
 
