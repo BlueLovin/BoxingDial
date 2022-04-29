@@ -8,16 +8,11 @@ import PostModal from "../../components/modals/PostModal";
 import { Button } from "reactstrap";
 
 export default function FightPage() {
-  // props
   const params = useParams();
   const fightID = params.fightID;
-
-  // context
   const { userVal, headersVal } = useContext(UserContext);
   const [user] = userVal;
   const [headers] = headersVal;
-
-  // state
   const [modal, setModal] = useState(false);
   const [fight, setFight] = useState({});
   const [postCount, setPostCount] = useState(0);

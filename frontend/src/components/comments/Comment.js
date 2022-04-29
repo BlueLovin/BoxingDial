@@ -5,24 +5,22 @@ import { UserContext } from "../../context/UserContext";
 import { Button, Container, FormGroup, Input } from "reactstrap";
 import VotingButtons from "./VotingButtons";
 import HighlightedContent from "../posts/HighlightedContent";
+import ItemAuthor from "../accounts/ItemAuthor";
 
 export default function Comment(props) {
-  //props
   const {
     comment,
     removeCommentFromParentList = null,
-    contextButton = false,
+    showContextButton = false,
     addNewReply = null,
     removeReply = null,
     parentComment = null,
   } = props;
 
-  //context
   const { userVal, headersVal, loggedInVal } = useContext(UserContext);
   const [user] = userVal;
   const [loggedIn] = loggedInVal;
   const [headers] = headersVal;
-  //state
   const [newReply, setNewReply] = useState({
     content: `@${comment.username} `,
   });
@@ -157,18 +155,8 @@ export default function Comment(props) {
           />
         </p>
         <div className="list-group-item p-auto m-auto d-flex justify-content-between align-items-center">
-          <div>
-            <div className="text-muted">
-              by{" "}
-              <span className="text-dark font-weight-bold">
-                {comment.owner.profile.screen_name}
-              </span>
-            </div>
-            <Link to={`/user/${comment.owner.username}`}>
-              @{comment.username}
-            </Link>
-          </div>
-          {contextButton && comment.post !== null ? (
+          <ItemAuthor user={comment.owner} />
+          {showContextButton && comment.post !== null ? (
             <Link to={`/post/${comment.post}/${comment.id}`}>
               <span>context</span>
             </Link>

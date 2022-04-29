@@ -18,7 +18,7 @@ export default function ProfileComments(props) {
     return commentsList.map((comment) => (
       <div key={comment.id}>
         <br />
-        <Comment comment={comment} contextButton={true} />
+        <Comment comment={comment} showContextButton={true} />
       </div>
     ));
   };

@@ -6,6 +6,7 @@ import { UserContext } from "../../context/UserContext";
 import HighlightedContent from "./HighlightedContent";
 import LikeButton from "./buttons/LikeButton";
 import RepostButton from "./buttons/RepostButton";
+import ItemAuthor from "../accounts/ItemAuthor";
 
 export default function Post(props) {
   const {
@@ -53,24 +54,7 @@ export default function Post(props) {
   return (
     <Container>
       <div className="list-group-item p-3">
-        <div className="d-flex align-items-center">
-          <div className="image-cropper">
-            <Link to={`/user/${post.owner.username}`}>
-              <img
-                className="medium-avatar"
-                src={post.owner.profile.avatar_url}
-                alt="avatar"
-              />
-            </Link>
-          </div>
-
-          <span>
-            {post.owner.profile ? post.owner.profile.screen_name : null}
-            <Link to={`/user/${post.owner.username}`}>
-              <div>@{post.owner.username}</div>
-            </Link>
-          </span>
-        </div>
+        <ItemAuthor user={post.owner} />
 
         <br />
         <span className="font-weight-light list-group-item bg-light p-2 m-1 preserve-line-breaks">
