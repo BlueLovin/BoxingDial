@@ -95,7 +95,12 @@ export default function EditProfile() {
           </FormGroup>
           <FormGroup>
             <div>avatar:</div>
-            <Input type="file" name="new_avatar" onChange={handleChange} />
+            <Input
+              type="file"
+              name="new_avatar"
+              accept="image/*"
+              onChange={handleChange}
+            />
           </FormGroup>
           <Button type="submit" className="btn btn-primary">
             Update

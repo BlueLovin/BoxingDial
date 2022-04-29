@@ -1,37 +1,34 @@
+import re
 from http import HTTPStatus
 from io import BytesIO
 from itertools import chain
-import re
-from django.conf import settings
+
+from backend.responses import BoxingDialResponses
+from django.contrib.auth.models import User
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.aggregates import Count
 from django.db.models.expressions import Exists, OuterRef
-from django.http.response import HttpResponse
-from rest_framework import generics
-from django.contrib.auth.models import User
-from rest_framework import exceptions
 from django.db.models.query import Prefetch
+from django.http.response import HttpResponse
+from PIL import Image
+from post_comments.models import PostComment
+from post_comments.serializers.common import CommentSerializer
+from posts.models import Post, PostLike, Repost
+from posts.serializers import RepostSerializer, SmallPostSerializer
+from rest_framework import exceptions, generics
 from rest_framework.exceptions import NotAuthenticated
 from rest_framework.response import Response
 from vote.models import DOWN, UP, Vote
+
+from accounts.feed_api import UserFeedByRecentView
+from accounts.managers import UserManager
+from accounts.models import UserFollowing
 from accounts.serializers import (
     FollowersSerializer,
     ProfileSerializer,
     UserFollowingSerializer,
     UserSerializer,
 )
-from PIL import Image
-from accounts.managers import UserManager
-from accounts.models import UserFollowing
-from accounts.feed_api import UserFeedByRecentView
-from backend.responses import BoxingDialResponses
-from posts.models import Post, PostLike, Repost
-from post_comments.models import PostComment
-from posts.serializers import (
-    RepostSerializer,
-    SmallPostSerializer,
-)
-from post_comments.serializers.common import CommentSerializer
 
 
 # all users - /api/users
@@ -196,8 +193,8 @@ class ChangeUserProfileView(generics.UpdateAPIView):
     def resize_avatar(self, request, img):
         img = Image.open(img)
 
-        if img.height > 300 or img.width > 300:
-            new_size = new_width, new_height = (300, 300)
+        if img.height > 500 or img.width > 500:
+            new_size = new_width, new_height = (500, 500)
             img.thumbnail(new_size, Image.ANTIALIAS)
             width, height = img.size
             cropped_img = img.crop(
@@ -233,9 +230,19 @@ class ChangeUserProfileView(generics.UpdateAPIView):
 
         if "new_avatar" in request.data:
             new_avatar = request.data["new_avatar"]
+            max_file_size = 6291456
+
+            if new_avatar.size > max_file_size:
+                return Response(
+                    {"error": "Images larger than 6mb not allowed at this time"},
+                    status=400,
+                )
+
             re_pattern = re.compile("\.[0-9A-Za-z]+$")
             file_extension = re.search(re_pattern, new_avatar.name).group(0)
+
             new_avatar = self.resize_avatar(request, new_avatar)
+            user.profile.avatar_url.delete()
             user.profile.avatar_url.save(
                 f"{request.user.username}{file_extension}", new_avatar
             )
