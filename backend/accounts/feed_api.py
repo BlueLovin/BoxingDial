@@ -35,7 +35,7 @@ class UserFeedByRecentView(generics.GenericAPIView):
         for repost in reposts_list:
             repost_id = repost["post"]["id"]
 
-            if repost_id in post_ids:
+            if repost_id in post_ids and repost["post"] in posts_list:
                 posts_list.remove(repost["post"])
 
         return posts_list

@@ -1,6 +1,6 @@
 import { Link, useHistory } from "react-router-dom";
 import { Container } from "reactstrap";
-import React, { useContext } from "react";
+import { useContext } from "react";
 import axios from "axios";
 import { UserContext } from "../../context/UserContext";
 import HighlightedContent from "./HighlightedContent";
@@ -112,21 +112,19 @@ export default function Post(props) {
             </>
           ) : null}
 
-          <div>
-            {/* show delete button */}
-            {user &&
-            user.username === post.username &&
-            removePostFromParentList != null ? (
-              <React.Fragment>
-                <button
-                  className="btn-sm btn-danger"
-                  onClick={() => deletePost(post)}
-                >
-                  Delete
-                </button>
-              </React.Fragment>
-            ) : null}
-          </div>
+          {/* show delete button */}
+          {user &&
+          user.username === post.username &&
+          removePostFromParentList !== null ? (
+            <div>
+              <button
+                className="btn-sm btn-danger"
+                onClick={() => deletePost(post)}
+              >
+                Delete
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     </Container>

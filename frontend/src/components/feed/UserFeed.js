@@ -75,7 +75,7 @@ export default function UserFeed() {
       <Container>
         {renderCreatePost()}
 
-        <Card className="p-3 m-3">
+        <Card className="p-1 m-1">
           {user && user.following.length === 0 ? (
             <p className="text-center p-3 m-3">
               Welcome to your feed! Follow somebody to see their posts here.

@@ -4,15 +4,18 @@ from django.contrib.auth.models import User
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    
     bio = models.CharField(
         max_length=500, blank=True, null=True, default="", editable=True
     )
+
     screen_name = models.CharField(
         max_length=15, blank=True, null=True, default="", editable=True
     )
+
     blocked_users = models.ManyToManyField("UserProfile", blank=True)
 
-    avatar_url = models.ImageField(upload_to="avatars/")
+    avatar_url = models.ImageField(upload_to="avatars/", default="avatars/default.webp")
 
 
 class UserFollowing(models.Model):
