@@ -14,14 +14,14 @@ environ.Env.read_env()
 SECRET_KEY = "c5rj_^kj+m1%784@dhdno*whjz57s#^r#gjy!qi%rn0x!@&%q2"
 
 AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY =  env("AWS_SECRET_ACCESS_KEY")
+AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
 AWS_S3_SIGNATURE_VERSION = env("AWS_S3_SIGNATURE_VERSION")
 AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME")
 AWS_S3_FILE_OVERWRITE = False
-AWS_S3_VERIFY = True 
-AWS_LOCATION = "" 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage' 
+AWS_S3_VERIFY = True
+AWS_LOCATION = ""
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 AWS_QUERYSTRING_AUTH = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "channels",
+    "channels_redis",
     "corsheaders",
     "rest_framework",
     "fights",
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
     "notifications",
     "knox",
     "vote",
+    "instant_messaging",
 ]
 
 MIDDLEWARE = [
@@ -142,3 +145,14 @@ USE_TZ = True
 STATIC_URL = "/static/"
 
 CORS_ORIGIN_WHITELIST = ["http://localhost:3000"]
+
+ASGI_APPLICATION = "instant_messaging.routing.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
