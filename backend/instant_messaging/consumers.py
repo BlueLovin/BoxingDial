@@ -57,10 +57,10 @@ class ChatConsumer(WebsocketConsumer):
     }
 
     def connect(self):
-        headers = dict(self.scope["headers"])
+        cookies = self.scope["cookies"]
         try:
-            auth_token = headers[b"authorization"].decode("utf-8").replace("Token ", "")
-            user_to_contact_username = headers[b"user-to-contact"].decode("utf-8")
+            auth_token = cookies["Authorization"].replace("Token ", "")
+            user_to_contact_username = cookies["user-to-contact"]
             self.user_to_contact = User.objects.get(username=user_to_contact_username)
             self.user = self.get_user(auth_token)
         except Exception:
@@ -73,9 +73,8 @@ class ChatConsumer(WebsocketConsumer):
         self.room_group_name = f"chat_{self.room_name}"
 
         group = MessageGroup.objects.get_or_create(group_name=self.room_group_name)[0]
-        if group.users.all() == []:
-            group.users = [self.user, self.user_to_contact]
-            group.save()
+        group.users.set([self.user, self.user_to_contact])
+        group.save()
         self.group = group
 
         # Join room group

@@ -51,6 +51,6 @@ class Message(models.Model):
     def last_50_messages(self, message_group):
         return (
             Message.objects.filter(group=message_group)
-            .order_by("-created_at")
+            .order_by("created_at")
             .all()[:50]
         )
