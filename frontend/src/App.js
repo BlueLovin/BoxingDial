@@ -27,6 +27,7 @@ export default function App() {
           Authorization: `Token ${tokenValue}`,
         };
 
+        document.cookie = `Authorization=${tokenValue} ;path=/ `;
         setHeaders({ headers: _headers });
       }
     };

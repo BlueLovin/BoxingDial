@@ -1,5 +1,5 @@
 //TODO: add user conversations on the side
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import {
   Container,
@@ -14,57 +14,31 @@ import {
   Input,
   InputGroupAddon,
 } from "reactstrap";
-import { UserContext } from "../../context/UserContext";
-import WebSocketService from "../../services/WebSocketService";
+import useChat from "../../hooks/useChat";
+import Conversations from "./Conversations";
 
-function ChatRoom() {
-  const { tokenVal } = useContext(UserContext);
-  const [token] = tokenVal;
-  const [chats, setChats] = useState([]);
-  const [users, ] = useState([]);
-  const [newchat, setNewchat] = useState({
-    message: "",
+export default function ChatRoom() {
+  const [newChatMessage, setNewChatMessage] = useState({
+    content: "",
   });
+
   const history = useHistory();
   const { userToContact } = useParams();
-  const [WebSocketInstance, setWebSocketInstance] = useState(null);
+  const { newChat, initChatWithUser, chats } = useChat(userToContact);
 
   useEffect(() => {
-    if (WebSocketInstance !== null && token !== null) {
-      WebSocketInstance.connect();
-      WebSocketInstance.addCallbacks(
-        (messages) => {
-          setChats(messages);
-          console.log(messages["messages"]);
-        },
-        (message) => setChats((c) => [...c, message])
-      );
-    } else {
-      const instance = WebSocketService.getInstance(
-        `Token ${token}`,
-        userToContact
-      );
-      setWebSocketInstance(instance);
-    }
-  }, [WebSocketInstance, userToContact, token]);
-
-  useEffect(() => {
-    if (WebSocketInstance != null) {
-      WebSocketInstance.waitForSocketConnection(() =>
-        WebSocketInstance.fetchMessages()
-      );
-    }
-  }, [WebSocketInstance]);
-
-  const submitMessage = (e) => {
-    e.preventDefault();
-    WebSocketInstance.newChatMessage(newchat.message);
-    setNewchat({ roomname: "", message: "", date: "", type: "" });
-  };
+    initChatWithUser(userToContact);
+  }, [initChatWithUser, userToContact]);
 
   const onChange = (e) => {
     e.persist();
-    setNewchat({ ...newchat, [e.target.name]: e.target.value });
+    setNewChatMessage({ ...newChatMessage, [e.target.name]: e.target.value });
+  };
+
+  const submitMessage = (e) => {
+    e.preventDefault();
+    newChat(newChatMessage.content);
+    setNewChatMessage({ roomname: "", content: "", date: "", type: "" });
   };
 
   const exitChat = () => {
@@ -92,13 +66,7 @@ function ChatRoom() {
                   </CardSubtitle>
                 </CardBody>
               </Card>
-              {users.map((item, idx) => (
-                <Card key={idx} className="UsersCard">
-                  <CardBody>
-                    <CardSubtitle>{item.username}</CardSubtitle>
-                  </CardBody>
-                </Card>
-              ))}
+              <Conversations />
             </div>
           </Col>
           <Col xs="8">
@@ -118,10 +86,10 @@ function ChatRoom() {
                 <InputGroup>
                   <Input
                     type="text"
-                    name="message"
-                    id="message"
+                    name="content"
+                    id="content"
                     placeholder="Enter message here"
-                    value={newchat.message}
+                    value={newChatMessage.content}
                     onChange={onChange}
                   />
                   <InputGroupAddon addonType="append">
@@ -138,5 +106,3 @@ function ChatRoom() {
     </div>
   );
 }
-
-export default ChatRoom;

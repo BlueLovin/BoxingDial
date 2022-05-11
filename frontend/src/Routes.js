@@ -9,7 +9,7 @@ import { NotFound } from "./NotFound404";
 import FightPage from "./pages/fights/FightPage";
 import Home from "./pages/home/HomePage";
 import Comments from "./pages/posts/PostPage";
-import ChatRoom from "./pages/profiles/ChatPage";
+import ChatRoom from "./pages/chat/ChatPage";
 import EditProfile from "./pages/profiles/EditProfile";
 import Inbox from "./pages/profiles/Inbox";
 import UserProfile from "./pages/profiles/UserProfile";

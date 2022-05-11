@@ -1,18 +1,18 @@
-import string
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 import json
-from channels.db import database_sync_to_async
-from knox.models import AuthToken
-from accounts.serializers import SmallUserSerializer, UserSerializer
+from accounts.serializers import SmallUserSerializer
 from django.contrib.auth.models import User
 from knox.auth import TokenAuthentication
-from rest_framework.authtoken.serializers import AuthTokenSerializer
 from .models import Message, MessageGroup
 
 
 class ChatConsumer(WebsocketConsumer):
     def fetch_messages(self, data):
+        if not self.connected_to_group:
+            self.send_message({"error": "not connected to a group"})
+            return
+
         messages = Message.last_50_messages(None, self.group)
         content = {"command": "messages", "messages": self.messages_to_json(messages)}
         self.send_message(content)
@@ -26,13 +26,21 @@ class ChatConsumer(WebsocketConsumer):
             return None
 
     def new_message(self, data):
+        if not self.connected_to_group:
+            self.send_message({"error": "not connected to a group"})
+            return
+
         owner = self.user
 
-        text = data["text"]
+        content = data["text"]
 
         message = Message.objects.create(
-            owner=owner, to=self.user_to_contact, group=self.group, content=text
+            owner=owner, to=self.user_to_contact, group=self.group, content=content
         )
+
+        self.group.last_received_message = message.content
+        self.group.save()
+
         content = {"command": "new_message", "message": self.message_to_json(message)}
         self.send_chat_message(content)
 
@@ -51,22 +59,9 @@ class ChatConsumer(WebsocketConsumer):
             "created_at": str(message.created_at),
         }
 
-    commands = {
-        "fetch_messages": fetch_messages,
-        "new_message": new_message,
-    }
-
-    def connect(self):
-        cookies = self.scope["cookies"]
-        try:
-            auth_token = cookies["Authorization"].replace("Token ", "")
-            user_to_contact_username = cookies["user-to-contact"]
-            self.user_to_contact = User.objects.get(username=user_to_contact_username)
-            self.user = self.get_user(auth_token)
-        except Exception:
-            self.close()
-            return
-
+    def connect_to_group(self, data):
+        user_to_contact_username = data["user_to_contact"]
+        self.user_to_contact = User.objects.get(username=user_to_contact_username)
         usernames = [user_to_contact_username, self.user.username]
         usernames.sort()
         self.room_name = "_".join(usernames)
@@ -76,12 +71,36 @@ class ChatConsumer(WebsocketConsumer):
         group.users.set([self.user, self.user_to_contact])
         group.save()
         self.group = group
-
-        # Join room group
+        self.connected_to_group = True
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name
         )
+        self.send_message({"success": f"now chatting with {user_to_contact_username}"})
+
+    commands = {
+        "fetch_messages": fetch_messages,
+        "new_message": new_message,
+        "connect_to_group": connect_to_group,
+    }
+
+    def connect(self):
+        cookies = self.scope["cookies"]
+        try:
+            auth_token = cookies["Authorization"].replace("Token ", "")
+            self.user = self.get_user(auth_token)
+
+        except Exception:
+            self.close()
+            return
+
         self.accept()
+
+        if self.user == None:
+            self.send_message({"error": "invalid auth token received"})
+            self.close()
+            return
+
+        self.connected_to_group = False
 
     def disconnect(self, close_code):
         # leave group room

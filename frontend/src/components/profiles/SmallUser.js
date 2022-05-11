@@ -1,7 +1,11 @@
 import { Link } from "react-router-dom";
 import FollowButton from "./FollowButton";
 
-export default function SmallUser({ user, toggleUserModal }) {
+export default function SmallUser({ user, bioText, toggleUserModal }) {
+  if(bioText === undefined){
+    bioText = user.profile.bio;
+  }
+
   return (
     <div className="small-user">
       <div className="image-cropper">
@@ -12,7 +16,7 @@ export default function SmallUser({ user, toggleUserModal }) {
           {user.username}
         </Link>
         <br />
-        <p>placeholder bio</p>
+        <p>{bioText}</p>
       </div>
       <div className="small-user-follow">
         <FollowButton profile={user} />

@@ -4,11 +4,9 @@ class WebSocketService {
   static instance = null;
   callbacks = {};
 
-  static getInstance(token, userToContact) {
+  static getInstance() {
     if (!WebSocketService.instance) {
       WebSocketService.instance = new WebSocketService();
-      WebSocketService.instance.token = token;
-      WebSocketService.instance.userToContact = userToContact;
     }
     return WebSocketService.instance;
   }
@@ -19,15 +17,13 @@ class WebSocketService {
 
   connect() {
     const path = "ws://localhost:8000/ws/chat";
-    if (this.userToContact && this.token) {
-      document.cookie = `Authorization=${this.token};path=/`;
-      document.cookie = ` user-to-contact=${this.userToContact}; path=/`;
-    } 
 
     this.socketRef = new WebSocket(path);
+
     this.socketRef.onopen = () => {
       console.log("WebSocket open");
     };
+
     this.socketRef.onmessage = (e) => {
       this.socketNewMessage(e.data);
     };
@@ -35,14 +31,26 @@ class WebSocketService {
     this.socketRef.onerror = (e) => {
       console.log(e.message);
     };
+
     this.socketRef.onclose = () => {
-      console.log("WebSocket closed let's reopen");
+      console.log("WebSocket closed, let's re-open");
       this.connect();
     };
   }
 
+  addCallbacks(messagesCallback, newMessageCallback) {
+    this.callbacks["messages"] = messagesCallback;
+    this.callbacks["new_message"] = newMessageCallback;
+  }
+
+  initChatWithUser(username) {
+    this.sendMessage({
+      command: "connect_to_group",
+      user_to_contact: username,
+    });
+  }
+
   socketNewMessage(data) {
-    console.log(data);
     const parsedData = JSON.parse(data);
     const command = parsedData.command;
     if (Object.keys(this.callbacks).length === 0) {
@@ -61,16 +69,10 @@ class WebSocketService {
   }
 
   newChatMessage(message) {
-    console.log("new chat message");
     this.sendMessage({
       command: "new_message",
       text: message,
     });
-  }
-
-  addCallbacks(messagesCallback, newMessageCallback) {
-    this.callbacks["messages"] = messagesCallback;
-    this.callbacks["new_message"] = newMessageCallback;
   }
 
   sendMessage(data) {
@@ -86,19 +88,25 @@ class WebSocketService {
   }
 
   waitForSocketConnection(callback) {
+    if (this === undefined) {
+      return;
+    }
+
     const socket = this.socketRef;
     const recursion = this.waitForSocketConnection;
+
     setTimeout(function () {
       if (socket !== null && socket.readyState === 1) {
         console.log("Connection is made");
         if (callback != null) {
           callback();
         }
+        clearTimeout();
       } else {
         console.log("wait for connection...");
         recursion(callback);
       }
-    }, 1000); // wait 5 milisecond for the connection...
+    }, 1000);
   }
 }
 

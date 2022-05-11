@@ -23,6 +23,7 @@ class MessageGroup(models.Model):
     )
     users = models.ManyToManyField(User, default=list)
     group_name = models.TextField()
+    last_received_message = models.TextField(max_length=150)
 
 
 class Message(models.Model):
