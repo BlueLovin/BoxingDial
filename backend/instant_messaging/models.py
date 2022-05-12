@@ -23,7 +23,9 @@ class MessageGroup(models.Model):
     )
     users = models.ManyToManyField(User, default=list)
     group_name = models.TextField()
-    last_received_message = models.TextField(max_length=150)
+    last_received_message = models.ForeignKey(
+        "Message", on_delete=models.CASCADE, blank=True, null=True
+    )
 
 
 class Message(models.Model):

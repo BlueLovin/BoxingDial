@@ -32,20 +32,31 @@ const Conversations = React.memo(() => {
         output = _user;
       }
     });
-    console.log(output);
     return output;
+  };
+
+  const getLastReceivedMessage = (conversation) => {
+    if (conversation.last_received_message !== null) {
+      const lastReceivedMessage = conversation.last_received_message;
+      return `${lastReceivedMessage.owner.username}: ${lastReceivedMessage.content}`;
+    }
+    return "";
   };
 
   return (
     <>
       {conversations &&
         conversations.map((conversation, idx) => {
-          const conversationUser = getContactedUserFromConversation(conversation);
+          const conversationUser =
+            getContactedUserFromConversation(conversation);
           return (
             <Card key={idx} className="UsersCard">
               <CardBody>
                 <Link to={`/chat/${conversationUser.username}`}>
-                  <SmallUser user={conversationUser} bioText={conversation.last_received_message}/>
+                  <SmallUser
+                    user={conversationUser}
+                    bioText={getLastReceivedMessage(conversation)}
+                  />
                 </Link>
               </CardBody>
             </Card>

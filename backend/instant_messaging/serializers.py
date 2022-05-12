@@ -3,7 +3,7 @@ from .models import Message, MessageGroup
 from rest_framework import serializers
 
 class MessageSerializer(serializers.ModelSerializer):
-    owner = SmallUserWithProfileSerializer(many=True)
+    owner = SmallUserWithProfileSerializer()
     class Meta:
         model = Message
         fields = ("id", "owner", "to", "content", "created_at")
@@ -11,6 +11,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class MessageGroupSerializer(serializers.ModelSerializer):
     users = SmallUserWithProfileSerializer(many=True)
+    last_received_message = MessageSerializer()
 
     class Meta:
         model = MessageGroup

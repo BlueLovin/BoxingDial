@@ -15,7 +15,7 @@ class MessageGroupsView(generics.ListAPIView):
 
     def get(self, request):
         user = request.user
-        query = MessageGroup.objects.filter(users=user)
+        query = MessageGroup.objects.filter(users=user).order_by("-last_received_message__created_at")
         response_data = MessageGroupSerializer(query, many=True).data
 
         return Response(response_data)

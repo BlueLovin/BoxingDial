@@ -38,7 +38,7 @@ class ChatConsumer(WebsocketConsumer):
             owner=owner, to=self.user_to_contact, group=self.group, content=content
         )
 
-        self.group.last_received_message = message.content
+        self.group.last_received_message = message
         self.group.save()
 
         content = {"command": "new_message", "message": self.message_to_json(message)}
