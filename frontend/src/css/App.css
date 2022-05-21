@@ -123,3 +123,15 @@ textarea {
   border: 3px solid black;
   margin: 10px;
 }
+
+.dm-container {
+  height: 60vh;
+}
+
+.sticky-send-msg-footer {
+  position: relative;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  overflow: hidden;
+}

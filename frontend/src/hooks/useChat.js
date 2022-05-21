@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import WebSocketService from "../services/WebSocketService";
 
 export default function useChat() {
@@ -11,6 +11,7 @@ export default function useChat() {
       websocket.connect();
       websocket.waitForSocketConnection(() => {
         websocket.addCallbacks(
+          (user) => setContactingUser(user),
           (messages) => setChats(messages),
           (message) => setChats((c) => [...c, message])
         );
@@ -25,19 +26,25 @@ export default function useChat() {
     if (websocket !== null) {
       websocket.fetchMessages();
     }
-  }, [contactingUser, websocket]);
+  }, [websocket]);
 
-  const initChatWithUser = (userToContact) => {
-    if (websocket !== null && userToContact) {
-      websocket.waitForSocketConnection(() => {
-        websocket.initChatWithUser(userToContact);
-        setContactingUser(userToContact);
-      });
-    }
-  };
+  const initChatWithUser = useCallback(
+    (userToContact) => {
+      if (websocket !== null && userToContact) {
+        websocket.waitForSocketConnection(() => {
+          websocket.initChatWithUser(userToContact);
+          websocket.fetchMessages();
+        });
+      }
+    },
+    [websocket]
+  );
 
-  const newChat = (newChatMessage) => {
-    websocket.newChatMessage(newChatMessage);
-  };
-  return { newChat, initChatWithUser, chats };
+  const newChat = useCallback(
+    (newChatMessage) => {
+      websocket.newChatMessage(newChatMessage);
+    },
+    [websocket]
+  );
+  return { newChat, initChatWithUser, chats, contactingUser };
 }

@@ -65,8 +65,7 @@ export default function Routes() {
         <RecentFights />
       </Route>
 
-      
-      <Route path="/chat/:userToContact" exact>
+      <Route path="/chat/:userToContactUsername" exact>
         <ChatRoom />
       </Route>
 

@@ -1,7 +1,7 @@
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 import json
-from accounts.serializers import SmallUserSerializer
+from accounts.serializers import SmallUserSerializer, SmallUserWithProfileSerializer
 from django.contrib.auth.models import User
 from knox.auth import TokenAuthentication
 from .models import Message, MessageGroup
@@ -75,7 +75,8 @@ class ChatConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name
         )
-        self.send_message({"success": f"now chatting with {user_to_contact_username}"})
+        user_to_contact_data = SmallUserWithProfileSerializer(self.user_to_contact).data
+        self.send_message({"success": f"now chatting with {user_to_contact_username}", "user_to_contact": user_to_contact_data})
 
     commands = {
         "fetch_messages": fetch_messages,

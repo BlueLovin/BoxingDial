@@ -38,9 +38,10 @@ class WebSocketService {
     };
   }
 
-  addCallbacks(messagesCallback, newMessageCallback) {
+  addCallbacks(updateUserToContact, messagesCallback, newMessageCallback) {
     this.callbacks["messages"] = messagesCallback;
     this.callbacks["new_message"] = newMessageCallback;
+    this.callbacks["update_user_to_contact"] = updateUserToContact;
   }
 
   initChatWithUser(username) {
@@ -61,6 +62,9 @@ class WebSocketService {
     }
     if (command === "new_message") {
       this.callbacks[command](parsedData.message);
+    }
+    if (parsedData.user_to_contact) {
+      this.callbacks["update_user_to_contact"](parsedData.user_to_contact);
     }
   }
 
@@ -98,7 +102,7 @@ class WebSocketService {
     setTimeout(function () {
       if (socket !== null && socket.readyState === 1) {
         console.log("Connection is made");
-        if (callback != null) {
+        if (callback !== null) {
           callback();
         }
         clearTimeout();
