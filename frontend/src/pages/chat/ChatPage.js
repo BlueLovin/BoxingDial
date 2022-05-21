@@ -20,7 +20,9 @@ import "../../css/chat.css";
 import { UserContext } from "../../context/UserContext";
 import ScrollToBottom from "react-scroll-to-bottom";
 import SmallUser from "../../components/profiles/SmallUser";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 export default function ChatRoom() {
   const [newChatMessage, setNewChatMessage] = useState({
     content: "",
@@ -56,26 +58,16 @@ export default function ChatRoom() {
     <div className="Container">
       <Container>
         <Row>
-          <Col xs="4">
-            <div>
-              <Card className="UsersCard">
-                <CardBody>
-                  <CardSubtitle>
-                    <Button
-                      variant="primary"
-                      type="button"
-                      onClick={() => exitChat()}
-                    >
-                      Exit Chat
-                    </Button>
-                  </CardSubtitle>
-                </CardBody>
-              </Card>
-              <Conversations />
-            </div>
+          <Col xs="4" className="users-container">
+            <Conversations />
           </Col>
-          <Col xs="8">
-            <div className="m-2">
+          <Col xs="8" className="dm-wrapper">
+            <div className="m-2 d-flex ">
+              <div className="dm-back-button">
+                <Link to="/chat">
+                  <FontAwesomeIcon className="m-4" icon={faArrowLeft} />
+                </Link>
+              </div>
               {contactingUser !== undefined ? (
                 <SmallUser user={contactingUser} />
               ) : (

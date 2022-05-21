@@ -99,6 +99,7 @@ textarea {
 
 .small-user-name {
   padding-left: 20px;
+  overflow: hidden;
 }
 
 .small-user-follow {

@@ -5,7 +5,7 @@ import { Card, CardBody } from "reactstrap";
 import { UserContext } from "../../context/UserContext";
 import SmallUser from "../../components/profiles/SmallUser";
 
-const Conversations = React.memo(() => {
+const Conversations = React.memo(({ fullPage = false }) => {
   const { headersVal, userVal } = useContext(UserContext);
   const [headers] = headersVal;
   const [user] = userVal;
@@ -44,25 +44,32 @@ const Conversations = React.memo(() => {
   };
 
   return (
-    <>
-      {conversations &&
-        conversations.map((conversation, idx) => {
-          const conversationUser =
-            getContactedUserFromConversation(conversation);
-          return (
-            <Card key={idx} className="UsersCard">
-              <CardBody>
-                <Link to={`/chat/${conversationUser.username}`}>
-                  <SmallUser
-                    user={conversationUser}
-                    bioText={getLastReceivedMessage(conversation)}
-                  />
-                </Link>
-              </CardBody>
-            </Card>
-          );
-        })}
-    </>
+    <div className="d-flex flex-row align-items-center">
+      <div className="col-center w-100">
+        {conversations &&
+          conversations.map((conversation, idx) => {
+            const conversationUser =
+              getContactedUserFromConversation(conversation);
+            return (
+              <Card key={idx} className="UsersCard">
+                <CardBody>
+                  <Link to={`/chat/${conversationUser.username}`}>
+                    <SmallUser
+                      user={conversationUser}
+                      bioText={getLastReceivedMessage(conversation)}
+                    />
+                  </Link>
+                </CardBody>
+              </Card>
+            );
+          })}
+      </div>
+      {fullPage ? (
+        <h3 className="users-container text-center w-100">
+          select a conversation
+        </h3>
+      ) : null}
+    </div>
   );
 });
 

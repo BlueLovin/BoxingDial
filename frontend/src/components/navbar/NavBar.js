@@ -18,6 +18,7 @@ import {
   faHome,
   faPenFancy,
   faFistRaised,
+  faComments,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ShowInboxBell from "./ShowInboxBell";
@@ -37,6 +38,12 @@ export const NavigationBar = React.memo(() => {
             <NavLink tag={Link} to="/">
               <FontAwesomeIcon icon={faHome} />
               {" Home"}
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink tag={Link} to="/chat">
+              <FontAwesomeIcon icon={faComments} />
+              {" Chat"}
             </NavLink>
           </NavItem>
           <NavItem>
