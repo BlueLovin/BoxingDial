@@ -53,7 +53,7 @@ class ChatConsumer(WebsocketConsumer):
     def message_to_json(self, message):
         return {
             "id": str(message.id),
-            "owner": SmallUserSerializer(message.owner).data,
+            "owner": SmallUserWithProfileSerializer(message.owner).data,
             "group": str(self.group.id),
             "content": message.content,
             "created_at": str(message.created_at),
@@ -76,7 +76,12 @@ class ChatConsumer(WebsocketConsumer):
             self.room_group_name, self.channel_name
         )
         user_to_contact_data = SmallUserWithProfileSerializer(self.user_to_contact).data
-        self.send_message({"success": f"now chatting with {user_to_contact_username}", "user_to_contact": user_to_contact_data})
+        self.send_message(
+            {
+                "success": f"now chatting with {user_to_contact_username}",
+                "user_to_contact": user_to_contact_data,
+            }
+        )
 
     commands = {
         "fetch_messages": fetch_messages,

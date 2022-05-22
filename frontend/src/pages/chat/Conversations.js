@@ -1,76 +1,74 @@
-import axios from "axios";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
 import { Card, CardBody } from "reactstrap";
 import { UserContext } from "../../context/UserContext";
 import SmallUser from "../../components/profiles/SmallUser";
 
-const Conversations = React.memo(({ fullPage = false }) => {
-  const { headersVal, userVal } = useContext(UserContext);
-  const [headers] = headersVal;
-  const [user] = userVal;
-  const [conversations, setConversations] = useState();
-  useEffect(() => {
-    const fetchConversations = () => {
-      axios
-        .get("/user/conversations", headers)
-        .then((res) => setConversations(res.data));
-    };
-    fetchConversations();
-  }, [headers]);
+const Conversations = React.memo(
+  ({ conversations, selectedUser = "", fullPage = false }) => {
+    const { userVal } = useContext(UserContext);
 
-  const getContactedUserFromConversation = (conversation) => {
-    const username = user.username;
-    let output = {};
+    const [user] = userVal;
 
-    if (conversation.users.length === 1) {
-      return conversation.users[0];
-    }
+    const getContactedUserFromConversation = (conversation) => {
+      const username = user.username;
+      let output = {};
 
-    conversation.users.forEach((_user) => {
-      if (username !== _user.username) {
-        output = _user;
+      if (conversation.users.length === 1) {
+        return conversation.users[0];
       }
-    });
-    return output;
-  };
 
-  const getLastReceivedMessage = (conversation) => {
-    if (conversation.last_received_message !== null) {
-      const lastReceivedMessage = conversation.last_received_message;
-      return `${lastReceivedMessage.owner.username}: ${lastReceivedMessage.content}`;
-    }
-    return "";
-  };
+      conversation.users.forEach((_user) => {
+        if (username !== _user.username) {
+          output = _user;
+        }
+      });
+      return output;
+    };
 
-  return (
-    <div className="d-flex flex-row align-items-center">
-      <div className="col-center w-100">
-        {conversations &&
-          conversations.map((conversation, idx) => {
-            const conversationUser =
-              getContactedUserFromConversation(conversation);
-            return (
-              <Card key={idx} className="UsersCard">
-                <CardBody>
-                  <Link to={`/chat/${conversationUser.username}`}>
-                    <SmallUser
-                      user={conversationUser}
-                      bioText={getLastReceivedMessage(conversation)}
-                    />
-                  </Link>
-                </CardBody>
-              </Card>
-            );
-          })}
+    const getLastReceivedMessage = (conversation) => {
+      if (conversation.last_received_message !== null) {
+        const lastReceivedMessage = conversation.last_received_message;
+        return `${lastReceivedMessage.owner.username}: ${lastReceivedMessage.content}`;
+      }
+      return "";
+    };
+
+    return (
+      <div className="d-flex flex-row align-items-center">
+        <div className="col-center w-100">
+          {conversations &&
+            conversations.map((conversation) => {
+              const conversationUser =
+                getContactedUserFromConversation(conversation);
+              const selected = conversationUser.username === selectedUser;
+              return (
+                <Card
+                  id={conversation.id}
+                  key={conversation.id}
+                  className="UsersCard"
+                >
+                  <CardBody>
+                    <Link to={`/chat/${conversationUser.username}`}>
+                      <SmallUser
+                        user={conversationUser}
+                        selected={selected}
+                        bioText={getLastReceivedMessage(conversation)}
+                      />
+                    </Link>
+                  </CardBody>
+                </Card>
+              );
+            })}
+        </div>
+        {fullPage ? (
+          <h3 className="users-container text-center w-100">
+            select a conversation
+          </h3>
+        ) : null}
       </div>
-      {fullPage ? (
-        <h3 className="users-container text-center w-100">
-          select a conversation
-        </h3>
-      ) : null}
-    </div>
-  );
-});
+    );
+  }
+);
 
 export default Conversations;

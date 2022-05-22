@@ -29,14 +29,16 @@ export default function useChat() {
   }, [websocket]);
 
   const initChatWithUser = useCallback(
-    (userToContact) => {
-      if (websocket !== null && userToContact) {
-        websocket.waitForSocketConnection(() => {
-          websocket.initChatWithUser(userToContact);
-          websocket.fetchMessages();
-        });
-      }
-    },
+    (userToContact) =>
+      new Promise((resolve) => {
+        if (websocket !== null && userToContact) {
+          websocket.waitForSocketConnection(() => {
+            websocket.initChatWithUser(userToContact);
+            websocket.fetchMessages();
+            resolve();
+          });
+        }
+      }),
     [websocket]
   );
 

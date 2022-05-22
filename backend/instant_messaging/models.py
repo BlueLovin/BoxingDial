@@ -55,5 +55,5 @@ class Message(models.Model):
         return (
             Message.objects.filter(group=message_group)
             .order_by("created_at")
-            .all()[:50]
+            .all()[:150]
         )

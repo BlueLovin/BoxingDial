@@ -97,6 +97,22 @@ textarea {
   justify-content: flex-start;
 }
 
+.small-user-selected {
+  background-color: gainsboro;
+  display: flex;
+  flex: initial;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.small-user-no-background {
+  display: flex;
+  flex: initial;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
 .small-user-name {
   padding-left: 20px;
   overflow: hidden;

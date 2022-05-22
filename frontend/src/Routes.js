@@ -13,7 +13,7 @@ import ChatRoom from "./pages/chat/ChatPage";
 import EditProfile from "./pages/profiles/EditProfile";
 import Inbox from "./pages/profiles/Inbox";
 import UserProfile from "./pages/profiles/UserProfile";
-import Conversations from "./pages/chat/Conversations";
+// import Conversations from "./pages/chat/Conversations";
 
 export default function Routes() {
   return (
@@ -66,14 +66,10 @@ export default function Routes() {
         <RecentFights />
       </Route>
 
-      <Route path="/chat/:userToContactUsername" exact>
+      <Route path="/chat/:userToContactUsername?" exact>
         <ChatRoom />
       </Route>
-
-      <Route path="/chat" exact>
-        <Conversations fullPage={true} />
-      </Route>
-
+      
       <Route path="*" exact={true} component={NotFound} />
     </Switch>
   );
