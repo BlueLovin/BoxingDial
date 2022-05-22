@@ -1,26 +1,69 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import WebSocketService from "../services/WebSocketService";
+import axios from "axios";
+import { UserContext } from "../context/UserContext";
 
 export default function useChat() {
+  const { headersVal, userVal } = useContext(UserContext);
+  const [headers] = headersVal;
+  const [user] = userVal;
   const [chats, setChats] = useState([]);
   const [contactingUser, setContactingUser] = useState();
   const [websocket, setWebSocketInstance] = useState(null);
+  const [conversations, setConversations] = useState({});
 
   useEffect(() => {
+    const fetchConversations = () => {
+      axios
+        .get("/user/conversations", headers)
+        .then((res) => setConversations(res.data));
+    };
+    fetchConversations();
+  }, [headers]);
+  useEffect(() => console.log(conversations), [conversations]);
+  const receiveNewChat = useCallback(
+    (message) => {
+      console.log(conversations);
+      if (conversations === {} || contactingUser === undefined) {
+        return;
+      }
+
+      if (
+        (message.to.username === contactingUser.username &&
+          message.owner.username === user.username) ||
+        (message.owner.username === contactingUser.username &&
+          message.to.username === user.username)
+      ) {
+        setChats((c) => [...c, message]);
+      }
+
+      let conversation = conversations[message.group];
+      conversation["last_received_message"] = message;
+      setConversations((c) => ({ [message.group]: conversation, ...c }));
+    },
+    [conversations, contactingUser, user.username]
+  );
+  useEffect(() => {
     if (websocket !== null) {
-      websocket.connect();
-      websocket.waitForSocketConnection(() => {
-        websocket.addCallbacks(
-          (user) => setContactingUser(user),
-          (messages) => setChats(messages),
-          (message) => setChats((c) => [...c, message])
-        );
-      });
-    } else {
-      const instance = WebSocketService.getInstance();
-      setWebSocketInstance(instance);
+      websocket.addCallbacks(
+        (_user) => setContactingUser(_user),
+        (messages) => setChats(messages),
+        (message) => receiveNewChat(message)
+      );
+      return;
     }
-  }, [websocket]);
+
+    const socket = WebSocketService.getInstance();
+    setWebSocketInstance(socket);
+    socket.connect();
+    socket.waitForSocketConnection(() => {
+      socket.addCallbacks(
+        (_user) => setContactingUser(_user),
+        (messages) => setChats(messages),
+        (message) => receiveNewChat(message)
+      );
+    });
+  }, [receiveNewChat, conversations, websocket, contactingUser]);
 
   useEffect(() => {
     if (websocket !== null) {
@@ -48,5 +91,5 @@ export default function useChat() {
     },
     [websocket]
   );
-  return { newChat, initChatWithUser, chats, contactingUser };
+  return { newChat, initChatWithUser, chats, conversations, contactingUser };
 }

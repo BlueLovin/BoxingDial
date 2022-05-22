@@ -20,5 +20,8 @@ class MessageGroupsView(generics.ListAPIView):
             "-last_received_message__created_at"
         )
         response_data = MessageGroupSerializer(query, many=True).data
+        output_dict = dict()
+        for message_group in response_data:
+            output_dict[message_group["id"]] = message_group
 
-        return Response(response_data)
+        return Response(output_dict)

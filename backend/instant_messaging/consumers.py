@@ -54,6 +54,7 @@ class ChatConsumer(WebsocketConsumer):
         return {
             "id": str(message.id),
             "owner": SmallUserWithProfileSerializer(message.owner).data,
+            "to": SmallUserWithProfileSerializer(message.to).data,
             "group": str(self.group.id),
             "content": message.content,
             "created_at": str(message.created_at),

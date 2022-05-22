@@ -2,12 +2,15 @@ from accounts.serializers import SmallUserSerializer, SmallUserWithProfileSerial
 from .models import Message, MessageGroup
 from rest_framework import serializers
 
+
 class MessageSerializer(serializers.ModelSerializer):
     owner = SmallUserWithProfileSerializer()
+    to = SmallUserWithProfileSerializer()
+
     class Meta:
         model = Message
-        fields = ("id", "owner", "to", "content", "created_at")
-    
+        fields = ("id", "owner", "to", "group", "content", "created_at")
+
 
 class MessageGroupSerializer(serializers.ModelSerializer):
     users = SmallUserWithProfileSerializer(many=True)

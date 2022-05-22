@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 
+
 def validate_message_content(content):
     if content is None or content == "" or content.isspace():
         raise ValidationError(

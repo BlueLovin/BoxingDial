@@ -16,31 +16,23 @@ import {
   InputGroupAddon,
   Spinner,
 } from "reactstrap";
-export default function DMContainer({
-  userToContactUsername,
-  setLastMessageSentOrReceived,
-}) {
+export default function DMContainer({ userToContactUsername, chatAPI }) {
   const { userVal } = useContext(UserContext);
   const [user] = userVal;
   const [loading, setLoading] = useState(true);
   const [newChatMessage, setNewChatMessage] = useState({
     content: "",
   });
-  const { newChat, initChatWithUser, chats, contactingUser } = useChat(
-    userToContactUsername
-  );
 
   useEffect(() => {
-    if (initChatWithUser !== undefined) {
-      initChatWithUser(userToContactUsername).then(() => setLoading(false));
+    if (chatAPI.initChatWithUser !== undefined) {
+      chatAPI
+        .initChatWithUser(userToContactUsername)
+        .then(() => setLoading(false));
     }
-  }, [initChatWithUser, userToContactUsername]);
+  }, [userToContactUsername]);
 
   useEffect(() => setLoading(true), [userToContactUsername]);
-  useEffect(() => {
-    setLastMessageSentOrReceived(chats);
-  }, [chats, setLastMessageSentOrReceived]);
-  
   const onChange = (e) => {
     e.persist();
     setNewChatMessage({ ...newChatMessage, [e.target.name]: e.target.value });
@@ -52,7 +44,7 @@ export default function DMContainer({
     if (newChatMessage.content.trim() === "") {
       return;
     }
-    newChat(newChatMessage.content);
+    chatAPI.newChat(newChatMessage.content);
   };
 
   if (loading) {
@@ -67,24 +59,21 @@ export default function DMContainer({
             <FontAwesomeIcon className="m-4" icon={faArrowLeft} />
           </Link>
         </div>
-        {contactingUser !== undefined ? (
-          <SmallUser user={contactingUser} bioText="" showBackground={false} />
+        {chatAPI.contactingUser !== undefined ? (
+          <SmallUser
+            user={chatAPI.contactingUser}
+            bioText=""
+            showBackground={false}
+          />
         ) : (
           <Spinner />
         )}
       </div>
       <ScrollToBottom className="dm-container">
-        {chats.map((item, idx) => {
+        {chatAPI.chats.map((item, idx) => {
           const isOwner = item.owner.username === user.username;
           return (
             <div key={idx} className="MessageBox ">
-              {/* {!isOwner && (
-                <img
-                  className="medium-avatar"
-                  src={item.owner.profile.avatar_url}
-                  alt="avatar"
-                />
-              )} */}
               <div className="ChatMessage">
                 <div className={isOwner ? "RightBubble" : "LeftBubble"}>
                   <span className="MsgName">
