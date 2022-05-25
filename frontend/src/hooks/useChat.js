@@ -20,20 +20,22 @@ export default function useChat() {
     };
     fetchConversations();
   }, [headers]);
-  useEffect(() => console.log(conversations), [conversations]);
+
   const receiveNewChat = useCallback(
     (message) => {
-      console.log(conversations);
       if (conversations === {} || contactingUser === undefined) {
         return;
       }
 
-      if (
-        (message.to.username === contactingUser.username &&
-          message.owner.username === user.username) ||
-        (message.owner.username === contactingUser.username &&
-          message.to.username === user.username)
-      ) {
+      const sending =
+        message.to.username === contactingUser.username &&
+        message.owner.username === user.username;
+      const receiving =
+        message.owner.username === contactingUser.username &&
+        message.to.username === user.username;
+
+
+      if (sending || receiving) {
         setChats((c) => [...c, message]);
       }
 
@@ -43,6 +45,7 @@ export default function useChat() {
     },
     [conversations, contactingUser, user.username]
   );
+
   useEffect(() => {
     if (websocket !== null) {
       websocket.addCallbacks(
@@ -85,11 +88,11 @@ export default function useChat() {
     [websocket]
   );
 
-  const newChat = useCallback(
+  const sendChat = useCallback(
     (newChatMessage) => {
-      websocket.newChatMessage(newChatMessage);
+      websocket.sendChatMessage(newChatMessage);
     },
     [websocket]
   );
-  return { newChat, initChatWithUser, chats, conversations, contactingUser };
+  return { sendChat, initChatWithUser, chats, conversations, contactingUser };
 }

@@ -72,7 +72,7 @@ class WebSocketService {
     this.sendMessage({ command: "fetch_messages" });
   }
 
-  newChatMessage(message) {
+  sendChatMessage(message) {
     this.sendMessage({
       command: "new_message",
       text: message,

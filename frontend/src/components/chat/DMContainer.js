@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
 import { UserContext } from "../../context/UserContext";
-import useChat from "../../hooks/useChat";
 import "../../css/chat.css";
 import {
   Col,
@@ -44,7 +43,7 @@ export default function DMContainer({ userToContactUsername, chatAPI }) {
     if (newChatMessage.content.trim() === "") {
       return;
     }
-    chatAPI.newChat(newChatMessage.content);
+    chatAPI.sendChat(newChatMessage.content);
   };
 
   if (loading) {
