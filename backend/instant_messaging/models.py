@@ -2,11 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 
 # Create your models here.
+from accounts.serializers import SmallUserSerializer, SmallUserWithProfileSerializer
 import uuid
 
 from django.core.exceptions import ValidationError
 from django.db import models
-
 
 
 def validate_message_content(content):
@@ -27,6 +27,24 @@ class MessageGroup(models.Model):
     last_received_message = models.ForeignKey(
         "Message", on_delete=models.CASCADE, blank=True, null=True
     )
+
+    @classmethod
+    def messages_to_json(self, messages):
+        result = []
+        for message in messages:
+            result.append(self.message_to_json(message))
+        return result
+
+    @classmethod
+    def message_to_json(self, message):
+        return {
+            "id": str(message.id),
+            "owner": SmallUserWithProfileSerializer(message.owner).data,
+            "to": SmallUserSerializer(message.to).data,
+            "group": str(message.group.id),
+            "content": message.content,
+            "created_at": str(message.created_at),
+        }
 
 
 class Message(models.Model):
@@ -52,6 +70,7 @@ class Message(models.Model):
     content = models.TextField(validators=[validate_message_content])
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
+    @classmethod
     def last_50_messages(self, message_group):
         return (
             Message.objects.filter(group=message_group)

@@ -68,14 +68,21 @@ class WebSocketService {
     }
   }
 
-  fetchMessages() {
-    this.sendMessage({ command: "fetch_messages" });
+  fetchMessages(userToContact) {
+    if (userToContact === undefined) {
+      return;
+    }
+    this.sendMessage({
+      command: "fetch_messages",
+      user_to_contact: userToContact,
+    });
   }
 
-  sendChatMessage(message) {
+  sendChatMessage(message, userToContact) {
     this.sendMessage({
       command: "new_message",
       text: message,
+      to: userToContact,
     });
   }
 

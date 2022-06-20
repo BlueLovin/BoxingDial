@@ -6,10 +6,11 @@ import { Button, Card } from "reactstrap";
 import { UserContext } from "../../context/UserContext";
 import FollowButton from "../../components/profiles/FollowButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPencilAlt, faComments } from "@fortawesome/free-solid-svg-icons";
 import BlockButton from "../../components/profiles/BlockButton";
 import { UserNotFoundPage } from "./UserNotFoundErrorPage";
 import FeedItem from "../../components/feed/FeedItem";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function UserProfile() {
   const params = useParams();
@@ -26,8 +27,9 @@ export default function UserProfile() {
 
   const { headersVal } = useContext(UserContext);
   const [headers] = headersVal;
-  const { userVal } = useContext(UserContext);
+  const { userVal, loggedInVal } = useContext(UserContext);
   const [user] = userVal;
+  const [loggedIn] = loggedInVal;
 
   // get user posts if you are not blocking this profile
   useEffect(() => setIsBlocked(profile.blocked), [profile, headers, username]);
@@ -132,13 +134,22 @@ export default function UserProfile() {
       <h1 className="text-center">
         {/* show screen name if they have one */}
         <img className="avatar" src={profile.profile.avatar_url} alt="avatar" />
-        
+
         {`${
           profile.profile ? profile.profile.screen_name : username
         }'s Profile`}
 
         {/* show follow button if user is not blocked */}
-        {!isBlocked ? <FollowButton profile={profile} /> : null}
+        {!isBlocked && <FollowButton profile={profile} />}
+
+        {loggedIn ? (
+          <Link to={`/chat/${profile.username}`}>
+            <Button>
+              <FontAwesomeIcon icon={faComments} />
+              {" Chat"}
+            </Button>
+          </Link>
+        ) : null}
 
         <BlockButton
           isBlockedState={[isBlocked, setIsBlocked]}

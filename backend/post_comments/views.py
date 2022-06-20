@@ -16,7 +16,6 @@ from rest_framework.response import Response
 from vote.managers import UP
 from vote.models import DOWN, Vote
 from vote.views import VoteMixin
-
 from .models import PostComment, PostCommentEntities
 
 
@@ -89,6 +88,8 @@ class CreatePostCommentView(generics.CreateAPIView):
         recipient = parent_post.owner
         new_comment_username = new_comment.username
         recipient_username = recipient.username
+        
+        
 
         if UserManager.user_blocks_you(None, self.request, recipient.profile):
             return BoxingDialResponses.USER_DOESNT_EXIST_RESPONSE

@@ -15,23 +15,36 @@ import {
   InputGroupAddon,
   Spinner,
 } from "reactstrap";
-export default function DMContainer({ userToContactUsername, chatAPI }) {
+const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
   const { userVal } = useContext(UserContext);
   const [user] = userVal;
   const [loading, setLoading] = useState(true);
+  const [userToContact, setUserToContact] = useState();
   const [newChatMessage, setNewChatMessage] = useState({
     content: "",
   });
 
   useEffect(() => {
-    if (chatAPI.initChatWithUser !== undefined) {
+    if (loading && userToContact !== undefined) {
+      console.log("shit");
       chatAPI
-        .initChatWithUser(userToContactUsername)
+        .initSocketConnection()
+        .then(() => chatAPI.initChatWithUser(userToContact))
         .then(() => setLoading(false));
     }
-  }, [userToContactUsername]);
+    // god, i am so sorry to do this but i can not find another way
+    // to solve this... adding chatApi as a dependency leads to a
+    // million different issues.
+    //
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, userToContact]);
 
-  useEffect(() => setLoading(true), [userToContactUsername]);
+  useEffect(() => {
+    setUserToContact(selectedUserUsername);
+  }, [selectedUserUsername]);
+
+  useEffect(() => setLoading(true), [selectedUserUsername]);
+
   const onChange = (e) => {
     e.persist();
     setNewChatMessage({ ...newChatMessage, [e.target.name]: e.target.value });
@@ -58,9 +71,9 @@ export default function DMContainer({ userToContactUsername, chatAPI }) {
             <FontAwesomeIcon className="m-4" icon={faArrowLeft} />
           </Link>
         </div>
-        {chatAPI.contactingUser !== undefined ? (
+        {chatAPI.selectedUser !== undefined ? (
           <SmallUser
-            user={chatAPI.contactingUser}
+            user={chatAPI.selectedUser}
             bioText=""
             showBackground={false}
           />
@@ -113,4 +126,6 @@ export default function DMContainer({ userToContactUsername, chatAPI }) {
       </footer>
     </Col>
   );
-}
+});
+
+export default DMContainer;

@@ -31,7 +31,7 @@ export default function ChatRoom() {
           {userToContactUsername !== undefined ? (
             <DMContainer
               chatAPI={chatAPI}
-              userToContactUsername={userToContactUsername}
+              selectedUserUsername={userToContactUsername}
             />
           ) : (
             <h3 className="text-center">Pick a Conversation</h3>

@@ -8,7 +8,7 @@ export default function useChat() {
   const [headers] = headersVal;
   const [user] = userVal;
   const [chats, setChats] = useState([]);
-  const [contactingUser, setContactingUser] = useState();
+  const [selectedUser, setSelectedUser] = useState({});
   const [websocket, setWebSocketInstance] = useState(null);
   const [conversations, setConversations] = useState({});
 
@@ -21,35 +21,71 @@ export default function useChat() {
     fetchConversations();
   }, [headers]);
 
+  const initChatWithUser = useCallback(
+    (userToContact) =>
+      new Promise((resolve) => {
+        if (websocket === null) {
+          return;
+        }
+        axios
+          .get(`/users/${userToContact}/`, headers)
+          .then((res) => setSelectedUser(res.data))
+          .then(() => websocket.fetchMessages())
+          .then(() => resolve());
+      }),
+    [headers, websocket]
+  );
+
+  const initSocketConnection = useCallback(
+    () =>
+      new Promise((resolve) => {
+        if (websocket !== null && selectedUser !== {}) {
+          websocket.waitForSocketConnection(() => {
+            resolve();
+          });
+        }
+      }),
+    [selectedUser, websocket]
+  );
+
   const receiveNewChat = useCallback(
     (message) => {
-      if (conversations === {} || contactingUser === undefined) {
+      if (conversations === {} || selectedUser === undefined) {
         return;
       }
 
       const sending =
-        message.to.username === contactingUser.username &&
+        message.to.username === selectedUser.username &&
         message.owner.username === user.username;
       const receiving =
-        message.owner.username === contactingUser.username &&
+        message.owner.username === selectedUser.username &&
         message.to.username === user.username;
-
 
       if (sending || receiving) {
         setChats((c) => [...c, message]);
       }
 
       let conversation = conversations[message.group];
-      conversation["last_received_message"] = message;
-      setConversations((c) => ({ [message.group]: conversation, ...c }));
+      if (conversation !== undefined) {
+        conversation["last_received_message"] = message;
+        setConversations((c) => ({ [message.group]: conversation, ...c }));
+      } else {
+        axios
+          .post("/retrieve-message-group", { id: message.group })
+          .then((res) =>
+            setConversations((c) => ({ [message.group]: res.data, ...c }))
+          );
+      }
+
+      // new conversation
     },
-    [conversations, contactingUser, user.username]
+    [conversations, selectedUser, user.username]
   );
 
   useEffect(() => {
     if (websocket !== null) {
       websocket.addCallbacks(
-        (_user) => setContactingUser(_user),
+        (_user) => setSelectedUser(_user),
         (messages) => setChats(messages),
         (message) => receiveNewChat(message)
       );
@@ -61,38 +97,36 @@ export default function useChat() {
     socket.connect();
     socket.waitForSocketConnection(() => {
       socket.addCallbacks(
-        (_user) => setContactingUser(_user),
+        (_user) => setSelectedUser(_user),
         (messages) => setChats(messages),
         (message) => receiveNewChat(message)
       );
     });
-  }, [receiveNewChat, conversations, websocket, contactingUser]);
+  }, [receiveNewChat, conversations, websocket, selectedUser]);
 
   useEffect(() => {
-    if (websocket !== null) {
-      websocket.fetchMessages();
+    if (websocket !== null && selectedUser !== {}) {
+      websocket.fetchMessages(selectedUser.username);
     }
-  }, [websocket]);
-
-  const initChatWithUser = useCallback(
-    (userToContact) =>
-      new Promise((resolve) => {
-        if (websocket !== null && userToContact) {
-          websocket.waitForSocketConnection(() => {
-            websocket.initChatWithUser(userToContact);
-            websocket.fetchMessages();
-            resolve();
-          });
-        }
-      }),
-    [websocket]
-  );
+  }, [websocket, selectedUser]);
 
   const sendChat = useCallback(
-    (newChatMessage) => {
-      websocket.sendChatMessage(newChatMessage);
+    (newChat) => {
+      axios.post(
+        `/chat/${selectedUser.username}`,
+        { content: newChat },
+        headers
+      );
     },
-    [websocket]
+    [selectedUser, headers]
   );
-  return { sendChat, initChatWithUser, chats, conversations, contactingUser };
+  return {
+    sendChat,
+    chats,
+    conversations,
+    initSocketConnection,
+    initChatWithUser,
+    setSelectedUser,
+    selectedUser,
+  };
 }
