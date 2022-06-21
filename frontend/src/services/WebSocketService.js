@@ -33,8 +33,7 @@ class WebSocketService {
     };
 
     this.socketRef.onclose = () => {
-      console.log("WebSocket closed, let's re-open");
-      this.connect();
+      console.log("WebSocket closed");
     };
   }
 

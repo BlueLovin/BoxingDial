@@ -26,12 +26,9 @@ class ChatConsumer(WebsocketConsumer):
         return group
 
     def get_user(self, token):
-        try:
-            auth = TokenAuthentication()
-            user = auth.authenticate_credentials(token.encode("utf-8"))
-            return user[0]
-        except Exception:
-            return None
+        auth = TokenAuthentication()
+        user = auth.authenticate_credentials(token.encode("utf-8"))
+        return user[0]
 
     def connect_to_inbox(self):
         self.inbox_channel_name = f"inbox_{self.user.username}"
@@ -51,10 +48,6 @@ class ChatConsumer(WebsocketConsumer):
             self.close()
             return
 
-        if self.user == None:
-            self.send_message({"error": "invalid auth token received"})
-            self.close()
-            return
         self.accept()
         self.connect_to_inbox()
 

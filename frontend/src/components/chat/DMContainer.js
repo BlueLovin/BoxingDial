@@ -26,7 +26,6 @@ const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
 
   useEffect(() => {
     if (loading && userToContact !== undefined) {
-      console.log("shit");
       chatAPI
         .initSocketConnection()
         .then(() => chatAPI.initChatWithUser(userToContact))

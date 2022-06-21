@@ -79,7 +79,7 @@ export default function useChat() {
 
       // new conversation
     },
-    [conversations, selectedUser, user.username]
+    [conversations, selectedUser, user]
   );
 
   useEffect(() => {
@@ -120,6 +120,7 @@ export default function useChat() {
     },
     [selectedUser, headers]
   );
+
   return {
     sendChat,
     chats,
