@@ -1,6 +1,4 @@
-//TODO: refactor this horse shit. turn it into a hook?
-
-class WebSocketService {
+export default class WebSocketService {
   static instance = null;
   callbacks = {};
 
@@ -17,11 +15,14 @@ class WebSocketService {
 
   connect() {
     const path = "ws://localhost:8000/ws/chat";
-
     this.socketRef = new WebSocket(path);
 
     this.socketRef.onopen = () => {
       console.log("WebSocket open");
+    };
+
+    this.socketRef.onclose = () => {
+      console.log("WebSocket closed");
     };
 
     this.socketRef.onmessage = (e) => {
@@ -31,16 +32,12 @@ class WebSocketService {
     this.socketRef.onerror = (e) => {
       console.log(e.message);
     };
-
-    this.socketRef.onclose = () => {
-      console.log("WebSocket closed");
-    };
   }
 
   addCallbacks(updateUserToContact, messagesCallback, newMessageCallback) {
+    this.callbacks["update_user_to_contact"] = updateUserToContact;
     this.callbacks["messages"] = messagesCallback;
     this.callbacks["new_message"] = newMessageCallback;
-    this.callbacks["update_user_to_contact"] = updateUserToContact;
   }
 
   initChatWithUser(username) {
@@ -62,7 +59,7 @@ class WebSocketService {
     if (command === "new_message") {
       this.callbacks[command](parsedData.message);
     }
-    if (parsedData.user_to_contact) {
+    if (command === "user_to_contact") {
       this.callbacks["update_user_to_contact"](parsedData.user_to_contact);
     }
   }
@@ -103,7 +100,7 @@ class WebSocketService {
     }
 
     const socket = this.socketRef;
-    const recursion = this.waitForSocketConnection;
+    const recurse = this.waitForSocketConnection;
 
     setTimeout(function () {
       if (socket !== null && socket.readyState === 1) {
@@ -114,10 +111,8 @@ class WebSocketService {
         clearTimeout();
       } else {
         console.log("wait for connection...");
-        recursion(callback);
+        recurse(callback);
       }
     }, 1000);
   }
 }
-
-export default WebSocketService;
