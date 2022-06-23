@@ -142,7 +142,8 @@ export default function UserProfile() {
         {/* show follow button if user is not blocked */}
         {!isBlocked && <FollowButton profile={profile} />}
 
-        {loggedIn ? (
+        {/* only shows on other's profiles */}
+        {loggedIn && user.username !== username ? (
           <Link to={`/chat/${profile.username}`}>
             <Button>
               <FontAwesomeIcon icon={faComments} />
