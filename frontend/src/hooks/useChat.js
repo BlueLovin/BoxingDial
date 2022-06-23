@@ -21,6 +21,13 @@ export default function useChat() {
     fetchConversations();
   }, [headers]);
 
+  const disconnect = useCallback(() => {
+    if (websocket === null) {
+      return;
+    }
+    websocket.disconnect();
+  }, [websocket]);
+
   const initChatWithUser = useCallback(
     (userToContact) =>
       new Promise((resolve) => {
@@ -123,6 +130,7 @@ export default function useChat() {
 
   return {
     sendChat,
+    disconnect,
     chats,
     conversations,
     initSocketConnection,

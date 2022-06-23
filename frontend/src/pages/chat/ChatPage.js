@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Container, Row, Col } from "reactstrap";
 import DMContainer from "../../components/chat/DMContainer";
@@ -13,6 +13,14 @@ export default function ChatRoom() {
   const history = useHistory();
   const { userToContactUsername } = useParams();
   const chatAPI = useChat();
+
+  useEffect(() => {
+    return () => {
+      chatAPI.disconnect();
+    };
+  // its ok to do this here... or whatever
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatAPI.disconnect]);
 
   if (!loggedIn) {
     history.push("/login");

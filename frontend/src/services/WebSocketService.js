@@ -34,6 +34,10 @@ export default class WebSocketService {
     };
   }
 
+  disconnect() {
+    this.socketRef.close();
+  }
+
   addCallbacks(updateUserToContact, messagesCallback, newMessageCallback) {
     this.callbacks["update_user_to_contact"] = updateUserToContact;
     this.callbacks["messages"] = messagesCallback;
