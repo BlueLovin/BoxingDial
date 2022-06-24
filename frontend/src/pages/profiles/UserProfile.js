@@ -23,15 +23,12 @@ export default function UserProfile() {
 
   const [profile, setProfile] = useState({});
 
-  const [activeTab, setActiveTab] = useState("1");
-
   const { headersVal } = useContext(UserContext);
   const [headers] = headersVal;
   const { userVal, loggedInVal } = useContext(UserContext);
   const [user] = userVal;
   const [loggedIn] = loggedInVal;
 
-  // get user posts if you are not blocking this profile
   useEffect(() => setIsBlocked(profile.blocked), [profile, headers, username]);
 
   useEffect(() => {
@@ -113,20 +110,12 @@ export default function UserProfile() {
     return "loading...";
   };
 
-  if (!profile) {
+  if (!profile || !profile.profile) {
     return "loading";
   }
 
   if (userBlocksYou) {
-    return (
-      <>
-        <UserNotFoundPage />
-      </>
-    );
-  }
-
-  if (!profile.profile) {
-    return "loading";
+    return <UserNotFoundPage />;
   }
 
   return (
@@ -177,11 +166,9 @@ export default function UserProfile() {
       </div>
 
       <br />
-
       <br />
+
       <ProfilePageTabs
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
         renderProfilePosts={renderProfilePosts}
         username={username}
         renderProfileFollowing={renderProfileFollowing}

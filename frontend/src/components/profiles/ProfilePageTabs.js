@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ProfileComments from "../../components/profiles/ProfileComments";
 import {
   Nav,
@@ -9,13 +9,13 @@ import {
   Container,
 } from "reactstrap";
 export function ProfilePageTabs({
-  activeTab,
-  setActiveTab,
   renderProfilePosts,
   username,
   renderProfileFollowing,
   renderProfileFollowers,
 }) {
+  const [activeTab, setActiveTab] = useState("1");
+
   return (
     <>
       <Nav tabs className="justify-content-center">
