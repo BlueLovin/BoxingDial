@@ -64,7 +64,7 @@ export default function LikeButton(props) {
           <FontAwesomeIcon icon={faHeart} />
         </button>{" "}
         <Link onClick={showModal} to="#">
-          {likeCount > 1 ? `${likeCount} likes` : `${likeCount} like`}
+          {likeCount === 1 ? `${likeCount} like` : `${likeCount} likes`}
         </Link>
       </p>
     );

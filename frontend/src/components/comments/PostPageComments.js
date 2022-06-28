@@ -77,6 +77,11 @@ export default function PostPageComments(props) {
       return;
     }
 
+    if (item.content.replaceAll(' ', '').length < 5) {
+      alert("comment must be a minimum of 5 characters");
+      return;
+    }
+
     axios // create
       .post("/comments/create", item, headers)
       .then((res) => {

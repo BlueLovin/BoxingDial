@@ -88,12 +88,12 @@ export default function Login() {
               onFocus={() => setError(false)}
               value={activeItem.password}
             />
-            {error ? (
+            {error && (
               <>
                 <br />
                 <h6 className="text-danger">Invalid username or password</h6>
               </>
-            ) : null}
+            )}
           </div>
           <div className="form-group text-center">
             <Button color="success" type="submit">

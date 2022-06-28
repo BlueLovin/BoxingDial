@@ -101,7 +101,7 @@ export default function Post(props) {
           )}
 
           {/* if the post has a fight */}
-          {post.fight !== null ? (
+          {post.fight !== null && (
             <>
               <span>
                 on:{" "}
@@ -110,21 +110,21 @@ export default function Post(props) {
               <br />
               <br />
             </>
-          ) : null}
+          )}
 
           {/* show delete button */}
           {user &&
-          user.username === post.username &&
-          removePostFromParentList !== null ? (
-            <div>
-              <button
-                className="btn-sm btn-danger"
-                onClick={() => deletePost(post)}
-              >
-                Delete
-              </button>
-            </div>
-          ) : null}
+            user.username === post.username &&
+            removePostFromParentList !== null && (
+              <div>
+                <button
+                  className="btn-sm btn-danger"
+                  onClick={() => deletePost(post)}
+                >
+                  Delete
+                </button>
+              </div>
+            )}
         </div>
       </div>
     </Container>

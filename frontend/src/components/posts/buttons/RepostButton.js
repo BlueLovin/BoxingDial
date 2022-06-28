@@ -66,9 +66,9 @@ export default function RepostButton(props) {
         </button>{" "}
         {fullPostPage && (
           <Link onClick={showModal} to="#">
-            {repostCount > 1
-              ? `${repostCount} reposts`
-              : `${repostCount} repost`}
+            {repostCount === 1
+              ? `${repostCount} repost`
+              : `${repostCount} reposts`}
           </Link>
         )}
       </p>

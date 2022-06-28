@@ -63,11 +63,9 @@ export default function UserProfile() {
         })
         //404 if user doesnt exist
         .catch(() => (window.location = "/404/"));
-      // set profile followers list
       axios
         .get(`/users/${username}/following/`)
         .then((res) => setFollowingList(res.data));
-      // set profile following list
       axios
         .get(`/users/${username}/followers/`)
         .then((res) => setFollowersList(res.data));

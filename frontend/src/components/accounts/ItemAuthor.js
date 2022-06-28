@@ -14,7 +14,7 @@ export default function ItemAuthor({ user }) {
       </div>
 
       <span>
-        {user.profile ? user.profile.screen_name : null}
+        {user.profile && user.profile.screen_name}
         <Link to={`/user/${user.username}`}>
           <div>@{user.username}</div>
         </Link>

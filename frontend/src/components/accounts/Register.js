@@ -144,7 +144,7 @@ export default function Register() {
               required
             />
           </div>
-          {error ? renderErrors() : null}
+          {error && renderErrors()}
           <div className="form-group">
             <Button color="success" type="submit">
               Register

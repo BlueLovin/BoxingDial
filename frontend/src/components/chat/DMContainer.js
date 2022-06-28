@@ -49,7 +49,7 @@ const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
   const submitMessage = (e) => {
     e.preventDefault();
     setNewChatMessage({ content: "" });
-    if (newChatMessage.content.trim() === "") {
+    if (newChatMessage.content.replaceAll(" ", "") === "") {
       return;
     }
     chatAPI.sendChat(newChatMessage.content);
