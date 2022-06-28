@@ -71,9 +71,17 @@ class Message(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
     @classmethod
-    def last_50_messages(self, message_group):
+    def last_50_messages(cls, message_group):
         return (
             Message.objects.filter(group=message_group)
             .order_by("created_at")
             .all()[:150]
         )
+
+    @classmethod
+    def check_user_messaging_permissions(cls, owner, recipient) -> bool:
+        recipient_follows_you = recipient.following.filter(
+            following_user_id=owner.id
+        ).exists()
+        # could return recipient_follows_you, but for prototyping lets just return true
+        return True

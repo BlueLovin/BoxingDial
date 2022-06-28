@@ -2,6 +2,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import WebSocketService from "../services/WebSocketService";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function useChat() {
   const { headersVal, userVal } = useContext(UserContext);
@@ -11,6 +12,7 @@ export default function useChat() {
   const [selectedUser, setSelectedUser] = useState({});
   const [websocket, setWebSocketInstance] = useState(null);
   const [conversations, setConversations] = useState({});
+  const history = useHistory();
 
   useEffect(() => {
     const fetchConversations = () => {
@@ -38,9 +40,10 @@ export default function useChat() {
           .get(`/users/${userToContact}/`, headers)
           .then((res) => setSelectedUser(res.data))
           .then(() => websocket.fetchMessages())
-          .then(() => resolve());
+          .then(() => resolve())
+          .catch(() => history.push("/404"));
       }),
-    [headers, websocket]
+    [headers, websocket, history]
   );
 
   const initSocketConnection = useCallback(
@@ -61,14 +64,14 @@ export default function useChat() {
         return;
       }
 
-      const sending =
+      const isSendingMessage =
         message.to.username === selectedUser.username &&
         message.owner.username === user.username;
-      const receiving =
+      const isReceivingMessage =
         message.owner.username === selectedUser.username &&
         message.to.username === user.username;
 
-      if (sending || receiving) {
+      if (isSendingMessage || isReceivingMessage) {
         setChats((c) => [...c, message]);
       }
 
@@ -77,14 +80,13 @@ export default function useChat() {
         conversation["last_received_message"] = message;
         setConversations((c) => ({ [message.group]: conversation, ...c }));
       } else {
+        // new conversation
         axios
           .post("/retrieve-message-group", { id: message.group })
           .then((res) =>
             setConversations((c) => ({ [message.group]: res.data, ...c }))
           );
       }
-
-      // new conversation
     },
     [conversations, selectedUser, user]
   );
@@ -119,11 +121,14 @@ export default function useChat() {
 
   const sendChat = useCallback(
     (newChat) => {
-      axios.post(
-        `/chat/${selectedUser.username}`,
-        { content: newChat },
-        headers
-      );
+      axios
+        .post(`/chat/${selectedUser.username}`, { content: newChat }, headers)
+        .catch((err) => {
+          alert(
+            "there was an error sending your message: \n" +
+              err.response.data.error
+          );
+        });
     },
     [selectedUser, headers]
   );

@@ -1,7 +1,6 @@
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 import json
-from accounts.serializers import SmallUserSerializer, SmallUserWithProfileSerializer
 from django.contrib.auth.models import User
 from knox.auth import TokenAuthentication
 from .models import Message, MessageGroup
@@ -12,6 +11,10 @@ class ChatConsumer(WebsocketConsumer):
         print(data)
         user_to_contact = data["user_to_contact"]
         group = self.get_or_create_group(user_to_contact)
+
+        if group == None:
+            return
+
         messages = Message.last_50_messages(group)
         messages_json = MessageGroup.messages_to_json(messages)
 
@@ -19,6 +22,9 @@ class ChatConsumer(WebsocketConsumer):
         self.send_message(content)
 
     def get_or_create_group(self, user_to_contact_username):
+        if User.objects.filter(username=user_to_contact_username).exists() == False:
+            return None
+
         username_list = [self.user.username, user_to_contact_username]
         username_list.sort()
         group_name = "chat_" + "_".join(username_list)

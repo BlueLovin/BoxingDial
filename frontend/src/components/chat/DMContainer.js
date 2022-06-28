@@ -31,10 +31,7 @@ const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
         .then(() => chatAPI.initChatWithUser(userToContact))
         .then(() => setLoading(false));
     }
-    // god, i am so sorry to do this but i can not find another way
-    // to solve this... adding chatApi as a dependency leads to a
-    // million different issues.
-    //
+    // please forgive me for this...
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, userToContact]);
 

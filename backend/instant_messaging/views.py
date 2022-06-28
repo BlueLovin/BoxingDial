@@ -62,6 +62,14 @@ class CreateMessageView(generics.CreateAPIView):
         owner = request.user
         content = request.data["content"]
         user_to_contact = User.objects.get(username=recipient)
+
+        has_permission = Message.check_user_messaging_permissions(
+            owner, user_to_contact
+        )
+
+        if has_permission == False:
+            return Response({"error": "Can not message this user."}, 500)
+
         group = self.get_or_create_group(owner, user_to_contact)
 
         message = Message.objects.create(
