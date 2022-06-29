@@ -16,13 +16,15 @@ import {
 } from "reactstrap";
 import ChatMessageBox from "./ChatMessageBox";
 import { UserContext } from "../../context/UserContext";
+import axios from "axios";
 const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
   const [loading, setLoading] = useState(true);
   const [userToContact, setUserToContact] = useState();
   const [newChatMessage, setNewChatMessage] = useState({
     content: "",
   });
-  const { userVal } = useContext(UserContext);
+  const { headersVal, userVal } = useContext(UserContext);
+  const [headers] = headersVal;
   const [user] = userVal;
 
   useEffect(() => {
@@ -58,11 +60,15 @@ const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
     };
 
     const unreadMessageIDs = readUnreadMessages();
-    if (unreadMessageIDs.length !== 0) {
+    if (unreadMessageIDs.length > 0) {
       console.log(unreadMessageIDs);
-      // send post request to read all messages in array.
+      axios.post(
+        "/chat/read-messages",
+        { message_ids: unreadMessageIDs },
+        headers
+      );
     }
-  }, [chatAPI.chats, user.username]);
+  }, [chatAPI.chats, user.username, headers]);
 
   useEffect(() => setLoading(true), [selectedUserUsername]);
 

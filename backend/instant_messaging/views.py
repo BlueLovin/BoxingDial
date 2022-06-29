@@ -81,6 +81,26 @@ class CreateMessageView(generics.CreateAPIView):
         return Response(MessageSerializer(message).data)
 
 
+class ReadMessagesView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        message_ids = request.data["message_ids"]
+
+        for message_id in message_ids:
+            message = Message.objects.get(id=message_id)
+
+            client_is_recipient = message.to == request.user
+
+            if not client_is_recipient:
+                continue
+
+            message.read_by_recipient = True
+            message.save()
+
+        return Response(200)
+
+
 class RetrieveMessageGroupView(generics.RetrieveAPIView):
     def post(self, request):
         group_id = request.data["id"]

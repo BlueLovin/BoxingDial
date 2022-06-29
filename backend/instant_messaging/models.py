@@ -41,6 +41,7 @@ class MessageGroup(models.Model):
             "id": str(message.id),
             "owner": SmallUserWithProfileSerializer(message.owner).data,
             "to": SmallUserSerializer(message.to).data,
+            "read_by_recipient": message.read_by_recipient,
             "group": str(message.group.id),
             "content": message.content,
             "created_at": str(message.created_at),
