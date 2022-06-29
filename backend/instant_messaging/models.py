@@ -29,14 +29,14 @@ class MessageGroup(models.Model):
     )
 
     @classmethod
-    def messages_to_json(self, messages):
+    def messages_to_json(cls, messages):
         result = []
         for message in messages:
-            result.append(self.message_to_json(message))
+            result.append(cls.message_to_json(message))
         return result
 
     @classmethod
-    def message_to_json(self, message):
+    def message_to_json(cls, message):
         return {
             "id": str(message.id),
             "owner": SmallUserWithProfileSerializer(message.owner).data,
@@ -48,7 +48,6 @@ class MessageGroup(models.Model):
 
 
 class Message(models.Model):
-
     id = models.UUIDField(
         primary_key=True, null=False, default=uuid.uuid4, editable=False
     )
@@ -69,6 +68,7 @@ class Message(models.Model):
     group = models.ForeignKey(MessageGroup, on_delete=models.CASCADE)
     content = models.TextField(validators=[validate_message_content])
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    read_by_recipient = models.BooleanField(default=False)
 
     @classmethod
     def last_50_messages(cls, message_group):

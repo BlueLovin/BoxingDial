@@ -4,7 +4,6 @@ import SmallUser from "../../components/profiles/SmallUser";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
-import { UserContext } from "../../context/UserContext";
 import "../../css/chat.css";
 import {
   Col,
@@ -15,14 +14,16 @@ import {
   InputGroupAddon,
   Spinner,
 } from "reactstrap";
+import ChatMessageBox from "./ChatMessageBox";
+import { UserContext } from "../../context/UserContext";
 const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
-  const { userVal } = useContext(UserContext);
-  const [user] = userVal;
   const [loading, setLoading] = useState(true);
   const [userToContact, setUserToContact] = useState();
   const [newChatMessage, setNewChatMessage] = useState({
     content: "",
   });
+  const { userVal } = useContext(UserContext);
+  const [user] = userVal;
 
   useEffect(() => {
     if (loading && userToContact !== undefined) {
@@ -38,6 +39,30 @@ const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
   useEffect(() => {
     setUserToContact(selectedUserUsername);
   }, [selectedUserUsername]);
+
+  useEffect(() => {
+    if (chatAPI.chats === undefined && chatAPI.chats.length !== 0) {
+      return;
+    }
+
+    const readUnreadMessages = () => {
+      let messageIDs = [];
+      chatAPI.chats.forEach((message) => {
+        const isOwner = message.owner.username === user.username;
+        const sendReadReceipt = !isOwner && !message.read_by_recipient;
+        if (sendReadReceipt) {
+          messageIDs.push(message.id);
+        }
+      });
+      return messageIDs;
+    };
+
+    const unreadMessageIDs = readUnreadMessages();
+    if (unreadMessageIDs.length !== 0) {
+      console.log(unreadMessageIDs);
+      // send post request to read all messages in array.
+    }
+  }, [chatAPI.chats, user.username]);
 
   useEffect(() => setLoading(true), [selectedUserUsername]);
 
@@ -78,28 +103,9 @@ const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
         )}
       </div>
       <ScrollToBottom className="dm-container">
-        {chatAPI.chats.map((item, idx) => {
-          const isOwner = item.owner.username === user.username;
-          return (
-            <div key={idx} className="MessageBox ">
-              <div className="ChatMessage">
-                <div className={isOwner ? "RightBubble" : "LeftBubble"}>
-                  <span className="MsgName">
-                    {!isOwner && (
-                      <img
-                        className="medium-avatar"
-                        src={item.owner.profile.avatar_url}
-                        alt="avatar"
-                      />
-                    )}
-                  </span>
-                  <span className="MsgDate"> at {item.created_at}</span>
-                  <p>{item.content}</p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+        {chatAPI.chats.map((message, idx) => (
+          <ChatMessageBox message={message} id={idx} />
+        ))}
       </ScrollToBottom>
       <footer className="p-2">
         <Form className="MessageForm" onSubmit={submitMessage}>

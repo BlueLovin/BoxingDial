@@ -9,7 +9,15 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ("id", "owner", "to", "group", "content", "created_at")
+        fields = (
+            "id",
+            "owner",
+            "to",
+            "group",
+            "content",
+            "created_at",
+            "read_by_recipient",
+        )
 
 
 class MessageGroupSerializer(serializers.ModelSerializer):
