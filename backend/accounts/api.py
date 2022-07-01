@@ -152,7 +152,7 @@ class UserAPI(generics.RetrieveAPIView):
 
     def get(self, request, format=None):
         user = self.request.user
-        unread_messages = Value(
+        unread_notifications_count = Value(
             Notification.objects.filter(recipient=user, is_read=False).count(),
             output_field=IntegerField(),
         )
@@ -160,7 +160,7 @@ class UserAPI(generics.RetrieveAPIView):
         # annotate user with unread messages count
         user = (
             User.objects.filter(id=user.id)
-            .annotate(unread_messages_count=unread_messages)
+            .annotate(unread_messages_count=unread_notifications_count)
             .first()
         )
 

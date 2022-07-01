@@ -76,7 +76,7 @@ class UserWithFollowersSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(many=False)
     following = UserFollowingSerializer(many=True)
     followers = FollowersSerializer(many=True)
-    unread_messages_count = serializers.IntegerField(default=0)
+    unread_notifications_count = serializers.IntegerField(default=0)
 
     class Meta:
         unique_together = ["followers, following"]
@@ -87,7 +87,7 @@ class UserWithFollowersSerializer(serializers.ModelSerializer):
             "profile",
             "followers",
             "following",
-            "unread_messages_count",
+            "unread_notifications_count",
         )
 
 

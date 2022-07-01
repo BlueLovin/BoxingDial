@@ -12,11 +12,12 @@ from accounts.serializers import UserSerializer
 from .serializers import NotificationSerializer
 from .models import Notification
 from backend.permissions import IsOwnerOrReadOnly
+from instant_messaging.models import Message
 
 not_logged_in_exception = exceptions.ValidationError("Not logged in.")
 
-# user inbox - /api/users/{username}
-class InboxView(generics.ListAPIView):
+# user inbox - /api/inbox/all/
+class NotificationListView(generics.ListAPIView):
     serializer_class = NotificationSerializer
 
     def get_queryset(self):
@@ -25,12 +26,30 @@ class InboxView(generics.ListAPIView):
         return user.notifications.order_by("-date")
 
 
+class InboxView(generics.GenericAPIView):
+    def get(self, request):
+        user = request.user
+
+        notifications_count = user.notifications.filter(is_read=False).count()
+        unread_chats_count = Message.objects.filter(
+            to=user, read_by_recipient=False
+        ).count()
+
+        return Response(
+            {
+                "unread_notifications_count": notifications_count,
+                "unread_chat_messages_count": unread_chats_count,
+            },
+            200,
+        )
+
+
 class MarkNotificationAsReadView(generics.UpdateAPIView):
     serializer_class = NotificationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, notification, format=None):
-        user = self.request.user
+        user = request.user
 
         if user.is_anonymous:
             raise not_logged_in_exception

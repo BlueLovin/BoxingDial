@@ -13,11 +13,11 @@ export default function ShowInboxBell() {
     return (
       <span className="p-3">
         <Button
-          color={user.unread_messages_count > 0 ? "danger" : "primary"}
+          color={user.unread_notifications_count > 0 ? "danger" : "primary"}
           href="/inbox"
         >
           <FontAwesomeIcon icon={faBell} onClick={null} />
-          {" " + user.unread_messages_count}
+          {" " + user.unread_notifications_count}
         </Button>
       </span>
     );
