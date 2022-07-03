@@ -3,6 +3,7 @@ import WebSocketService from "../services/WebSocketService";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import useInbox from "./useInbox";
 
 export default function useChat() {
   const { headersVal, userVal } = useContext(UserContext);
@@ -12,6 +13,7 @@ export default function useChat() {
   const [selectedUser, setSelectedUser] = useState({});
   const [websocket, setWebSocketInstance] = useState(null);
   const [conversations, setConversations] = useState({});
+  const inbox = useInbox();
   const history = useHistory();
 
   useEffect(() => {
@@ -22,6 +24,38 @@ export default function useChat() {
     };
     fetchConversations();
   }, [headers]);
+
+  const getUnreadMessageIDsAndUpdateChats = useCallback(() => {
+    let messageIDs = [];
+    const newChatList = chats.forEach((message) => {
+      const isOwner = message.owner.username === user.username;
+      const sendReadReceipt = !isOwner && !message.read_by_recipient;
+      if (sendReadReceipt) {
+        messageIDs.push(message.id);
+        return { ...message, read_by_recipient: true };
+      }
+      return message;
+    });
+    // setChats(newChatList);
+    return messageIDs;
+  }, [chats, user.username]);
+
+  const readUnreadMessages = useCallback(() => {
+    const unreadMessageIDs = getUnreadMessageIDsAndUpdateChats();
+    console.log(unreadMessageIDs);
+    const unreadMessageCount = unreadMessageIDs.length;
+    if (unreadMessageCount > 0) {
+      axios
+        .post("/chat/read-messages", { message_ids: unreadMessageIDs }, headers)
+        .then(() => inbox.addToUnreadChatsCount(-unreadMessageCount));
+    }
+  }, [getUnreadMessageIDsAndUpdateChats, headers]);
+
+  useEffect(() => {
+    if (chats !== undefined) {
+      readUnreadMessages();
+    }
+  }, [chats, readUnreadMessages]);
 
   const disconnect = useCallback(() => {
     if (websocket === null) {
@@ -63,16 +97,15 @@ export default function useChat() {
       if (conversations === {} || selectedUser === undefined) {
         return;
       }
+      const isSendingMessage = message.owner.username === user.username;
+      const isReceivingMessage = message.to.username === user.username;
 
-      const isSendingMessage =
-        message.to.username === selectedUser.username &&
-        message.owner.username === user.username;
-      const isReceivingMessage =
-        message.owner.username === selectedUser.username &&
-        message.to.username === user.username;
-
-      if (isSendingMessage || isReceivingMessage) {
-        setChats((c) => [...c, message]);
+      const isReceivingFromSelectedConversation =
+        selectedUser !== null &&
+        message.owner.username === selectedUser.username;
+      console.log(selectedUser);
+      if (isReceivingMessage && !isReceivingFromSelectedConversation) {
+        inbox.addtoUnreadNotificationsCount(1);
       }
 
       let conversation = conversations[message.group];
@@ -83,12 +116,25 @@ export default function useChat() {
         // new conversation
         axios
           .post("/retrieve-message-group", { id: message.group })
-          .then((res) =>
-            setConversations((c) => ({ [message.group]: res.data, ...c }))
-          );
+          .then((res) => {
+            const newConversation = res.data;
+            newConversation["last_received_message"] = message;
+            setConversations((c) => ({
+              [message.group]: newConversation,
+              ...c,
+            }));
+          });
+      }
+
+      if (isReceivingFromSelectedConversation) {
+        readUnreadMessages();
+      }
+
+      if (isSendingMessage || isReceivingFromSelectedConversation) {
+        setChats((c) => [...c, message]);
       }
     },
-    [conversations, selectedUser, user]
+    [conversations, selectedUser, user, inbox, readUnreadMessages]
   );
 
   useEffect(() => {
@@ -137,6 +183,8 @@ export default function useChat() {
     sendChat,
     disconnect,
     chats,
+    setChats,
+    readUnreadMessages,
     conversations,
     initSocketConnection,
     initChatWithUser,

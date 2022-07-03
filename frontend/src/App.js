@@ -13,6 +13,7 @@ export default function App() {
   const [token, setToken] = useState();
   const [loggedIn, setLoggedIn] = useState(null);
   const [headers, setHeaders] = useState(null);
+  const [inbox, setInbox] = useState(null);
   const [loading, setLoading] = useState(true);
   const { userModalContext } = useUserListModalContext();
 
@@ -64,6 +65,15 @@ export default function App() {
     }
   }, [token]);
 
+  useEffect(() => {
+    if (loggedIn && headers !== undefined) {
+      axios.get("/inbox/", headers).then((res) => {
+        console.log(res.data);
+        setInbox(res.data);
+      });
+    }
+  }, [loggedIn, headers]);
+
   // SET GLOBAL LOADING STATE
   useEffect(() => {
     if (loggedIn !== null && user !== undefined) {
@@ -80,6 +90,7 @@ export default function App() {
             tokenVal: [token, setToken],
             loggedInVal: [loggedIn, setLoggedIn],
             headersVal: [headers, setHeaders],
+            inboxVal: [inbox, setInbox],
           }}
         >
           <NavigationBar />

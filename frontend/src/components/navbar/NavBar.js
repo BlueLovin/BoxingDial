@@ -21,8 +21,9 @@ import {
   faComments,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ShowInboxBell from "./ShowInboxBell";
+import ShowInbox from "./ShowInboxBell";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
+import ChatNavItem from "./ChatNavItem";
 
 export const NavigationBar = React.memo(() => {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,8 +43,7 @@ export const NavigationBar = React.memo(() => {
           </NavItem>
           <NavItem>
             <NavLink tag={Link} to="/chat">
-              <FontAwesomeIcon icon={faComments} />
-              {" Chat"}
+              <ChatNavItem />
             </NavLink>
           </NavItem>
           <NavItem>
@@ -69,7 +69,7 @@ export const NavigationBar = React.memo(() => {
             </DropdownMenu>
           </UncontrolledDropdown>
         </Nav>
-        <ShowInboxBell />
+        <ShowInbox />
         <NavbarText>
           <ShowUser />
         </NavbarText>

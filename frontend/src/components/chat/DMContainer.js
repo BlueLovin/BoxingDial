@@ -15,60 +15,30 @@ import {
   Spinner,
 } from "reactstrap";
 import ChatMessageBox from "./ChatMessageBox";
-import { UserContext } from "../../context/UserContext";
-import axios from "axios";
 const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
   const [loading, setLoading] = useState(true);
   const [userToContact, setUserToContact] = useState();
   const [newChatMessage, setNewChatMessage] = useState({
     content: "",
   });
-  const { headersVal, userVal } = useContext(UserContext);
-  const [headers] = headersVal;
-  const [user] = userVal;
 
   useEffect(() => {
-    if (loading && userToContact !== undefined) {
-      chatAPI
-        .initSocketConnection()
-        .then(() => chatAPI.initChatWithUser(userToContact))
-        .then(() => setLoading(false));
+    if (userToContact !== undefined) {
+      chatAPI.initChatWithUser(userToContact).then(() => {
+        setLoading(false);
+      });
     }
+
     // please forgive me for this...
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, userToContact]);
 
   useEffect(() => {
     setUserToContact(selectedUserUsername);
-  }, [selectedUserUsername]);
-
-  useEffect(() => {
-    if (chatAPI.chats === undefined && chatAPI.chats.length !== 0) {
-      return;
-    }
-
-    const readUnreadMessages = () => {
-      let messageIDs = [];
-      chatAPI.chats.forEach((message) => {
-        const isOwner = message.owner.username === user.username;
-        const sendReadReceipt = !isOwner && !message.read_by_recipient;
-        if (sendReadReceipt) {
-          messageIDs.push(message.id);
-        }
-      });
-      return messageIDs;
+    return () => {
+      // chatAPI.setSelectedUser(undefined);
     };
-
-    const unreadMessageIDs = readUnreadMessages();
-    if (unreadMessageIDs.length > 0) {
-      console.log(unreadMessageIDs);
-      axios.post(
-        "/chat/read-messages",
-        { message_ids: unreadMessageIDs },
-        headers
-      );
-    }
-  }, [chatAPI.chats, user.username, headers]);
+  }, [selectedUserUsername, chatAPI]);
 
   useEffect(() => setLoading(true), [selectedUserUsername]);
 
