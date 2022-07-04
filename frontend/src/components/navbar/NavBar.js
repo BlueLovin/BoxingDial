@@ -18,7 +18,6 @@ import {
   faHome,
   faPenFancy,
   faFistRaised,
-  faComments,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ShowInbox from "./ShowInboxBell";

@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Container, Row, Col } from "reactstrap";
 import DMContainer from "../../components/chat/DMContainer";
@@ -13,19 +13,20 @@ export default function ChatRoom() {
   const history = useHistory();
   const { userToContactUsername } = useParams();
   const chatAPI = useChat();
+  const isMounted = useRef(false);
+  useEffect(() => {
+    if (!isMounted.current) {
+      chatAPI.initSocketConnection();
+      isMounted.current = true;
+    }
+  }, [chatAPI]);
 
   useEffect(() => {
-    chatAPI.initSocketConnection();
-    if (userToContactUsername === undefined) {
-      chatAPI.setSelectedUser({});
-      alert("no user selected");
-    }
     return () => {
       chatAPI.disconnect();
     };
-    // its ok to do this here... or whatever
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatAPI.disconnect, userToContactUsername]);
+  }, []);
 
   if (!loggedIn) {
     history.push("/login");

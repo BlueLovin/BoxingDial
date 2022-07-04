@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
 import SmallUser from "../../components/profiles/SmallUser";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -35,10 +35,7 @@ const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
 
   useEffect(() => {
     setUserToContact(selectedUserUsername);
-    return () => {
-      // chatAPI.setSelectedUser(undefined);
-    };
-  }, [selectedUserUsername, chatAPI]);
+  }, [selectedUserUsername]);
 
   useEffect(() => setLoading(true), [selectedUserUsername]);
 
@@ -47,14 +44,14 @@ const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
     setNewChatMessage({ ...newChatMessage, [e.target.name]: e.target.value });
   };
 
-  const submitMessage = (e) => {
+  const submitMessage = useCallback((e) => {
     e.preventDefault();
     setNewChatMessage({ content: "" });
     if (newChatMessage.content.replaceAll(" ", "") === "") {
       return;
     }
     chatAPI.sendChat(newChatMessage.content);
-  };
+  }, [chatAPI, newChatMessage.content]);
 
   if (loading) {
     return <Spinner />;

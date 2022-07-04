@@ -10,7 +10,7 @@ export default function useChat() {
   const [headers] = headersVal;
   const [user] = userVal;
   const [chats, setChats] = useState([]);
-  const [selectedUser, setSelectedUser] = useState({});
+  const [selectedUser, setSelectedUser] = useState();
   const [websocket, setWebSocketInstance] = useState(null);
   const [conversations, setConversations] = useState({});
   const inbox = useInbox();
@@ -49,6 +49,7 @@ export default function useChat() {
         .post("/chat/read-messages", { message_ids: unreadMessageIDs }, headers)
         .then(() => inbox.addToUnreadChatsCount(-unreadMessageCount));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getUnreadMessageIDsAndUpdateChats, headers]);
 
   useEffect(() => {
@@ -77,24 +78,29 @@ export default function useChat() {
           .then(() => resolve())
           .catch(() => history.push("/404"));
       }),
-    [headers, websocket, history]
+    [headers, websocket, history, setSelectedUser]
   );
 
   const initSocketConnection = useCallback(
     () =>
       new Promise((resolve) => {
-        if (websocket !== null && selectedUser !== {}) {
+        if (websocket !== null) {
           websocket.waitForSocketConnection(() => {
             resolve();
           });
         }
       }),
-    [selectedUser, websocket]
+    [websocket]
   );
+
+  useEffect(() => {
+    console.log("selected user changed")
+    console.log(selectedUser);
+  }, [selectedUser]);
 
   const receiveNewChat = useCallback(
     (message) => {
-      if (conversations === {} || selectedUser === undefined) {
+      if (conversations === {}) {
         return;
       }
       const isSendingMessage = message.owner.username === user.username;
@@ -102,8 +108,14 @@ export default function useChat() {
 
       const isReceivingFromSelectedConversation =
         selectedUser !== null &&
+        selectedUser !== undefined &&
         message.owner.username === selectedUser.username;
+
+
+      // WHY TF IS SELECTED USER UNDEFINED HERE???
       console.log(selectedUser);
+
+
       if (isReceivingMessage && !isReceivingFromSelectedConversation) {
         inbox.addtoUnreadNotificationsCount(1);
       }
@@ -134,13 +146,12 @@ export default function useChat() {
         setChats((c) => [...c, message]);
       }
     },
-    [conversations, selectedUser, user, inbox, readUnreadMessages]
+    [conversations, user, inbox, readUnreadMessages, selectedUser]
   );
 
   useEffect(() => {
     if (websocket !== null) {
       websocket.addCallbacks(
-        (_user) => setSelectedUser(_user),
         (messages) => setChats(messages),
         (message) => receiveNewChat(message)
       );
@@ -152,7 +163,6 @@ export default function useChat() {
     socket.connect();
     socket.waitForSocketConnection(() => {
       socket.addCallbacks(
-        (_user) => setSelectedUser(_user),
         (messages) => setChats(messages),
         (message) => receiveNewChat(message)
       );
@@ -160,7 +170,7 @@ export default function useChat() {
   }, [receiveNewChat, conversations, websocket, selectedUser]);
 
   useEffect(() => {
-    if (websocket !== null && selectedUser !== {}) {
+    if (websocket !== null && selectedUser !== undefined) {
       websocket.fetchMessages(selectedUser.username);
     }
   }, [websocket, selectedUser]);

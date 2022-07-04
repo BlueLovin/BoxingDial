@@ -38,8 +38,7 @@ export default class WebSocketService {
     this.socketRef.close();
   }
 
-  addCallbacks(updateUserToContact, messagesCallback, newMessageCallback) {
-    this.callbacks["update_user_to_contact"] = updateUserToContact;
+  addCallbacks(messagesCallback, newMessageCallback) {
     this.callbacks["messages"] = messagesCallback;
     this.callbacks["new_message"] = newMessageCallback;
   }
@@ -62,9 +61,6 @@ export default class WebSocketService {
     }
     if (command === "new_message") {
       this.callbacks[command](parsedData.message);
-    }
-    if (command === "user_to_contact") {
-      this.callbacks["update_user_to_contact"](parsedData.user_to_contact);
     }
   }
 
