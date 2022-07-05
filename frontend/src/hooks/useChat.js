@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import WebSocketService from "../services/WebSocketService";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
@@ -15,6 +15,7 @@ export default function useChat() {
   const [conversations, setConversations] = useState({});
   const inbox = useInbox();
   const history = useHistory();
+  const isMounted = useRef(false);
 
   useEffect(() => {
     const fetchConversations = () => {
@@ -49,7 +50,7 @@ export default function useChat() {
         .post("/chat/read-messages", { message_ids: unreadMessageIDs }, headers)
         .then(() => inbox.addToUnreadChatsCount(-unreadMessageCount));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getUnreadMessageIDsAndUpdateChats, headers]);
 
   useEffect(() => {
@@ -94,7 +95,7 @@ export default function useChat() {
   );
 
   useEffect(() => {
-    console.log("selected user changed")
+    console.log("selected user changed");
     console.log(selectedUser);
   }, [selectedUser]);
 
@@ -110,11 +111,6 @@ export default function useChat() {
         selectedUser !== null &&
         selectedUser !== undefined &&
         message.owner.username === selectedUser.username;
-
-
-      // WHY TF IS SELECTED USER UNDEFINED HERE???
-      console.log(selectedUser);
-
 
       if (isReceivingMessage && !isReceivingFromSelectedConversation) {
         inbox.addtoUnreadNotificationsCount(1);
@@ -161,12 +157,11 @@ export default function useChat() {
     const socket = WebSocketService.getInstance();
     setWebSocketInstance(socket);
     socket.connect();
-    socket.waitForSocketConnection(() => {
-      socket.addCallbacks(
-        (messages) => setChats(messages),
-        (message) => receiveNewChat(message)
-      );
-    });
+    socket.addCallbacks(
+      (messages) => setChats(messages),
+      (message) => receiveNewChat(message)
+    );
+    socket.waitForSocketConnection();
   }, [receiveNewChat, conversations, websocket, selectedUser]);
 
   useEffect(() => {

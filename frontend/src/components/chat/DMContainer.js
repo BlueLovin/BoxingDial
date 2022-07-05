@@ -77,7 +77,7 @@ const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
       </div>
       <ScrollToBottom className="dm-container">
         {chatAPI.chats.map((message, idx) => (
-          <ChatMessageBox message={message} id={idx} />
+          <ChatMessageBox message={message} id={idx} key={idx}/>
         ))}
       </ScrollToBottom>
       <footer className="p-2">

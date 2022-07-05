@@ -105,7 +105,7 @@ export default class WebSocketService {
     setTimeout(function () {
       if (socket !== null && socket.readyState === 1) {
         console.log("Connection is made");
-        if (callback !== null) {
+        if (callback !== null && typeof callback === "function") {
           callback();
         }
         clearTimeout();
