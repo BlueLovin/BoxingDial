@@ -68,7 +68,6 @@ export default function App() {
   useEffect(() => {
     if (loggedIn && headers !== undefined) {
       axios.get("/inbox/", headers).then((res) => {
-        console.log(res.data);
         setInbox(res.data);
       });
     }

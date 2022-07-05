@@ -26,9 +26,22 @@ export default function useChat() {
     fetchConversations();
   }, [headers]);
 
-  const getUnreadMessageIDsAndUpdateChats = useCallback(() => {
+  const updateNewlyReadChats = useCallback((messageIDs) => {
+    setChats((_chats) =>
+      _chats.map((message) => {
+        const updateMessage = messageIDs.includes(message.id);
+        if (updateMessage) {
+          messageIDs.push(message.id);
+          return { ...message, read_by_recipient: true };
+        }
+        return message;
+      })
+    );
+    return messageIDs;
+  }, []);
+  const getUnreadMessageIDs = useCallback(() => {
     let messageIDs = [];
-    const newChatList = chats.forEach((message) => {
+    chats.forEach((message) => {
       const isOwner = message.owner.username === user.username;
       const sendReadReceipt = !isOwner && !message.read_by_recipient;
       if (sendReadReceipt) {
@@ -37,25 +50,25 @@ export default function useChat() {
       }
       return message;
     });
-    // setChats(newChatList);
     return messageIDs;
-  }, [chats, user.username]);
+  }, [user.username, chats]);
 
   const readUnreadMessages = useCallback(() => {
-    const unreadMessageIDs = getUnreadMessageIDsAndUpdateChats();
-    console.log(unreadMessageIDs);
+    const unreadMessageIDs = getUnreadMessageIDs();
     const unreadMessageCount = unreadMessageIDs.length;
     if (unreadMessageCount > 0) {
       axios
         .post("/chat/read-messages", { message_ids: unreadMessageIDs }, headers)
-        .then(() => inbox.addToUnreadChatsCount(-unreadMessageCount));
+        .then(() => inbox.addToUnreadChatsCount(-unreadMessageCount))
+        .then(() => updateNewlyReadChats(unreadMessageIDs));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getUnreadMessageIDsAndUpdateChats, headers]);
+  }, [getUnreadMessageIDs, updateNewlyReadChats, headers, inbox]);
 
   useEffect(() => {
-    if (chats !== undefined) {
+    if (chats.length !== 0 && isMounted.current === false) {
+      console.log(chats);
       readUnreadMessages();
+      isMounted.current = true;
     }
   }, [chats, readUnreadMessages]);
 
@@ -94,11 +107,6 @@ export default function useChat() {
     [websocket]
   );
 
-  useEffect(() => {
-    console.log("selected user changed");
-    console.log(selectedUser);
-  }, [selectedUser]);
-
   const receiveNewChat = useCallback(
     (message) => {
       if (conversations === {}) {
@@ -111,7 +119,7 @@ export default function useChat() {
         selectedUser !== null &&
         selectedUser !== undefined &&
         message.owner.username === selectedUser.username;
-
+      console.log(selectedUser);
       if (isReceivingMessage && !isReceivingFromSelectedConversation) {
         inbox.addtoUnreadNotificationsCount(1);
       }
@@ -134,12 +142,12 @@ export default function useChat() {
           });
       }
 
-      if (isReceivingFromSelectedConversation) {
-        readUnreadMessages();
-      }
-
       if (isSendingMessage || isReceivingFromSelectedConversation) {
         setChats((c) => [...c, message]);
+      }
+
+      if (isReceivingFromSelectedConversation) {
+        readUnreadMessages();
       }
     },
     [conversations, user, inbox, readUnreadMessages, selectedUser]

@@ -38,7 +38,6 @@ export default function EditProfile() {
   const handleChange = (e) => {
     let { name, value } = e.target;
 
-    console.log(profile);
     if (name === "new_avatar") {
       setNewProfile((p) => ({ ...p, new_avatar: e.target.files[0] }));
       return;

@@ -22,6 +22,12 @@ export default function ChatRoom() {
   }, [chatAPI]);
 
   useEffect(() => {
+    if (userToContactUsername === undefined) {
+      chatAPI.setSelectedUser({});
+    }
+  });
+
+  useEffect(() => {
     return () => {
       chatAPI.disconnect();
     };

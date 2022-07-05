@@ -44,14 +44,17 @@ const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
     setNewChatMessage({ ...newChatMessage, [e.target.name]: e.target.value });
   };
 
-  const submitMessage = useCallback((e) => {
-    e.preventDefault();
-    setNewChatMessage({ content: "" });
-    if (newChatMessage.content.replaceAll(" ", "") === "") {
-      return;
-    }
-    chatAPI.sendChat(newChatMessage.content);
-  }, [chatAPI, newChatMessage.content]);
+  const submitMessage = useCallback(
+    (e) => {
+      e.preventDefault();
+      setNewChatMessage({ content: "" });
+      if (newChatMessage.content.replaceAll(" ", "") === "") {
+        return;
+      }
+      chatAPI.sendChat(newChatMessage.content);
+    },
+    [chatAPI, newChatMessage.content]
+  );
 
   if (loading) {
     return <Spinner />;
@@ -77,7 +80,7 @@ const DMContainer = React.memo(({ selectedUserUsername, chatAPI }) => {
       </div>
       <ScrollToBottom className="dm-container">
         {chatAPI.chats.map((message, idx) => (
-          <ChatMessageBox message={message} id={idx} key={idx}/>
+          <ChatMessageBox message={message} id={idx} key={idx} />
         ))}
       </ScrollToBottom>
       <footer className="p-2">
