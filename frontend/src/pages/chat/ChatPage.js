@@ -14,6 +14,8 @@ export default function ChatRoom() {
   const { userToContactUsername } = useParams();
   const chatAPI = useChat();
   const isMounted = useRef(false);
+  const userSelected = userToContactUsername !== undefined;
+
   useEffect(() => {
     if (!isMounted.current) {
       chatAPI.initSocketConnection();
@@ -22,7 +24,7 @@ export default function ChatRoom() {
   }, [chatAPI]);
 
   useEffect(() => {
-    if (userToContactUsername === undefined) {
+    if (!userSelected) {
       chatAPI.setSelectedUser({});
     }
   });
@@ -48,7 +50,7 @@ export default function ChatRoom() {
               selectedUser={userToContactUsername}
             />
           </Col>
-          {userToContactUsername !== undefined ? (
+          {userSelected ? (
             <DMContainer
               chatAPI={chatAPI}
               selectedUserUsername={userToContactUsername}

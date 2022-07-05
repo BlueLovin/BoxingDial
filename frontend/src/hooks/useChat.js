@@ -39,6 +39,7 @@ export default function useChat() {
     );
     return messageIDs;
   }, []);
+
   const getUnreadMessageIDs = useCallback(() => {
     let messageIDs = [];
     chats.forEach((message) => {
@@ -56,6 +57,7 @@ export default function useChat() {
   const readUnreadMessages = useCallback(() => {
     const unreadMessageIDs = getUnreadMessageIDs();
     const unreadMessageCount = unreadMessageIDs.length;
+
     if (unreadMessageCount > 0) {
       axios
         .post("/chat/read-messages", { message_ids: unreadMessageIDs }, headers)
@@ -66,17 +68,15 @@ export default function useChat() {
 
   useEffect(() => {
     if (chats.length !== 0 && isMounted.current === false) {
-      console.log(chats);
       readUnreadMessages();
       isMounted.current = true;
     }
   }, [chats, readUnreadMessages]);
 
   const disconnect = useCallback(() => {
-    if (websocket === null) {
-      return;
+    if (websocket !== null) {
+      websocket.disconnect();
     }
-    websocket.disconnect();
   }, [websocket]);
 
   const initChatWithUser = useCallback(
@@ -107,50 +107,68 @@ export default function useChat() {
     [websocket]
   );
 
+  const updateLastReceivedMessageInConversation = useCallback(
+    (newMessage) => {
+      let conversation = conversations[newMessage.group];
+      const creatingNewConversation = conversation === undefined;
+      if (creatingNewConversation) {
+        axios
+          .post("/retrieve-message-group", { id: newMessage.group })
+          .then((res) => {
+            const newConversation = res.data;
+            newConversation["last_received_message"] = newMessage;
+            setConversations((c) => ({
+              [newMessage.group]: newConversation,
+              ...c,
+            }));
+          });
+      } else {
+        conversation["last_received_message"] = newMessage;
+        setConversations((c) => ({ [newMessage.group]: conversation, ...c }));
+      }
+    },
+    [conversations]
+  );
+
   const receiveNewChat = useCallback(
     (message) => {
-      if (conversations === {}) {
-        return;
-      }
       const isSendingMessage = message.owner.username === user.username;
       const isReceivingMessage = message.to.username === user.username;
 
       const isReceivingFromSelectedConversation =
-        selectedUser !== null &&
+        isReceivingMessage &&
         selectedUser !== undefined &&
         message.owner.username === selectedUser.username;
-      console.log(selectedUser);
+
+      const isSendingToSelectedConversation =
+        isSendingMessage &&
+        selectedUser !== undefined &&
+        message.to.username === selectedUser.username;
+
       if (isReceivingMessage && !isReceivingFromSelectedConversation) {
         inbox.addtoUnreadNotificationsCount(1);
       }
 
-      let conversation = conversations[message.group];
-      if (conversation !== undefined) {
-        conversation["last_received_message"] = message;
-        setConversations((c) => ({ [message.group]: conversation, ...c }));
-      } else {
-        // new conversation
-        axios
-          .post("/retrieve-message-group", { id: message.group })
-          .then((res) => {
-            const newConversation = res.data;
-            newConversation["last_received_message"] = message;
-            setConversations((c) => ({
-              [message.group]: newConversation,
-              ...c,
-            }));
-          });
-      }
-
-      if (isSendingMessage || isReceivingFromSelectedConversation) {
+      if (
+        isSendingToSelectedConversation ||
+        isReceivingFromSelectedConversation
+      ) {
         setChats((c) => [...c, message]);
       }
 
       if (isReceivingFromSelectedConversation) {
         readUnreadMessages();
       }
+
+      updateLastReceivedMessageInConversation(message);
     },
-    [conversations, user, inbox, readUnreadMessages, selectedUser]
+    [
+      user,
+      inbox,
+      readUnreadMessages,
+      selectedUser,
+      updateLastReceivedMessageInConversation,
+    ]
   );
 
   useEffect(() => {
@@ -196,8 +214,6 @@ export default function useChat() {
     sendChat,
     disconnect,
     chats,
-    setChats,
-    readUnreadMessages,
     conversations,
     initSocketConnection,
     initChatWithUser,
