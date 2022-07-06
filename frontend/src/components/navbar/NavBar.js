@@ -40,11 +40,9 @@ export const NavigationBar = React.memo(() => {
               {" Home"}
             </NavLink>
           </NavItem>
-          <NavItem>
-            <NavLink tag={Link} to="/chat">
-              <ChatNavItem />
-            </NavLink>
-          </NavItem>
+
+          <ChatNavItem />
+
           <NavItem>
             <NavLink tag={Link} to="/posts/popular">
               <FontAwesomeIcon icon={faPenFancy} />

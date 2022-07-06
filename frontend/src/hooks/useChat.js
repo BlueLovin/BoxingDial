@@ -37,7 +37,6 @@ export default function useChat() {
         return message;
       })
     );
-    return messageIDs;
   }, []);
 
   const getUnreadMessageIDs = useCallback(() => {

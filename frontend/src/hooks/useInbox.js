@@ -32,7 +32,7 @@ const useInbox = () => {
   }, [inbox, unreadChatsCount, unreadNotificationsCount]);
 
   const fetchInbox = useCallback(() => {
-    axios.get("/inbox/", headers).then((res) => {
+    axios.get("/inbox", headers).then((res) => {
       const _inbox = res.data;
       setUnreadChatsCount(_inbox.unread_chat_messages_count);
       setUnreadNotificationsCount(_inbox.unread_notifications_count);

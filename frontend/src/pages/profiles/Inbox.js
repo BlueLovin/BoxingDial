@@ -15,7 +15,7 @@ export default function Inbox() {
   useEffect(() => {
     if (loggedIn) {
       axios
-        .get("/inbox/all/", headers)
+        .get("/inbox/all", headers)
         .then((res) => setNotificationList(res.data));
     } else {
       return <Redirect to="/404" />;

@@ -3,7 +3,7 @@ from . import views as inbox_views
 
 urlpatterns = [
     path("api/inbox/all", inbox_views.NotificationListView.as_view()),
-    path("api/inbox/", inbox_views.InboxView.as_view()),
+    path("api/inbox", inbox_views.InboxView.as_view()),
     path(
         "api/inbox/<int:notification>/read",
         inbox_views.MarkNotificationAsReadView.as_view(),
