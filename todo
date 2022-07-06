@@ -25,12 +25,13 @@
 [x] repost other people's post
 [x] integrate Storage/CDN service
 [x] add profile pictures to profiles
-[]  DMs
+[x] DMs
 []  pagination backend and frontend
-[]  add media to posts
+[]  add media to posts 
     - []  validate files
     - []  compress images
     - []  video streaming
+[]  add media to Messages
 []  add explore page
 []  emailing / email verification
 []  captcha on register page

@@ -25,7 +25,6 @@ const useInbox = () => {
     const beforeMount = inbox !== null && unreadChatsCount === undefined;
 
     if (beforeMount) {
-      console.table(inbox);
       setUnreadChatsCount(inbox.unread_chat_messages_count);
       setUnreadNotificationsCount(inbox.unread_notifications_count);
     }
