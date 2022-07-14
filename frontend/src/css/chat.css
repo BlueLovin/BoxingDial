@@ -54,7 +54,7 @@ footer.StickyFooter {
 
 .MessageBox .ChatMessage .RightBubble {
   position: relative;
-  background: #dcf8c6;
+  background: green;
   border-top-left-radius: 0.4em;
   border-bottom-left-radius: 0.4em;
   border-bottom-right-radius: 0.4em;
@@ -79,7 +79,7 @@ footer.StickyFooter {
   width: 0;
   height: 0;
   border: 27px solid transparent;
-  border-left-color: #dcf8c6;
+  border-left-color: green;
   border-right: 0;
   border-top: 0;
   margin-top: -13.5px;
@@ -87,7 +87,7 @@ footer.StickyFooter {
 }
 .MessageBox .ChatMessage .LeftBubble {
   position: relative;
-  background: lightblue;
+  background: #006789;
   border-top-right-radius: 0.4em;
   border-bottom-left-radius: 0.4em;
   border-bottom-right-radius: 0.4em;
@@ -110,7 +110,7 @@ footer.StickyFooter {
   width: 0;
   height: 0;
   border: 27px solid transparent;
-  border-right-color: lightblue;
+  border-right-color: #006789;
   border-left: 0;
   border-top: 0;
   margin-top: -13.5px;

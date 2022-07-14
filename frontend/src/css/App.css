@@ -7,14 +7,14 @@
     background: cadetblue;
   }
   to {
-    background: #f8f9fa;
+    background: inherit;
   }
 }
 
 .highlight-background {
   animation-name: yellowfade;
   animation-duration: 1.5s;
-  background-color: #f8f9fa;
+  background-color: inherit;
 }
 .App-logo {
   height: 40vmin;
@@ -92,13 +92,14 @@ textarea {
 .small-user {
   background-color: beige;
   display: flex;
+  background: inherit;
   flex: initial;
   flex-direction: row;
   justify-content: flex-start;
 }
 
 .small-user-selected {
-  background-color: gainsboro;
+  background-color: #d9d9d9;
   display: flex;
   flex: initial;
   flex-direction: row;
