@@ -242,7 +242,10 @@ class ChangeUserProfileView(generics.UpdateAPIView):
             file_extension = re.search(re_pattern, new_avatar.name).group(0)
 
             new_avatar = self.resize_avatar(request, new_avatar)
-            user.profile.avatar_url.delete()
+            
+            if (user.profile.avatar_url != "default.webp"):
+                user.profile.avatar_url.delete()
+                
             user.profile.avatar_url.save(
                 f"{request.user.username}{file_extension}", new_avatar
             )
